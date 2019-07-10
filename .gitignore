@@ -1,0 +1,52 @@
+## IDEs ###
+*.sublime-workspace
+.tag*
+.tern-project
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+### Windows ###
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# App specific
+
+dist/
+build/
+test/tmp/
+test/build/
+api/files/
+apidoc/
+coverage/
+node_modules/
+bower_components/
+.sass-cache/
+.tmp
+.nyc_output
+yarn-error.log
+tmp
+results_*.xml
+ad_builder_backup.sql*
+package-lock.json
+
+ad_builder.sql
+# Vim specific
+.vim

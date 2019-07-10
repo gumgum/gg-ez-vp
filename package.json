@@ -2,7 +2,7 @@
   "name": "gg-ez-vp",
   "version": "1.0.0",
   "description": "GumGum EZ video player",
-  "main": "main.js",
+  "main": "src/main.js",
   "repository": "git@github.com:gumgum/gg-ez-vp.git",
   "license": "MIT"
 }

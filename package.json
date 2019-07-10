@@ -13,6 +13,7 @@
     "@babel/preset-env": "^7.5.4",
     "babel-eslint": "^10.0.2",
     "eslint": "^6.0.1",
+    "http-server": "^0.11.1",
     "prettier": "^1.18.2",
     "rollup": "^1.16.7",
     "rollup-plugin-babel": "^4.3.3",
@@ -22,8 +23,10 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "prestart": "yarn run clean",
-    "start": "yarn run dev",
+    "start": "yarn run build:dev & yarn run devServer",
     "build": "rollup -c",
-    "dev": "rollup -c -w"
+    "build:dev": "rollup -c -w",
+    "devServer": "http-server"
   }
+  
 }

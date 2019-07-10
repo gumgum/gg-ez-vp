@@ -2,7 +2,26 @@
   "name": "gg-ez-vp",
   "version": "1.0.0",
   "description": "GumGum EZ video player",
-  "main": "main.js",
+  "main": "dist/gg-ez-vp.cjs.js",
+  "module": "dist/gg-ez-vp.esm.js",
+  "browser": "dist/gg-ez-vp.umd.js",
   "repository": "git@github.com:gumgum/gg-ez-vp.git",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "rollup": "^1.16.7"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.0.1",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "scripts": {
+    "clean": "rm -rf dist build",
+    "start": "nodemon --watch src --exec \"yarn build:dev",
+    "build:dev": "rollup src/main.js --format umd --name \"GgEzVp\" --file dist/ggezvp.js"
+  }
 }

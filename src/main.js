@@ -16,7 +16,7 @@ export default class GgEzVp {
         this.init();
     }
 
-    init = () => {
+    init() {
         console.log(this);
-    };
+    }
 }

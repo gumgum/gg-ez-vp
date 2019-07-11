@@ -2186,6 +2186,32 @@
     return _parseAdXML.apply(this, arguments);
   }
 
+  function GgEzControls$1(playerInstance) {
+    var container = playerInstance.container,
+        _playerInstance$confi = playerInstance.config,
+        controls = _playerInstance$confi.controls,
+        muted = _playerInstance$confi.muted;
+    if (!controls) return null;
+    var controlContainer = document.createElement('div');
+    controlContainer.id = "".concat(container.id, "-GgEzControls");
+    controlContainer.className = 'gg-ez-controls';
+    var leftControls = document.createElement('div');
+    leftControls.className = 'left-controls';
+    var rightControls = document.createElement('div');
+    rightControls.className = 'right-controls';
+
+    if (controls.play) {
+      var playPause = document.createElement('div');
+      playPause.className = 'gg-ez-control-icon gg-ez-playpause';
+      playPause.documentCreate = 'background-image: url(dist/img/play.svg)';
+      leftControls.append(playPause);
+    }
+
+    controlContainer.append(leftControls, rightControls);
+    container.append(controlContainer);
+    return document.getElementById(controlContainer.id);
+  }
+
   function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2198,6 +2224,7 @@
     defineProperty(this, "init", function () {
       var _this$config = _this.config,
           containerId = _this$config.container,
+          controls = _this$config.controls,
           isVAST = _this$config.isVAST;
       var currentContainer = document.getElementById(containerId);
 
@@ -2205,6 +2232,10 @@
         throw new Error('No container found. Is the id correct?');
       }
 
+      currentContainer.className += ' gg-ez-container';
+      console.log({
+        currentContainer: currentContainer
+      });
       _this.container = currentContainer; //console.log({ parseAdXML });
 
       _this.renderVideoElement();
@@ -2221,6 +2252,7 @@
     defineProperty(this, "renderVideoElement", function () {
       _this.on('dataready', function () {
         _this.player = renderVideoElement(_this);
+        _this.controlContainer = controls ? GgEzControls$1(_this) : null;
         _this.ready = true;
 
         _this.emitter.emit('ready');
@@ -2353,12 +2385,19 @@
       _this.removeListeners();
 
       _this.container.parentNode.removeChild(_this.container);
+
+      _this.controlsContainer = GgEzControls(_this);
+      console.log({
+        controlsContainer: _this.controlsContainer
+      });
     });
 
     // set up the event emitter
     this.emitter = new nanoevents(); // merge default options with user provided options
 
-    this.config = _objectSpread({}, defaultOptions, {}, options); // flag than can be used from the outside to check if the instance is ready
+    this.config = _objectSpread({}, defaultOptions, {}, options, {
+      controls: options.controls !== undefined ? options.controls && _objectSpread({}, defaultOptions.controls, {}, options.controls) : defaultOptions.controls
+    }); // flag than can be used from the outside to check if the instance is ready
 
     this.ready = false; // set vast data default
 
@@ -2371,8 +2410,34 @@
     width: null,
     height: null,
     src: null,
-    controls: true,
-    autoplay: false,
+    controls: {
+      bg: null,
+      color: null,
+      play: {
+        color: null,
+        src: null
+      },
+      stop: {
+        color: null,
+        src: null
+      },
+      replay: {
+        color: null,
+        src: null
+      },
+      volume: {
+        color: null,
+        src: null
+      },
+      fullscreen: {
+        color: null,
+        src: null
+      },
+      timer: {
+        color: null
+      }
+    },
+    autoPlay: false,
     volume: 1,
     muted: true,
     poster: null,

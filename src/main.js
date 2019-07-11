@@ -3,6 +3,7 @@ import NanoEvents from 'nanoevents';
 // own modules
 import mountVideoElement from './lib/renderVideoElement';
 import parseAdXML from './lib/parseAdXML';
+import videoControls from './lib/controls.js';
 
 export default class GgEzVp {
     constructor(options) {
@@ -12,7 +13,14 @@ export default class GgEzVp {
         // merge default options with user provided options
         this.config = {
             ...defaultOptions,
-            ...options
+            ...options,
+            controls:
+                options.controls !== undefined
+                    ? options.controls && {
+                          ...defaultOptions.controls,
+                          ...options.controls
+                      }
+                    : defaultOptions.controls
         };
 
         // flag than can be used from the outside to check if the instance is ready
@@ -26,11 +34,13 @@ export default class GgEzVp {
     }
 
     init = () => {
-        const { container: containerId, isVAST } = this.config;
+        const { container: containerId, controls, isVAST } = this.config;
         const currentContainer = document.getElementById(containerId);
         if (!currentContainer) {
             throw new Error('No container found. Is the id correct?');
         }
+        currentContainer.className += ' gg-ez-container';
+        console.log({ currentContainer });
         this.container = currentContainer;
         //console.log({ parseAdXML });
         this.renderVideoElement();
@@ -44,6 +54,7 @@ export default class GgEzVp {
     renderVideoElement = () => {
         this.on('dataready', () => {
             this.player = mountVideoElement(this);
+            this.controlContainer = controls ? videoControls(this) : null;
             this.ready = true;
             this.emitter.emit('ready');
         });
@@ -140,6 +151,8 @@ export default class GgEzVp {
         this.pause();
         this.removeListeners();
         this.container.parentNode.removeChild(this.container);
+        this.controlsContainer = GgEzControls(this);
+        console.log({ controlsContainer: this.controlsContainer });
     };
 }
 
@@ -148,8 +161,34 @@ const defaultOptions = {
     width: null,
     height: null,
     src: null,
-    controls: true,
-    autoplay: false,
+    controls: {
+        bg: null,
+        color: null,
+        play: {
+            color: null,
+            src: null
+        },
+        stop: {
+            color: null,
+            src: null
+        },
+        replay: {
+            color: null,
+            src: null
+        },
+        volume: {
+            color: null,
+            src: null
+        },
+        fullscreen: {
+            color: null,
+            src: null
+        },
+        timer: {
+            color: null
+        }
+    },
+    autoPlay: false,
     volume: 1,
     muted: true,
     poster: null,

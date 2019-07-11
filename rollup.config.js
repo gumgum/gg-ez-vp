@@ -2,6 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
+import copy from 'rollup-plugin-copy';
 
 import pkg from './package.json';
 
@@ -21,7 +22,13 @@ export default [
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
-            commonjs()
+            commonjs(),
+            copy({
+                targets: [
+                    { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
+                    { src: 'src/img/*', dest: 'dist/img' }
+                ]
+            })
         ]
     },
     // Node and ES module version
@@ -37,7 +44,13 @@ export default [
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
-            commonjs()
+            commonjs(),
+            copy({
+                targets: [
+                    { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
+                    { src: 'src/img/*', dest: 'dist/img' }
+                ]
+            })
         ]
     }
 ];

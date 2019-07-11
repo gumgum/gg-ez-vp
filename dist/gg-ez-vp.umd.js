@@ -58,6 +58,32 @@
     return target;
   }
 
+  function renderVideoElement(playerInstance) {
+    var src = playerInstance.config.src,
+        container = playerInstance.container;
+
+    if (!src) {
+      throw new Error('No file source found. Is src set?');
+    }
+
+    if (typeof src !== 'string' && !Array.isArray(src)) {
+      throw new Error('src should be either a string or an array of strings');
+    }
+
+    var sources = typeof src === 'string' ? [src] : src;
+    var video = document.createElement('video');
+    sources.forEach(function (s) {
+      var source = document.createElement('source');
+      source.src = s; // TODO: need a better way to set type
+
+      source.type = "video/".concat(s.split('.').reverse()[0]);
+      video.appendChild(source);
+    }); // TODO: Add more properties
+
+    container.appendChild(video);
+    return video;
+  }
+
   var GgEzVp = function GgEzVp(options) {
     var _this = this;
 
@@ -71,11 +97,16 @@
         throw new Error('No container found. Is the id correct?');
       }
 
-      console.log({
-        currentContainer: currentContainer
-      });
       _this.container = currentContainer;
-      console.log(_this);
+      _this.player = renderVideoElement(_this);
+    });
+
+    _defineProperty(this, "play", function () {
+      if (_this.player) {
+        console.log(_this.player);
+
+        _this.player.play();
+      }
     });
 
     console.log({

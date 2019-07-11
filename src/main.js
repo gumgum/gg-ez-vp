@@ -1,3 +1,5 @@
+import mountVideoElement from './lib/renderVideoElement';
+
 export default class GgEzVp {
     constructor(options) {
         console.log({ options });
@@ -16,9 +18,15 @@ export default class GgEzVp {
         if (!currentContainer) {
             throw new Error('No container found. Is the id correct?');
         }
-        console.log({ currentContainer });
         this.container = currentContainer;
-        console.log(this);
+        this.player = mountVideoElement(this);
+    };
+
+    play = () => {
+        if (this.player) {
+            console.log(this.player);
+            this.player.play();
+        }
     };
 }
 

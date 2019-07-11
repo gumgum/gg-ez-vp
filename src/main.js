@@ -10,9 +10,16 @@ export default class GgEzVp {
         this.init();
     }
 
-    init() {
+    init = () => {
+        const { container: containerId } = this.config;
+        const currentContainer = document.getElementById(containerId);
+        if (!currentContainer) {
+            throw new Error('No container found. Is the id correct?');
+        }
+        console.log({ currentContainer });
+        this.container = currentContainer;
         console.log(this);
-    }
+    };
 }
 
 const defaultOptions = {
@@ -26,5 +33,6 @@ const defaultOptions = {
     mute: false,
     poster: null,
     preload: false,
-    loop: false
+    loop: false,
+    monetization: false
 };

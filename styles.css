@@ -1,0 +1,9 @@
+.video-containers {
+    display: block;
+    position: relative;
+    width: 640px;
+    height: 360px;
+    background: rebeccapurple;
+    margin: 0 auto;
+
+}

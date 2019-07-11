@@ -13,12 +13,12 @@ export default [
             file: pkg.browser,
             format: 'umd'
         },
-        plugins: [resolve(), commonjs(), babel()]
+        plugins: [resolve(), babel(), commonjs()]
     },
     // Node and ES module version
     {
         input: 'src/main.js',
         output: [{ file: pkg.main, format: 'cjs' }, { file: pkg.module, format: 'es' }],
-        plugins: [resolve(), commonjs(), babel()]
+        plugins: [resolve(), babel(), commonjs()]
     }
 ];

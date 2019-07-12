@@ -12,11 +12,12 @@ export default [
         output: {
             name: 'GgEzVp',
             file: pkg.browser,
-            format: 'umd'
+            format: 'umd',
+            sourcemap: true
         },
         plugins: [
             resolve(),
-            babel(),
+            babel({ runtimeHelpers: true }),
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
@@ -26,10 +27,13 @@ export default [
     // Node and ES module version
     {
         input: 'src/main.js',
-        output: [{ file: pkg.main, format: 'cjs' }, { file: pkg.module, format: 'es' }],
+        output: [
+            { file: pkg.main, format: 'cjs', sourcemap: true },
+            { file: pkg.module, format: 'es', sourcemap: true }
+        ],
         plugins: [
             resolve(),
-            babel(),
+            babel({ runtimeHelpers: true }),
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),

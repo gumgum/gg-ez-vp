@@ -1,7 +1,8 @@
 export default function renderVideoElement(playerInstance) {
     const {
         container,
-        config: { src, width, height, autoplay, volume, muted, poster, preload, loop }
+        VASTData,
+        config: { src, isVAST, width, height, autoplay, volume, muted, poster, preload, loop }
     } = playerInstance;
 
     // Group all the video element attributes
@@ -25,6 +26,11 @@ export default function renderVideoElement(playerInstance) {
         throw new Error('src should be either a string or an array of strings');
     }
 
+    // Validate VASTData exists
+    if (isVAST && !VASTData) {
+        throw new Error('VAST data not found');
+    }
+
     // Create an array of tuples with the filtered attributes to be added to the video node
     const attributes = Object.keys(attrsConfig).reduce((attrs, key) => {
         const value = attrsConfig[key];
@@ -34,8 +40,12 @@ export default function renderVideoElement(playerInstance) {
         return attrs;
     }, []);
 
+    const VASTSources = isVAST
+        ? VASTData.ads[0].creatives[0].mediaFiles.map(({ fileURL }) => fileURL)
+        : null;
+
     // Find the sources for media playback
-    const sources = typeof src === 'string' ? [src] : src;
+    const sources = VASTSources || (typeof src === 'string' ? [src] : src);
 
     // Create the video node
     const video = document.createElement('video');

@@ -20,7 +20,7 @@ export default function renderVideoElement(playerInstance) {
         throw new Error('No file source found. Is src set?');
     }
 
-    // validate the source is an accepted type
+    // validate the source is an accepted type (string | array)
     if (typeof src !== 'string' && !Array.isArray(src)) {
         throw new Error('src should be either a string or an array of strings');
     }
@@ -33,7 +33,6 @@ export default function renderVideoElement(playerInstance) {
         }
         return attrs;
     }, []);
-    console.log({ attributes });
 
     // Find the sources for media playback
     const sources = typeof src === 'string' ? [src] : src;

@@ -2,22 +2,34 @@
 
 window.onload = function onload() {
     console.log({ GgEzVp });
-    const playerInstance1 = new GgEzVp({
+
+    let playerInstance = new GgEzVp({
         container: 'videoContainer1',
         src: 'https://aba.gumgum.com/13861/8/big_buck_bunny_640x360.mp4',
         autoplay: false
     });
-    // Controls test
-    //playerInstance1.play();
-    //setTimeout(() => {
-    //    playerInstance1.pause();
-    //    setTimeout(() => {
-    //        playerInstance1.playPause();
-    //        setTimeout(() => {
-    //            playerInstance1.playPause();
-    //            console.log({ playerInstance1 });
-    //        }, 1000);
-    //    }, 1000);
-    //}, 1000);
-    console.log({ playerInstance1 });
+
+    const playBtn = document.getElementById('play-btn');
+    playBtn.addEventListener('click', () => playerInstance.playPause());
+
+    const muteBtn = document.getElementById('mute-btn');
+    muteBtn.addEventListener('click', () => playerInstance.muteUnmute());
+
+    const rmBtn = document.getElementById('destroy-btn');
+    rmBtn.addEventListener('click', () => playerInstance.destroy());
+
+    const f5Btn = document.getElementById('reload-btn');
+    f5Btn.addEventListener('click', () => location.reload());
+
+    playerInstance.on('ready', console.log);
+    playerInstance.on('play', console.log);
+    playerInstance.on('pause', console.log);
+    playerInstance.on('timeupdate', console.log);
+    playerInstance.on('predestroy', () => {
+        console.log({ playerInstance });
+        playerInstance = null;
+        console.log({ playerInstance });
+    });
+
+    console.log({ playerInstance });
 };

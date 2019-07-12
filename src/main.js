@@ -1,14 +1,21 @@
+// external modules
+import NanoEvents from 'nanoevents';
+// own modules
 import mountVideoElement from './lib/renderVideoElement';
 
 export default class GgEzVp {
     constructor(options) {
-        console.log({ options });
+        // set up the event emitter
+        this.emitter = new NanoEvents();
+
+        // merge default options with user provided options
         this.config = {
             ...defaultOptions,
             ...options
         };
         console.log(this.config);
 
+        // set up any extra processes
         this.init();
     }
 
@@ -20,12 +27,32 @@ export default class GgEzVp {
         }
         this.container = currentContainer;
         this.player = mountVideoElement(this);
-        // TODO
-        //this.setListeners()
+        setTimeout(() => {
+            this.emitter.emit('ready', { test: true });
+        }, 3000);
     };
 
+    on = (eventName, ...args) => {
+        // Set internal event listeners
+        if (['ready', 'predestroy'].includes(eventName)) {
+            const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
+            // Store listener for teardown on this.destroy
+            this.instanceListeners.push(teardown);
+        }
+
+        // Set player event listeners
+        if (this.player) {
+            this.player.addEventListener(eventName, ...args);
+            // Store listener for teardown on this.destroy
+            this.playerListeners.push([eventName, ...args]);
+        }
+    };
+
+    instanceListeners = [];
+
+    playerListeners = [];
+
     playPause = () => {
-        console.log(this.player.paused);
         if (this.player.paused) {
             this.play();
         } else {
@@ -47,11 +74,10 @@ export default class GgEzVp {
     };
 
     muteUnmute = () => {
-        console.log(this.player.muted);
         if (this.player.muted) {
             this.unmute();
         } else {
-            this.pause();
+            this.mute();
         }
     };
 
@@ -63,10 +89,25 @@ export default class GgEzVp {
         this.player.muted = false;
     };
 
+    removeListeners = () => {
+        // remove internal listeners
+        this.instanceListeners.forEach(teardownFn => {
+            teardownFn();
+        });
+
+        // remove player listeners
+        this.playerListeners.forEach(listenerConfig => {
+            this.player.removeEventListener(...listenerConfig);
+        });
+
+        this.instanceListeners = [];
+        this.playerListeners = [];
+    };
+
     destroy = () => {
+        this.emitter.emit('predestroy');
         this.pause();
-        // TODO
-        //this.removeListeners()
+        this.removeListeners();
         this.container.parentNode.removeChild(this.container);
     };
 }

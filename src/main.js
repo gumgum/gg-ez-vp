@@ -34,7 +34,7 @@ export default class GgEzVp {
     }
 
     init = () => {
-        const { container: containerId, controls, isVAST } = this.config;
+        const { container: containerId, isVAST } = this.config;
         const currentContainer = document.getElementById(containerId);
         if (!currentContainer) {
             throw new Error('No container found. Is the id correct?');
@@ -53,8 +53,16 @@ export default class GgEzVp {
     // Renders the video element once the data to render it is ready
     renderVideoElement = () => {
         this.on('dataready', () => {
+            const { controls } = this.config;
             this.player = mountVideoElement(this);
             this.controlContainer = controls ? videoControls(this) : null;
+            if (this.controlContainer)
+                this.container.addEventListener('mouseenter', () =>
+                    this.controlContainer.classList.add('active')
+                );
+            this.container.addEventListener('mouseleave', () =>
+                this.controlContainer.classList.remove('active')
+            );
             this.ready = true;
             this.emitter.emit('ready');
         });
@@ -130,6 +138,37 @@ export default class GgEzVp {
         this.player.muted = false;
     };
 
+    fullscreenToggle = () => {
+        const el = this.player;
+        if (!this.config.fullscreen) {
+            if (el.requestFullscreen) {
+                el.requestFullscreen();
+            } else if (el.mozRequestFullScreen) {
+                /* Firefox */
+                el.mozRequestFullScreen();
+            } else if (el.webkitRequestFullscreen) {
+                /* Chrome, Safari and Opera */
+                el.webkitRequestFullscreen();
+            } else if (el.msRequestFullscreen) {
+                /* IE/Edge */
+                el.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                /* Firefox */
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                /* Chrome, Safari and Opera */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                /* IE/Edge */
+                document.msExitFullscreen();
+            }
+        }
+    };
+
     // Teardown methods
     removeListeners = () => {
         // remove internal listeners
@@ -151,8 +190,6 @@ export default class GgEzVp {
         this.pause();
         this.removeListeners();
         this.container.parentNode.removeChild(this.container);
-        this.controlsContainer = GgEzControls(this);
-        console.log({ controlsContainer: this.controlsContainer });
     };
 }
 
@@ -163,7 +200,8 @@ const defaultOptions = {
     src: null,
     controls: {
         bg: null,
-        color: null,
+        color: '#FFFFFF',
+        timer: true,
         play: {
             color: null,
             src: null
@@ -194,5 +232,6 @@ const defaultOptions = {
     poster: null,
     preload: 'auto',
     loop: false,
-    isVAST: false
+    isVAST: false,
+    fullscreen: false
 };

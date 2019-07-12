@@ -2180,28 +2180,137 @@ function _parseAdXML() {
   return _parseAdXML.apply(this, arguments);
 }
 
-function GgEzControls$1(playerInstance) {
+function defaultIcons() {
+  return {
+    play: {
+      viewbox: '0 0 448 512',
+      path: 'M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z'
+    },
+    pause: {
+      viewbox: '0 0 448 512',
+      path: 'M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z'
+    },
+    volume: {
+      viewbox: '0 0 576 512',
+      path: 'M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zm233.32-51.08c-11.17-7.33-26.18-4.24-33.51 6.95-7.34 11.17-4.22 26.18 6.95 33.51 66.27 43.49 105.82 116.6 105.82 195.58 0 78.98-39.55 152.09-105.82 195.58-11.17 7.32-14.29 22.34-6.95 33.5 7.04 10.71 21.93 14.56 33.51 6.95C528.27 439.58 576 351.33 576 256S528.27 72.43 448.35 19.97zM480 256c0-63.53-32.06-121.94-85.77-156.24-11.19-7.14-26.03-3.82-33.12 7.46s-3.78 26.21 7.41 33.36C408.27 165.97 432 209.11 432 256s-23.73 90.03-63.48 115.42c-11.19 7.14-14.5 22.07-7.41 33.36 6.51 10.36 21.12 15.14 33.12 7.46C447.94 377.94 480 319.54 480 256zm-141.77-76.87c-11.58-6.33-26.19-2.16-32.61 9.45-6.39 11.61-2.16 26.2 9.45 32.61C327.98 228.28 336 241.63 336 256c0 14.38-8.02 27.72-20.92 34.81-11.61 6.41-15.84 21-9.45 32.61 6.43 11.66 21.05 15.8 32.61 9.45 28.23-15.55 45.77-45 45.77-76.88s-17.54-61.32-45.78-76.86z'
+    },
+    mute: {
+      viewbox: '0 0 512 512',
+      path: 'M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zM461.64 256l45.64-45.64c6.3-6.3 6.3-16.52 0-22.82l-22.82-22.82c-6.3-6.3-16.52-6.3-22.82 0L416 210.36l-45.64-45.64c-6.3-6.3-16.52-6.3-22.82 0l-22.82 22.82c-6.3 6.3-6.3 16.52 0 22.82L370.36 256l-45.63 45.63c-6.3 6.3-6.3 16.52 0 22.82l22.82 22.82c6.3 6.3 16.52 6.3 22.82 0L416 301.64l45.64 45.64c6.3 6.3 16.52 6.3 22.82 0l22.82-22.82c6.3-6.3 6.3-16.52 0-22.82L461.64 256z'
+    },
+    fullscreen: {
+      viewbox: '0 0 448 512',
+      path: 'M0 180V56c0-13.3 10.7-24 24-24h124c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H64v84c0 6.6-5.4 12-12 12H12c-6.6 0-12-5.4-12-12zM288 44v40c0 6.6 5.4 12 12 12h84v84c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12V56c0-13.3-10.7-24-24-24H300c-6.6 0-12 5.4-12 12zm148 276h-40c-6.6 0-12 5.4-12 12v84h-84c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h124c13.3 0 24-10.7 24-24V332c0-6.6-5.4-12-12-12zM160 468v-40c0-6.6-5.4-12-12-12H64v-84c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v124c0 13.3 10.7 24 24 24h124c6.6 0 12-5.4 12-12z'
+    }
+  };
+}
+
+function GgEzControls(playerInstance) {
+  //get necessary vars from instance
   var container = playerInstance.container,
       _playerInstance$confi = playerInstance.config,
       controls = _playerInstance$confi.controls,
-      muted = _playerInstance$confi.muted;
-  if (!controls) return null;
+      muted = _playerInstance$confi.muted; // if for any reason controls config is falsey return
+
+  if (!controls) return null; // create the controls container element
+
   var controlContainer = document.createElement('div');
   controlContainer.id = "".concat(container.id, "-GgEzControls");
   controlContainer.className = 'gg-ez-controls';
-  var leftControls = document.createElement('div');
-  leftControls.className = 'left-controls';
-  var rightControls = document.createElement('div');
-  rightControls.className = 'right-controls';
+  var iconPaths = defaultIcons(); // function to get necessary icon
+
+  var getIcon = function getIcon(_ref, _ref2) {
+    var color = _ref.color,
+        _ref$play = _ref.play,
+        src = _ref$play.src,
+        iconColor = _ref$play.color;
+    var viewbox = _ref2.viewbox,
+        path = _ref2.path;
+
+    if (src) {
+      var img = document.createElement('img');
+      img.src = src;
+      return img;
+    }
+
+    var template = document.createElement('template');
+    var svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewbox='".concat(viewbox, "' ><path d='").concat(path, "' fill='").concat(iconColor ? iconColor : color, "'></svg>");
+    template.innerHTML = svg.trim();
+    return template.content.firstChild;
+  }; // start creating each button
+
 
   if (controls.play) {
+    // create button element
     var playPause = document.createElement('div');
     playPause.className = 'gg-ez-control-icon gg-ez-playpause';
-    playPause.documentCreate = 'background-image: url(dist/img/play.svg)';
-    leftControls.append(playPause);
+    var playIcon = getIcon(controls, iconPaths.play);
+    var pauseIcon = getIcon(controls, iconPaths.pause);
+
+    if (playerInstance.player.paused) {
+      playIcon.classList.add('active');
+    } else {
+      pauseIcon.classList.add('active');
+    }
+
+    playPause.append(playIcon, pauseIcon);
+    playPause.addEventListener('click', function () {
+      if (playerInstance.player.paused) {
+        pauseIcon.classList.add('active');
+        playIcon.classList.remove('active');
+      } else {
+        playIcon.classList.add('active');
+        pauseIcon.classList.remove('active');
+      }
+
+      playerInstance.playPause();
+    }); // append to correnponding div
+
+    controlContainer.append(playPause);
   }
 
-  controlContainer.append(leftControls, rightControls);
+  if (controls.fullscreen) {
+    // create button element
+    var fullscreen = document.createElement('div');
+    fullscreen.className = 'gg-ez-control-icon gg-ez-fullscreen';
+    var fullscreenIcon = getIcon(controls, iconPaths.fullscreen);
+    fullscreen.append(fullscreenIcon); // append to correnponding div
+
+    fullscreen.addEventListener('click', function () {
+      playerInstance.fullscreenToggle();
+    });
+    controlContainer.append(fullscreen);
+  }
+
+  if (controls.volume) {
+    // create button element
+    var volume = document.createElement('div');
+    volume.className = 'gg-ez-control-icon gg-ez-volume';
+    var volumeIcon = getIcon(controls, iconPaths.volume);
+    var muteIcon = getIcon(controls, iconPaths.mute);
+
+    if (playerInstance.player.muted) {
+      muteIcon.classList.add('active');
+    } else {
+      volumeIcon.classList.add('active');
+    }
+
+    volume.addEventListener('click', function () {
+      if (playerInstance.player.muted) {
+        volumeIcon.classList.add('active');
+        muteIcon.classList.remove('active');
+      } else {
+        volumeIcon.classList.remove('active');
+        muteIcon.classList.add('active');
+      }
+
+      playerInstance.muteUnmute();
+    });
+    volume.append(volumeIcon, muteIcon); // append to correnponding div
+
+    controlContainer.append(volume);
+  }
+
   container.append(controlContainer);
   return document.getElementById(controlContainer.id);
 }
@@ -2218,7 +2327,6 @@ var GgEzVp = function GgEzVp(options) {
   defineProperty(this, "init", function () {
     var _this$config = _this.config,
         containerId = _this$config.container,
-        controls = _this$config.controls,
         isVAST = _this$config.isVAST;
     var currentContainer = document.getElementById(containerId);
 
@@ -2245,8 +2353,17 @@ var GgEzVp = function GgEzVp(options) {
 
   defineProperty(this, "renderVideoElement", function () {
     _this.on('dataready', function () {
+      var controls = _this.config.controls;
       _this.player = renderVideoElement(_this);
-      _this.controlContainer = controls ? GgEzControls$1(_this) : null;
+      _this.controlContainer = controls ? GgEzControls(_this) : null;
+      if (_this.controlContainer) _this.container.addEventListener('mouseenter', function () {
+        return _this.controlContainer.classList.add('active');
+      });
+
+      _this.container.addEventListener('mouseleave', function () {
+        return _this.controlContainer.classList.remove('active');
+      });
+
       _this.ready = true;
 
       _this.emitter.emit('ready');
@@ -2354,6 +2471,38 @@ var GgEzVp = function GgEzVp(options) {
     _this.player.muted = false;
   });
 
+  defineProperty(this, "fullscreenToggle", function () {
+    var el = _this.player;
+
+    if (!_this.config.fullscreen) {
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if (el.mozRequestFullScreen) {
+        /* Firefox */
+        el.mozRequestFullScreen();
+      } else if (el.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        el.webkitRequestFullscreen();
+      } else if (el.msRequestFullscreen) {
+        /* IE/Edge */
+        el.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        /* IE/Edge */
+        document.msExitFullscreen();
+      }
+    }
+  });
+
   defineProperty(this, "removeListeners", function () {
     // remove internal listeners
     _this.instanceListeners.forEach(function (teardownFn) {
@@ -2379,11 +2528,6 @@ var GgEzVp = function GgEzVp(options) {
     _this.removeListeners();
 
     _this.container.parentNode.removeChild(_this.container);
-
-    _this.controlsContainer = GgEzControls(_this);
-    console.log({
-      controlsContainer: _this.controlsContainer
-    });
   });
 
   // set up the event emitter
@@ -2404,9 +2548,10 @@ var defaultOptions = {
   width: null,
   height: null,
   src: null,
-  controls: {
+  controls: defineProperty({
     bg: null,
-    color: null,
+    color: '#FFFFFF',
+    timer: true,
     play: {
       color: null,
       src: null
@@ -2426,18 +2571,18 @@ var defaultOptions = {
     fullscreen: {
       color: null,
       src: null
-    },
-    timer: {
-      color: null
     }
-  },
+  }, "timer", {
+    color: null
+  }),
   autoPlay: false,
   volume: 1,
   muted: true,
   poster: null,
   preload: 'auto',
   loop: false,
-  isVAST: false
+  isVAST: false,
+  fullscreen: false
 };
 
 export default GgEzVp;

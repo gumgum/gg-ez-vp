@@ -21,15 +21,16 @@ window.onload = function onload() {
     const f5Btn = document.getElementById('reload-btn');
     f5Btn.addEventListener('click', () => location.reload());
 
-    playerInstance.on('ready', console.log);
-    playerInstance.on('play', console.log);
-    playerInstance.on('pause', console.log);
-    playerInstance.on('timeupdate', console.log);
-    playerInstance.on('predestroy', () => {
-        console.log({ playerInstance });
-        playerInstance = null;
+    playerInstance.on('ready', () => {
+        playerInstance.on('play', console.log);
+        playerInstance.on('pause', console.log);
+        playerInstance.on('timeupdate', console.log);
+        playerInstance.on('predestroy', () => {
+            console.log({ playerInstance });
+            playerInstance = null;
+            console.log({ playerInstance });
+        });
+
         console.log({ playerInstance });
     });
-
-    console.log({ playerInstance });
 };

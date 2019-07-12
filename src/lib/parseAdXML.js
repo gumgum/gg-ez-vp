@@ -4,7 +4,6 @@ export default async function parseAdXML(playerInstance) {
     const {
         config: { isVAST, src }
     } = playerInstance;
-    console.log('BEEP BOOP');
 
     // validate isVAST value is right
     if (isVAST !== true) {
@@ -18,9 +17,8 @@ export default async function parseAdXML(playerInstance) {
 
     const vastClient = new VASTClient();
 
-    const data = await vastClient(src);
-
-    console.log({ data });
+    // Request and parse vast tag
+    const data = await vastClient.get(src);
 
     return data;
 }

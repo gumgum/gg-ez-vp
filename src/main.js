@@ -14,10 +14,12 @@ export default class GgEzVp {
             ...defaultOptions,
             ...options
         };
-        console.log(this.config);
 
         // flag than can be used from the outside to check if the instance is ready
         this.ready = false;
+
+        // set vast data default
+        this.VASTData = null;
 
         // set up any extra processes
         this.init();
@@ -38,18 +40,19 @@ export default class GgEzVp {
         setTimeout(() => this.emitter.emit('dataready'));
     };
 
+    // Renders the video element once the data to render it is ready
     renderVideoElement = () => {
         this.on('dataready', () => {
             this.player = mountVideoElement(this);
-            console.log(this.player);
             this.ready = true;
             this.emitter.emit('ready');
         });
     };
 
+    // helps retrieve and parse the VAST data
     fetchVASTData = async () => {
         try {
-            this.vastData = await parseAdXML(this);
+            this.VASTData = await parseAdXML(this);
             this.emitter.emit('dataready');
         } catch (err) {
             this.emitter.emit('error', err.toString());
@@ -61,7 +64,6 @@ export default class GgEzVp {
         const isInternal = ['ready', 'dataready', 'predestroy', 'error'].includes(eventName);
         // Set internal event listeners
         if (isInternal) {
-            console.log({ eventName });
             const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
             // Store listener for teardown on this.destroy
             this.instanceListeners.push(teardown);
@@ -69,7 +71,6 @@ export default class GgEzVp {
 
         // Set player event listeners
         if (this.player && (!isInternal || eventName === 'error')) {
-            console.log({ eventName });
             this.player.addEventListener(eventName, ...args);
             // Store listener for teardown on this.destroy
             this.playerListeners.push([eventName, ...args]);

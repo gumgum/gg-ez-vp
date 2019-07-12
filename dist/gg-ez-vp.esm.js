@@ -941,8 +941,10 @@ var slicedToArray = _slicedToArray;
 
 function renderVideoElement(playerInstance) {
   var container = playerInstance.container,
+      VASTData = playerInstance.VASTData,
       _playerInstance$confi = playerInstance.config,
       src = _playerInstance$confi.src,
+      isVAST = _playerInstance$confi.isVAST,
       width = _playerInstance$confi.width,
       height = _playerInstance$confi.height,
       autoplay = _playerInstance$confi.autoplay,
@@ -969,6 +971,11 @@ function renderVideoElement(playerInstance) {
 
   if (typeof src !== 'string' && !Array.isArray(src)) {
     throw new Error('src should be either a string or an array of strings');
+  } // Validate VASTData exists
+
+
+  if (isVAST && !VASTData) {
+    throw new Error('VAST data not found');
   } // Create an array of tuples with the filtered attributes to be added to the video node
 
 
@@ -980,18 +987,22 @@ function renderVideoElement(playerInstance) {
     }
 
     return attrs;
-  }, []); // Find the sources for media playback
+  }, []);
+  var VASTSources = isVAST ? VASTData.ads[0].creatives[0].mediaFiles.map(function (_ref) {
+    var fileURL = _ref.fileURL;
+    return fileURL;
+  }) : null; // Find the sources for media playback
 
-  var sources = typeof src === 'string' ? [src] : src; // Create the video node
+  var sources = VASTSources || (typeof src === 'string' ? [src] : src); // Create the video node
 
   var video = document.createElement('video'); // Set the default muted value
 
   video.muted = muted; // Add all attributes to the video node
 
-  attributes.forEach(function (_ref) {
-    var _ref2 = slicedToArray(_ref, 2),
-        key = _ref2[0],
-        value = _ref2[1];
+  attributes.forEach(function (_ref2) {
+    var _ref3 = slicedToArray(_ref2, 2),
+        key = _ref3[0],
+        value = _ref3[1];
 
     video.setAttribute(key, isBooleanAttr(key) ? key : value);
   }); // Add all sources to the video node
@@ -2132,37 +2143,34 @@ function _parseAdXML() {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _playerInstance$confi = playerInstance.config, isVAST = _playerInstance$confi.isVAST, src = _playerInstance$confi.src;
-            console.log('BEEP BOOP'); // validate isVAST value is right
+            _playerInstance$confi = playerInstance.config, isVAST = _playerInstance$confi.isVAST, src = _playerInstance$confi.src; // validate isVAST value is right
 
             if (!(isVAST !== true)) {
-              _context.next = 4;
+              _context.next = 3;
               break;
             }
 
             throw new Error('isVAST should be true to parse src as an ad');
 
-          case 4:
+          case 3:
             if (!(!src || typeof src !== 'string')) {
-              _context.next = 6;
+              _context.next = 5;
               break;
             }
 
             throw new Error('src must be a URL string');
 
-          case 6:
-            vastClient = new VASTClient();
-            _context.next = 9;
-            return vastClient(src);
+          case 5:
+            vastClient = new VASTClient(); // Request and parse vast tag
 
-          case 9:
+            _context.next = 8;
+            return vastClient.get(src);
+
+          case 8:
             data = _context.sent;
-            console.log({
-              data: data
-            });
             return _context.abrupt("return", data);
 
-          case 12:
+          case 10:
           case "end":
             return _context.stop();
         }
@@ -2207,7 +2215,6 @@ var GgEzVp = function GgEzVp(options) {
   defineProperty(this, "renderVideoElement", function () {
     _this.on('dataready', function () {
       _this.player = renderVideoElement(_this);
-      console.log(_this.player);
       _this.ready = true;
 
       _this.emitter.emit('ready');
@@ -2228,7 +2235,7 @@ var GgEzVp = function GgEzVp(options) {
             return parseAdXML(_this);
 
           case 3:
-            _this.vastData = _context.sent;
+            _this.VASTData = _context.sent;
 
             _this.emitter.emit('dataready');
 
@@ -2257,10 +2264,6 @@ var GgEzVp = function GgEzVp(options) {
     }
 
     if (isInternal) {
-      console.log({
-        eventName: eventName
-      });
-
       var teardown = _this.emitter.on.apply(_this.emitter, [eventName].concat(args)); // Store listener for teardown on this.destroy
 
 
@@ -2270,10 +2273,6 @@ var GgEzVp = function GgEzVp(options) {
 
     if (_this.player && (!isInternal || eventName === 'error')) {
       var _this$player;
-
-      console.log({
-        eventName: eventName
-      });
 
       (_this$player = _this.player).addEventListener.apply(_this$player, [eventName].concat(args)); // Store listener for teardown on this.destroy
 
@@ -2353,10 +2352,11 @@ var GgEzVp = function GgEzVp(options) {
   // set up the event emitter
   this.emitter = new nanoevents(); // merge default options with user provided options
 
-  this.config = _objectSpread({}, defaultOptions, {}, options);
-  console.log(this.config); // flag than can be used from the outside to check if the instance is ready
+  this.config = _objectSpread({}, defaultOptions, {}, options); // flag than can be used from the outside to check if the instance is ready
 
-  this.ready = false; // set up any extra processes
+  this.ready = false; // set vast data default
+
+  this.VASTData = null; // set up any extra processes
 
   this.init();
 };

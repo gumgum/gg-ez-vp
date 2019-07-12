@@ -41,10 +41,9 @@ export default class GgEzVp {
         this.player.pause();
     };
 
-    volume = value => {
-        if (value >= 0 || value <= 1) {
-            this.player.volume = value;
-        }
+    volume = val => {
+        const value = val < 0 ? 0 : val > 1 ? 1 : value;
+        this.player.volume = value;
     };
 
     muteUnmute = () => {
@@ -73,16 +72,16 @@ export default class GgEzVp {
 }
 
 const defaultOptions = {
-    container: '',
+    container: null,
     width: null,
     height: null,
     src: null,
     controls: true,
-    autoPlay: false,
+    autoplay: false,
     volume: 1,
-    mute: false,
+    muted: true,
     poster: null,
-    preload: false,
+    preload: 'auto',
     loop: false,
     monetization: false
 };

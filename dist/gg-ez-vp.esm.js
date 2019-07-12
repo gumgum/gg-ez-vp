@@ -92,15 +92,58 @@ var GgEzVp = function GgEzVp(options) {
     }
 
     _this.container = currentContainer;
-    _this.player = renderVideoElement(_this);
+    _this.player = renderVideoElement(_this); // TODO
+    //this.setListeners()
+  });
+
+  _defineProperty(this, "playPause", function () {
+    console.log(_this.player.paused);
+
+    if (_this.player.paused) {
+      _this.play();
+    } else {
+      _this.pause();
+    }
   });
 
   _defineProperty(this, "play", function () {
-    if (_this.player) {
-      console.log(_this.player);
+    _this.player.play();
+  });
 
-      _this.player.play();
+  _defineProperty(this, "pause", function () {
+    _this.player.pause();
+  });
+
+  _defineProperty(this, "volume", function (value) {
+    if (value >= 0 || value <= 1) {
+      _this.player.volume = value;
     }
+  });
+
+  _defineProperty(this, "muteUnmute", function () {
+    console.log(_this.player.muted);
+
+    if (_this.player.muted) {
+      _this.unmute();
+    } else {
+      _this.pause();
+    }
+  });
+
+  _defineProperty(this, "mute", function () {
+    _this.player.muted = true;
+  });
+
+  _defineProperty(this, "unmute", function () {
+    _this.player.muted = false;
+  });
+
+  _defineProperty(this, "destroy", function () {
+    _this.pause(); // TODO
+    //this.removeListeners()
+
+
+    _this.container.parentNode.removeChild(_this.container);
   });
 
   console.log({

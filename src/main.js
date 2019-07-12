@@ -20,13 +20,55 @@ export default class GgEzVp {
         }
         this.container = currentContainer;
         this.player = mountVideoElement(this);
+        // TODO
+        //this.setListeners()
+    };
+
+    playPause = () => {
+        console.log(this.player.paused);
+        if (this.player.paused) {
+            this.play();
+        } else {
+            this.pause();
+        }
     };
 
     play = () => {
-        if (this.player) {
-            console.log(this.player);
-            this.player.play();
+        this.player.play();
+    };
+
+    pause = () => {
+        this.player.pause();
+    };
+
+    volume = value => {
+        if (value >= 0 || value <= 1) {
+            this.player.volume = value;
         }
+    };
+
+    muteUnmute = () => {
+        console.log(this.player.muted);
+        if (this.player.muted) {
+            this.unmute();
+        } else {
+            this.pause();
+        }
+    };
+
+    mute = () => {
+        this.player.muted = true;
+    };
+
+    unmute = () => {
+        this.player.muted = false;
+    };
+
+    destroy = () => {
+        this.pause();
+        // TODO
+        //this.removeListeners()
+        this.container.parentNode.removeChild(this.container);
     };
 }
 

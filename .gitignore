@@ -29,24 +29,11 @@ $RECYCLE.BIN/
 
 # App specific
 
-dist/
-build/
-test/tmp/
-test/build/
-api/files/
-apidoc/
-coverage/
 node_modules/
-bower_components/
-.sass-cache/
 .tmp
-.nyc_output
 yarn-error.log
 tmp
-results_*.xml
-ad_builder_backup.sql*
 package-lock.json
 
-ad_builder.sql
 # Vim specific
 .vim

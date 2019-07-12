@@ -3,16 +3,42 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-        <title>Script Demo page</title>
+        <title>GgEzVp Demo page</title>
+        <link rel="stylesheet" href="https://ds.gumgum.com/stable/theme-blue.css" type="text/css" media="all">
+        <link rel="stylesheet" href="dist/gg-ez-vp.css" type="text/css" media="all">
+        <link rel="stylesheet" href="styles.css" type="text/css" media="all">
     </head>
     <body>
+        <h1 class="gds-text--header-md -text-center -m-v-2">
+            GG EZ Video Player Demo Page
+        </h1>
+        <div class="gds-layout__container">
+            <div class="gds-layout__row">
+                <div class="gds-layout__column--sm-12 gds-layout__column--md-12">
+                     <div id="videoContainer1" class="video-containers -text-center"></div>
+                     <div class="gds-button-group">
+                        <button id="play-btn" type="button" class="gds-button-group__button gds-button--primary">Toggle playback</button>
+                        <button id="mute-btn" type="button" class="gds-button-group__button gds-button--warning">Toggle mute</button>
+                        <button id="destroy-btn" type="button" class="gds-button-group__button gds-button--danger">Destroy instance</button>
+                        <button id="reload-btn" type="button" class="gds-button-group__button gds-button--default">Recreate instance</button>
+                     </div>
+
+                </div>
+            </div>
+            <div class="gds-layout__row">
+                <div class="gds-layout__column--sm-12 gds-layout__column--md-12">
+                     <div id="videoContainer2" class="video-containers -text-center"></div>
+                     <div class="gds-button-group"> 
+                        <button id="play-btn1" type="button" class="gds-button-group__button gds-button--primary">Toggle playback</button>
+                        <button id="mute-btn1" type="button" class="gds-button-group__button gds-button--warning">Toggle mute</button>
+                        <button id="destroy-btn1" type="button" class="gds-button-group__button gds-button--danger">Destroy instance</button>
+                        <button id="reload-btn1" type="button" class="gds-button-group__button gds-button--default">Recreate instance</button>
+                     </div>
+
+                </div>
+            </div>
+        </div>
         <script src="dist/gg-ez-vp.umd.js" async ></script>
-        <script>
-            window.onload = function() {
-                console.log({GgEzVp})
-                const playerInstance = new GgEzVp();
-                console.log({playerInstance})
-            }
-        </script>
+        <script src="demo.js" async ></script>
     </body>
 </html>

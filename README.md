@@ -81,7 +81,7 @@ Here's the full list of options available
 | muted  |true   |false | video will be muted by default  |
 | poster  |null   |false | source for an image to be used as video poster  |
 | preload  |'auto'   |false | standard HTML values for preload (none|metadata|auto)  |
-| look  | false   |false | whether to loop video or not  |
+| loop  | false   |false | whether to loop video or not  |
 | isVAST  | false   |false | enables support for a single VAST / VPAID / MOAT TAG to be parsed and used as source  |
 
 ## Customizing Controls

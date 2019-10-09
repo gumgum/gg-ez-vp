@@ -63,6 +63,7 @@ export default class GgEzVp {
             this.container.addEventListener('mouseleave', () =>
                 this.controlContainer.classList.remove('active')
             );
+            this.retryPlayerEvents();
             this.ready = true;
             this.emitter.emit('ready');
         });
@@ -78,9 +79,24 @@ export default class GgEzVp {
         }
     };
 
+    // Add event listeners to player before playing
+    retryPlayerEvents = () => {
+        if (this.player) {
+            this.storedEvents.forEach(([eventName, args]) => this.on(eventName, ...args));
+            this.storedEvents = [];
+        }
+    };
+
+    // Store player events when the player is not ready
+    storePlayerEvent = (eventName, ...args) => {
+        this.storedEvents.push([eventName, args]);
+    };
+
+    storedEvents = [];
+
     // event handler
     on = (eventName, ...args) => {
-        const isInternal = ['ready', 'dataready', 'predestroy', 'error'].includes(eventName);
+        const isInternal = ['ready', 'dataready', 'predestroy'].includes(eventName);
         // Set internal event listeners
         if (isInternal) {
             const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
@@ -89,7 +105,12 @@ export default class GgEzVp {
         }
 
         // Set player event listeners
-        if (this.player && (!isInternal || eventName === 'error')) {
+        if (!isInternal) {
+            // Store player events if the player node is not ready
+            if (!this.player) {
+                this.storePlayerEvent(eventName, ...args);
+                return;
+            }
             console.log('player event');
             console.log({ eventName, args });
             this.player.addEventListener(eventName, ...args);

@@ -39,7 +39,7 @@ export default class GgEzVp {
         if (!currentContainer) {
             throw new Error('No container found. Is the id correct?');
         }
-        currentContainer.className += ' gg-ez-container';
+        currentContainer.classList.add('gg-ez-container');
         console.log({ currentContainer });
         this.container = currentContainer;
         //console.log({ parseAdXML });
@@ -96,6 +96,14 @@ export default class GgEzVp {
         }
     };
 
+    once(event, callback) {
+        const unbind = this.emitter.on(event, function(...args) {
+            unbind();
+            callback.apply(this, args);
+        });
+        return unbind;
+    }
+
     instanceListeners = [];
 
     playerListeners = [];
@@ -118,7 +126,7 @@ export default class GgEzVp {
     };
 
     volume = val => {
-        const value = val < 0 ? 0 : val > 1 ? 1 : value;
+        const value = val < 0 ? 0 : val > 1 ? 1 : val;
         this.player.volume = value;
     };
 
@@ -201,7 +209,6 @@ const defaultOptions = {
     controls: {
         bg: null,
         color: '#FFFFFF',
-        timer: true,
         play: {
             color: null,
             src: null

@@ -82,21 +82,35 @@ export default class GgEzVp {
     // Add event listeners to player before playing
     retryPlayerEvents = () => {
         if (this.player) {
-            this.storedEvents.forEach(([eventName, args]) => this.on(eventName, ...args));
-            this.storedEvents = [];
+            Object.keys(this.storedListeners).forEach(method =>
+                this.storedListeners[method].forEach(([eventName, args]) =>
+                    this[method](eventName, ...args)
+                )
+            );
+            this.storedListeners = {
+                on: [],
+                once: []
+            };
         }
     };
 
     // Store player events when the player is not ready
-    storePlayerEvent = (eventName, ...args) => {
-        this.storedEvents.push([eventName, args]);
+    storePlayerEvent = (method, eventName, ...args) => {
+        console.log({ method, eventName, args });
+        this.storedListeners[method].push([eventName, args]);
+        console.log(this.storedListeners);
     };
 
-    storedEvents = [];
+    storedListeners = {
+        on: [],
+        once: []
+    };
+
+    isInternalEvent = eventName => ['ready', 'dataready', 'predestroy'].includes(eventName);
 
     // event handler
     on = (eventName, ...args) => {
-        const isInternal = ['ready', 'dataready', 'predestroy'].includes(eventName);
+        const isInternal = this.isInternalEvent(eventName);
         // Set internal event listeners
         if (isInternal) {
             const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
@@ -108,7 +122,7 @@ export default class GgEzVp {
         if (!isInternal) {
             // Store player events if the player node is not ready
             if (!this.player) {
-                this.storePlayerEvent(eventName, ...args);
+                this.storePlayerEvent('on', eventName, ...args);
                 return;
             }
             console.log('player event');
@@ -120,17 +134,26 @@ export default class GgEzVp {
     };
 
     // Listen for an event just once
-    once(event, callback) {
-        console.log({ event, callback });
-        // TODO: should "once" events be pushed to this.instanceListeners?
-        const unbind = this.emitter.on(event, function(...args) {
+    once = (eventName, callback) => {
+        const isInternal = this.isInternalEvent(eventName);
+        // Handle player events
+        if (!isInternal) {
+            if (!this.player) {
+                this.storePlayerEvent('once', eventName, callback);
+                return;
+            }
+            this.player.addEventListener(eventName, callback, { once: true });
+            return;
+        }
+        console.log({ eventName, callback });
+        const unbind = this.emitter.on(eventName, function(...args) {
             unbind();
             console.log({ unbind, args });
             callback.apply(this, args);
         });
         console.log({ unbind });
         return unbind;
-    }
+    };
 
     instanceListeners = [];
 

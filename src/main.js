@@ -37,10 +37,10 @@ export default class GgEzVp {
         const { container: containerId, isVAST } = this.config;
         const currentContainer = document.getElementById(containerId);
         if (!currentContainer) {
-            throw new Error('No container found. Is the id correct?');
+            throw new Error(`No container found. Is the id correct? (${containerId})`);
         }
         currentContainer.classList.add('gg-ez-container');
-        console.log({ currentContainer });
+        console.log({ containerId });
         this.container = currentContainer;
         //console.log({ parseAdXML });
         this.renderVideoElement();
@@ -90,17 +90,24 @@ export default class GgEzVp {
 
         // Set player event listeners
         if (this.player && (!isInternal || eventName === 'error')) {
+            console.log('player event');
+            console.log({ eventName, args });
             this.player.addEventListener(eventName, ...args);
             // Store listener for teardown on this.destroy
             this.playerListeners.push([eventName, ...args]);
         }
     };
 
+    // Listen for an event just once
     once(event, callback) {
+        console.log({ event, callback });
+        // TODO: should "once" events be pushed to this.instanceListeners?
         const unbind = this.emitter.on(event, function(...args) {
             unbind();
+            console.log({ unbind, args });
             callback.apply(this, args);
         });
+        console.log({ unbind });
         return unbind;
     }
 
@@ -197,7 +204,7 @@ export default class GgEzVp {
         this.emitter.emit('predestroy');
         this.pause();
         this.removeListeners();
-        this.container.parentNode.removeChild(this.container);
+        this.container.innerHTML = '';
     };
 }
 

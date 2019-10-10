@@ -1,9 +1,17 @@
 // external modules
 import NanoEvents from 'nanoevents';
+import unbindAll from 'nanoevents/unbind-all';
 // own modules
 import mountVideoElement from './lib/renderVideoElement';
 import parseAdXML from './lib/parseAdXML';
-import videoControls from './lib/controls.js';
+import videoControls from './lib/controls';
+
+const DATA_READY = 'data-ready';
+const READY = 'ready';
+const PRE_DESTROY = 'pre-destroy';
+const PLAYBACK_PROGRESS = 'playback-progress';
+
+const internalEvents = [READY, DATA_READY, PRE_DESTROY, PLAYBACK_PROGRESS];
 
 export default class GgEzVp {
     constructor(options) {
@@ -47,12 +55,12 @@ export default class GgEzVp {
         if (isVAST) {
             return this.fetchVASTData();
         }
-        setTimeout(() => this.emitter.emit('dataready'));
+        setTimeout(() => this.emitter.emit(DATA_READY));
     };
 
     // Renders the video element once the data to render it is ready
     renderVideoElement = () => {
-        this.on('dataready', () => {
+        this.on(DATA_READY, () => {
             const { controls } = this.config;
             this.player = mountVideoElement(this);
             this.controlContainer = controls ? videoControls(this) : null;
@@ -63,9 +71,12 @@ export default class GgEzVp {
             this.container.addEventListener('mouseleave', () =>
                 this.controlContainer.classList.remove('active')
             );
+            // set up playback progress listener
+            this.on('timeupdate', this.playbackProgressReporter);
+            // listen for events registered before rendering the video
             this.retryPlayerEvents();
             this.ready = true;
-            this.emitter.emit('ready');
+            this.emitter.emit(READY);
         });
     };
 
@@ -73,7 +84,7 @@ export default class GgEzVp {
     fetchVASTData = async () => {
         try {
             this.VASTData = await parseAdXML(this);
-            this.emitter.emit('dataready');
+            this.emitter.emit(DATA_READY);
         } catch (err) {
             this.emitter.emit('error', err.toString());
         }
@@ -106,7 +117,7 @@ export default class GgEzVp {
         once: []
     };
 
-    isInternalEvent = eventName => ['ready', 'dataready', 'predestroy'].includes(eventName);
+    isInternalEvent = eventName => internalEvents.includes(eventName);
 
     // event handler
     on = (eventName, ...args) => {
@@ -114,48 +125,56 @@ export default class GgEzVp {
         // Set internal event listeners
         if (isInternal) {
             const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
-            // Store listener for teardown on this.destroy
-            this.instanceListeners.push(teardown);
+            // return the teardown function
+            return teardown;
         }
 
         // Set player event listeners
-        if (!isInternal) {
-            // Store player events if the player node is not ready
-            if (!this.player) {
-                this.storePlayerEvent('on', eventName, ...args);
-                return;
-            }
-            console.log('player event');
-            console.log({ eventName, args });
-            this.player.addEventListener(eventName, ...args);
-            // Store listener for teardown on this.destroy
-            this.playerListeners.push([eventName, ...args]);
+        // Store player events if the player node is not ready
+        if (!this.player) {
+            this.storePlayerEvent('on', eventName, ...args);
+            return;
         }
+        console.log('player event');
+        console.log({ eventName, args });
+        this.player.addEventListener(eventName, ...args);
+        // Store listener for teardown on this.destroy
+        const eventData = [eventName, ...args];
+        this.playerListeners.push(eventData);
+        // return the teardown function
+        return () => {
+            this.playerListeners.filter(data => data !== eventData);
+            this.player.removeEventListener(eventName, ...args);
+        };
+        // TODO: CONTINUE HERE
+        // TEST EVENT TEARDOWN AND ONCE METHOD REFACTOR
     };
 
     // Listen for an event just once
     once = (eventName, callback) => {
         const isInternal = this.isInternalEvent(eventName);
+        const options = !isInternal ? { once: true } : undefined;
         // Handle player events
-        if (!isInternal) {
-            if (!this.player) {
-                this.storePlayerEvent('once', eventName, callback);
-                return;
-            }
-            this.player.addEventListener(eventName, callback, { once: true });
+        if (!isInternal && !this.player) {
+            this.storePlayerEvent('once', eventName, callback);
             return;
         }
+
         console.log({ eventName, callback });
-        const unbind = this.emitter.on(eventName, function(...args) {
-            unbind();
-            console.log({ unbind, args });
-            callback.apply(this, args);
-        });
+
+        const unbind = this.on(
+            eventName,
+            (...args) => {
+                unbind();
+                console.log({ unbind, args });
+                callback.apply(this, args);
+            },
+            options
+        );
+
         console.log({ unbind });
         return unbind;
     };
-
-    instanceListeners = [];
 
     playerListeners = [];
 
@@ -228,24 +247,33 @@ export default class GgEzVp {
         }
     };
 
+    // Listens for timeupdate and emits an event with duration, currentTime and readableTime
+    playbackProgressReporter = ({ timeStamp }) => {
+        const { currentTime, duration } = this.player;
+        // TODO timeStamp vs currentTime?
+        console.log({ timeStamp, currentTime, duration });
+        const mins = Math.floor(currentTime / 60);
+        const secs = Math.floor(currentTime % 60);
+        const readableTime = `${mins}:${secs < 10 ? `0${secs}` : secs}`;
+        console.log({ mins, secs, readableTime });
+        this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
+    };
+
     // Teardown methods
     removeListeners = () => {
         // remove internal listeners
-        this.instanceListeners.forEach(teardownFn => {
-            teardownFn();
-        });
+        unbindAll(this.emitter);
 
         // remove player listeners
         this.playerListeners.forEach(listenerConfig => {
             this.player.removeEventListener(...listenerConfig);
         });
 
-        this.instanceListeners = [];
         this.playerListeners = [];
     };
 
     destroy = () => {
-        this.emitter.emit('predestroy');
+        this.emitter.emit(PRE_DESTROY);
         this.pause();
         this.removeListeners();
         this.container.innerHTML = '';

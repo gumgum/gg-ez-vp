@@ -48,9 +48,7 @@ export default class GgEzVp {
             throw new Error(`No container found. Is the id correct? (${containerId})`);
         }
         currentContainer.classList.add('gg-ez-container');
-        console.log({ containerId });
         this.container = currentContainer;
-        //console.log({ parseAdXML });
         this.renderVideoElement();
         if (isVAST) {
             return this.fetchVASTData();
@@ -107,9 +105,7 @@ export default class GgEzVp {
 
     // Store player events when the player is not ready
     storePlayerEvent = (method, eventName, ...args) => {
-        console.log({ method, eventName, args });
         this.storedListeners[method].push([eventName, args]);
-        console.log(this.storedListeners);
     };
 
     storedListeners = {
@@ -125,54 +121,40 @@ export default class GgEzVp {
         // Set internal event listeners
         if (isInternal) {
             const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
-            // return the teardown function
+            // return the instance teardown function
             return teardown;
         }
 
-        // Set player event listeners
         // Store player events if the player node is not ready
         if (!this.player) {
             this.storePlayerEvent('on', eventName, ...args);
             return;
         }
-        console.log('player event');
-        console.log({ eventName, args });
         this.player.addEventListener(eventName, ...args);
         // Store listener for teardown on this.destroy
         const eventData = [eventName, ...args];
         this.playerListeners.push(eventData);
-        // return the teardown function
+        // return the player teardown function
         return () => {
-            this.playerListeners.filter(data => data !== eventData);
+            this.playerListeners = this.playerListeners.filter(data => data !== eventData);
             this.player.removeEventListener(eventName, ...args);
         };
-        // TODO: CONTINUE HERE
-        // TEST EVENT TEARDOWN AND ONCE METHOD REFACTOR
     };
 
     // Listen for an event just once
     once = (eventName, callback) => {
         const isInternal = this.isInternalEvent(eventName);
-        const options = !isInternal ? { once: true } : undefined;
         // Handle player events
         if (!isInternal && !this.player) {
             this.storePlayerEvent('once', eventName, callback);
             return;
         }
 
-        console.log({ eventName, callback });
+        const unbind = this.on(eventName, (...args) => {
+            unbind();
+            callback.apply(this, args);
+        });
 
-        const unbind = this.on(
-            eventName,
-            (...args) => {
-                unbind();
-                console.log({ unbind, args });
-                callback.apply(this, args);
-            },
-            options
-        );
-
-        console.log({ unbind });
         return unbind;
     };
 
@@ -248,14 +230,11 @@ export default class GgEzVp {
     };
 
     // Listens for timeupdate and emits an event with duration, currentTime and readableTime
-    playbackProgressReporter = ({ timeStamp }) => {
+    playbackProgressReporter = () => {
         const { currentTime, duration } = this.player;
-        // TODO timeStamp vs currentTime?
-        console.log({ timeStamp, currentTime, duration });
         const mins = Math.floor(currentTime / 60);
         const secs = Math.floor(currentTime % 60);
         const readableTime = `${mins}:${secs < 10 ? `0${secs}` : secs}`;
-        console.log({ mins, secs, readableTime });
         this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
     };
 

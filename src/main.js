@@ -31,12 +31,15 @@ export default class GgEzVp {
                     : defaultOptions.controls
         };
 
+        // Create the video node
+        this.player = document.createElement('video');
+        // Set instance methods dependent on player existence
+        this.play = this.player.play.bind(this.player);
+        this.pause = this.player.pause.bind(this.player);
         // flag than can be used from the outside to check if the instance is ready
         this.ready = false;
-
         // set vast data default
         this.VASTData = null;
-
         // set up any extra processes
         this.init();
     }
@@ -49,18 +52,19 @@ export default class GgEzVp {
         }
         currentContainer.classList.add('gg-ez-container');
         this.container = currentContainer;
-        this.renderVideoElement();
+        this.renderVideoElement(isVAST);
         if (isVAST) {
             return this.fetchVASTData();
         }
-        setTimeout(() => this.emitter.emit(DATA_READY));
     };
 
+    mountVideoElement = mountVideoElement;
+
     // Renders the video element once the data to render it is ready
-    renderVideoElement = () => {
-        this.on(DATA_READY, () => {
+    renderVideoElement = isVAST => {
+        const renderer = () => {
             const { controls } = this.config;
-            this.player = mountVideoElement(this);
+            this.mountVideoElement();
             this.controlContainer = controls ? videoControls(this) : null;
             if (this.controlContainer)
                 this.container.addEventListener('mouseenter', () =>
@@ -74,8 +78,13 @@ export default class GgEzVp {
             // listen for events registered before rendering the video
             this.retryPlayerEvents();
             this.ready = true;
-            this.emitter.emit(READY);
-        });
+            requestAnimationFrame(() => this.emitter.emit(READY));
+        };
+        if (isVAST) {
+            this.on(DATA_READY, renderer);
+        } else {
+            return renderer();
+        }
     };
 
     // helps retrieve and parse the VAST data
@@ -163,31 +172,23 @@ export default class GgEzVp {
     // Playback methods
     playPause = () => {
         if (this.player.paused) {
-            this.play();
-        } else {
-            this.pause();
+            return this.play();
         }
+        return this.pause();
     };
 
-    play = () => {
-        this.player.play();
-    };
-
-    pause = () => {
-        this.player.pause();
-    };
-
-    volume = val => {
-        const value = val < 0 ? 0 : val > 1 ? 1 : val;
-        this.player.volume = value;
+    volume = value => {
+        if (this.player) {
+            const volume = Math.min(Math.max(value, 0), 1);
+            this.player.volume = volume;
+        }
     };
 
     muteUnmute = () => {
         if (this.player.muted) {
-            this.unmute();
-        } else {
-            this.mute();
+            return this.unmute();
         }
+        return this.mute();
     };
 
     mute = () => {
@@ -298,5 +299,6 @@ const defaultOptions = {
     preload: 'auto',
     loop: false,
     isVAST: false,
-    fullscreen: false
+    fullscreen: false,
+    playsinline: true
 };

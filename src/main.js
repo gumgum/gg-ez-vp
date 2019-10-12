@@ -10,6 +10,7 @@ const DATA_READY = 'data-ready';
 const READY = 'ready';
 const PRE_DESTROY = 'pre-destroy';
 const PLAYBACK_PROGRESS = 'playback-progress';
+const PLAYER_CLICK = 'player-click';
 
 const internalEvents = [READY, DATA_READY, PRE_DESTROY, PLAYBACK_PROGRESS];
 
@@ -34,8 +35,8 @@ export default class GgEzVp {
         // Create the video node
         this.player = document.createElement('video');
         // Set instance methods dependent on player existence
-        this.play = this.player.play.bind(this.player);
-        this.pause = this.player.pause.bind(this.player);
+        //this.play = this.player.play.bind(this.player);
+        //this.pause = this.player.pause.bind(this.player);
         // flag than can be used from the outside to check if the instance is ready
         this.ready = false;
         // set vast data default
@@ -51,6 +52,8 @@ export default class GgEzVp {
             throw new Error(`No container found. Is the id correct? (${containerId})`);
         }
         currentContainer.classList.add('gg-ez-container');
+        // set click listener on player
+        this.nodeOn(currentContainer, 'click', this.emitPlayerClick);
         this.container = currentContainer;
         this.renderVideoElement(isVAST);
         if (isVAST) {
@@ -59,6 +62,14 @@ export default class GgEzVp {
     };
 
     mountVideoElement = mountVideoElement;
+
+    play = () => {
+        this.player.play();
+    };
+
+    pause = () => {
+        this.player.pause();
+    };
 
     // Renders the video element once the data to render it is ready
     renderVideoElement = isVAST => {
@@ -75,8 +86,6 @@ export default class GgEzVp {
             );
             // set up playback progress listener
             this.on('timeupdate', this.playbackProgressReporter);
-            // listen for events registered before rendering the video
-            this.retryPlayerEvents();
             this.ready = true;
             requestAnimationFrame(() => this.emitter.emit(READY));
         };
@@ -97,26 +106,6 @@ export default class GgEzVp {
         }
     };
 
-    // Add event listeners to player before playing
-    retryPlayerEvents = () => {
-        if (this.player) {
-            Object.keys(this.storedListeners).forEach(method =>
-                this.storedListeners[method].forEach(([eventName, args]) =>
-                    this[method](eventName, ...args)
-                )
-            );
-            this.storedListeners = {
-                on: [],
-                once: []
-            };
-        }
-    };
-
-    // Store player events when the player is not ready
-    storePlayerEvent = (method, eventName, ...args) => {
-        this.storedListeners[method].push([eventName, args]);
-    };
-
     storedListeners = {
         on: [],
         once: []
@@ -127,38 +116,22 @@ export default class GgEzVp {
     // event handler
     on = (eventName, ...args) => {
         const isInternal = this.isInternalEvent(eventName);
-        // Set internal event listeners
-        if (isInternal) {
-            const teardown = this.emitter.on.apply(this.emitter, [eventName, ...args]);
-            // return the instance teardown function
-            return teardown;
-        }
 
-        // Store player events if the player node is not ready
-        if (!this.player) {
-            this.storePlayerEvent('on', eventName, ...args);
-            return;
-        }
-        this.player.addEventListener(eventName, ...args);
-        // Store listener for teardown on this.destroy
-        const eventData = [eventName, ...args];
-        this.playerListeners.push(eventData);
-        // return the player teardown function
-        return () => {
-            this.playerListeners = this.playerListeners.filter(data => data !== eventData);
-            this.player.removeEventListener(eventName, ...args);
-        };
+        const teardown = isInternal
+            ? // Set instance listener
+              this.emitter.on.apply(this.emitter, [eventName, ...args])
+            : // Set player listeners
+              this.nodeOn(this.player, eventName, ...args);
+
+        console.log({ teardown });
+
+        // return the teardown function
+        console.log(this.nodeListeners);
+        return teardown;
     };
 
     // Listen for an event just once
     once = (eventName, callback) => {
-        const isInternal = this.isInternalEvent(eventName);
-        // Handle player events
-        if (!isInternal && !this.player) {
-            this.storePlayerEvent('once', eventName, callback);
-            return;
-        }
-
         const unbind = this.on(eventName, (...args) => {
             unbind();
             callback.apply(this, args);
@@ -167,7 +140,24 @@ export default class GgEzVp {
         return unbind;
     };
 
-    playerListeners = [];
+    nodeOn = (node, eventName, ...args) => {
+        node.addEventListener(eventName, ...args);
+        // Store listener for teardown on this.destroy
+        const eventData = [node, eventName, ...args];
+        this.nodeListeners.push(eventData);
+        // return the node teardown function
+        return () => {
+            this.nodeListeners = this.nodeListeners.filter(data => data !== eventData);
+            node.removeEventListener(eventName, ...args);
+            console.log(this.nodeListeners);
+        };
+    };
+
+    nodeListeners = [];
+
+    emitPlayerClick = (...args) => {
+        this.emitter.emit(PLAYER_CLICK, ...args);
+    };
 
     // Playback methods
     playPause = () => {
@@ -178,10 +168,8 @@ export default class GgEzVp {
     };
 
     volume = value => {
-        if (this.player) {
-            const volume = Math.min(Math.max(value, 0), 1);
-            this.player.volume = volume;
-        }
+        const volume = Math.min(Math.max(value, 0), 1);
+        this.player.volume = volume;
     };
 
     muteUnmute = () => {
@@ -245,11 +233,12 @@ export default class GgEzVp {
         unbindAll(this.emitter);
 
         // remove player listeners
-        this.playerListeners.forEach(listenerConfig => {
-            this.player.removeEventListener(...listenerConfig);
+        this.nodeListeners.forEach(([node, ...args]) => {
+            node.removeEventListener(...args);
         });
 
-        this.playerListeners = [];
+        //this.nodeListeners = [];
+        console.log(this.nodeListeners);
     };
 
     destroy = () => {

@@ -6,11 +6,7 @@ import mountVideoElement from './lib/renderVideoElement';
 import parseAdXML from './lib/parseAdXML';
 import videoControls from './lib/controls';
 
-const DATA_READY = 'data-ready';
-const READY = 'ready';
-const PRE_DESTROY = 'pre-destroy';
-const PLAYBACK_PROGRESS = 'playback-progress';
-const PLAYER_CLICK = 'player-click';
+import { DATA_READY, READY, PRE_DESTROY, PLAYBACK_PROGRESS, PLAYER_CLICK } from './constants';
 
 const internalEvents = [READY, DATA_READY, PRE_DESTROY, PLAYBACK_PROGRESS];
 
@@ -123,10 +119,7 @@ export default class GgEzVp {
             : // Set player listeners
               this.nodeOn(this.player, eventName, ...args);
 
-        console.log({ teardown });
-
         // return the teardown function
-        console.log(this.nodeListeners);
         return teardown;
     };
 
@@ -149,7 +142,6 @@ export default class GgEzVp {
         return () => {
             this.nodeListeners = this.nodeListeners.filter(data => data !== eventData);
             node.removeEventListener(eventName, ...args);
-            console.log(this.nodeListeners);
         };
     };
 
@@ -236,9 +228,6 @@ export default class GgEzVp {
         this.nodeListeners.forEach(([node, ...args]) => {
             node.removeEventListener(...args);
         });
-
-        //this.nodeListeners = [];
-        console.log(this.nodeListeners);
     };
 
     destroy = () => {

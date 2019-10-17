@@ -107,6 +107,7 @@ export default class GgEzVp {
 
     __isInternalEvent = eventName => internalEvents.includes(eventName);
 
+    // add event listeners to any node
     __nodeOn = (node, eventName, ...args) => {
         node.addEventListener(eventName, ...args);
         // Store listener for teardown on this.destroy
@@ -119,10 +120,12 @@ export default class GgEzVp {
         };
     };
 
+    // list of active node event listeners
     __nodeListeners = [];
 
-    __emitPlayerClick = (...args) => {
-        this.emitter.emit(PLAYER_CLICK, ...args);
+    __emitPlayerClick = event => {
+        const target = this.controlContainer;
+        this.emitter.emit(PLAYER_CLICK, event);
     };
 
     __playerResizeListener = () => {

@@ -46,7 +46,8 @@ export default function GgEzControls(playerInstance) {
             pauseIcon.classList.add('active');
         }
         playPause.append(playIcon, pauseIcon);
-        playPause.addEventListener('click', () => {
+        playPause.addEventListener('click', event => {
+            event.stopImmediatePropagation();
             if (playerInstance.player.paused) {
                 pauseIcon.classList.add('active');
                 playIcon.classList.remove('active');
@@ -67,7 +68,8 @@ export default function GgEzControls(playerInstance) {
         const fullscreenIcon = getIcon(controls, iconPaths.fullscreen);
         fullscreen.append(fullscreenIcon);
         // append to correnponding div
-        fullscreen.addEventListener('click', () => {
+        fullscreen.addEventListener('click', event => {
+            event.stopImmediatePropagation();
             playerInstance.fullscreenToggle();
         });
         controlContainer.append(fullscreen);
@@ -84,7 +86,8 @@ export default function GgEzControls(playerInstance) {
         } else {
             volumeIcon.classList.add('active');
         }
-        volume.addEventListener('click', () => {
+        volume.addEventListener('click', event => {
+            event.stopImmediatePropagation();
             if (playerInstance.player.muted) {
                 volumeIcon.classList.add('active');
                 muteIcon.classList.remove('active');

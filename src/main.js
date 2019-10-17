@@ -12,7 +12,8 @@ import {
     PLAYER_CLICK,
     PRE_DESTROY,
     READY,
-    RESIZE
+    RESIZE,
+    DEFAULT_OPTIONS as defaultOptions
 } from './constants';
 
 // List of events fired by the instance instead of events the <video> tag
@@ -46,6 +47,8 @@ export default class GgEzVp {
         this.__init();
     }
 
+    // set up controls and internal listeners
+    // fetch VAST data if necessary
     __init = () => {
         const { container: containerId, isVAST } = this.config;
         const currentContainer = document.getElementById(containerId);
@@ -64,9 +67,11 @@ export default class GgEzVp {
         }
     };
 
+    // add pass all the required data into the video element
     __mountVideoElement = mountVideoElement;
 
-    // Renders the video element once the data to render it is ready
+    // renders the video element once the data to render it is ready
+    // emits: READY
     __renderVideoElement = isVAST => {
         const renderer = () => {
             const { controls } = this.config;
@@ -96,6 +101,7 @@ export default class GgEzVp {
     };
 
     // helps retrieve and parse the VAST data
+    // emits: DATA_READY || error
     __fetchVASTData = async () => {
         try {
             this.VASTData = await parseAdXML(this);
@@ -123,11 +129,13 @@ export default class GgEzVp {
     // list of active node event listeners
     __nodeListeners = [];
 
-    __emitPlayerClick = event => {
-        const target = this.controlContainer;
-        this.emitter.emit(PLAYER_CLICK, event);
+    // emit event for clicks inside the player container
+    // emits: PLAYER_CLICK
+    __emitPlayerClick = (...args) => {
+        this.emitter.emit(PLAYER_CLICK, ...args);
     };
 
+    // listen for clicks inside the player container
     __playerResizeListener = () => {
         const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
         this.dimensions.width = initialWidth;
@@ -135,6 +143,8 @@ export default class GgEzVp {
         return this.__resizeHandler;
     };
 
+    // listen for changes in the video tag dimensions
+    // emits: RESIZE
     __resizeHandler = () => {
         const { offsetWidth: currentWidth, offsetHeight: currentHeight } = this.player;
         const changedWidth = currentWidth !== this.dimensions.width;
@@ -146,7 +156,8 @@ export default class GgEzVp {
         }
     };
 
-    // Listens for timeupdate and emits an event with duration, currentTime and readableTime
+    // listens for timeupdate and emits an event with duration, currentTime and readableTime
+    // emits: PLAYBACK_PROGRESS
     __playbackProgressReporter = () => {
         const { currentTime, duration } = this.player;
         const mins = Math.floor(currentTime / 60);
@@ -155,7 +166,7 @@ export default class GgEzVp {
         this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
     };
 
-    // Teardown methods
+    // teardown methods
     __removeListeners = () => {
         // remove internal listeners
         unbindAll(this.emitter);
@@ -180,7 +191,7 @@ export default class GgEzVp {
         return teardown;
     };
 
-    // Listen for an event just once
+    // listen for an event just once
     once = (eventName, callback) => {
         const unbind = this.on(eventName, (...args) => {
             unbind();
@@ -190,20 +201,23 @@ export default class GgEzVp {
         return unbind;
     };
 
+    // store for current video dimensions
     dimensions = {
         width: 0,
         height: 0
     };
 
+    // start media playback
     play = () => {
         this.player.play();
     };
 
+    // stop media playback
     pause = () => {
         this.player.pause();
     };
 
-    // Playback methods
+    // toggle media playback
     playPause = () => {
         if (this.player.paused) {
             return this.play();
@@ -211,11 +225,23 @@ export default class GgEzVp {
         return this.pause();
     };
 
+    // set the media volume, accepts float numbers between 0 and 1
     volume = value => {
         const volume = Math.min(Math.max(value, 0), 1);
         this.player.volume = volume;
     };
 
+    // mute audio
+    mute = () => {
+        this.player.muted = true;
+    };
+
+    // unmute audio
+    unmute = () => {
+        this.player.muted = false;
+    };
+
+    // toggle mute
     muteUnmute = () => {
         if (this.player.muted) {
             return this.unmute();
@@ -223,19 +249,13 @@ export default class GgEzVp {
         return this.mute();
     };
 
-    mute = () => {
-        this.player.muted = true;
-    };
-
-    unmute = () => {
-        this.player.muted = false;
-    };
-
+    // return the currentTime of the video
     getCurrentTime = () => {
         const { currentTime } = this.player;
         return currentTime;
     };
 
+    // turn fullscreen on/off
     fullscreenToggle = () => {
         const el = this.player;
         if (!this.config.fullscreen) {
@@ -267,6 +287,8 @@ export default class GgEzVp {
         }
     };
 
+    // remove all event listeners and remove everything inside the container
+    // emits PRE_DESTROY
     destroy = () => {
         this.emitter.emit(PRE_DESTROY);
         this.pause();
@@ -274,46 +296,3 @@ export default class GgEzVp {
         this.container.innerHTML = '';
     };
 }
-
-const defaultOptions = {
-    container: null,
-    width: null,
-    height: null,
-    src: null,
-    controls: {
-        bg: null,
-        color: '#FFFFFF',
-        play: {
-            color: null,
-            src: null
-        },
-        stop: {
-            color: null,
-            src: null
-        },
-        replay: {
-            color: null,
-            src: null
-        },
-        volume: {
-            color: null,
-            src: null
-        },
-        fullscreen: {
-            color: null,
-            src: null
-        },
-        timer: {
-            color: null
-        }
-    },
-    autoPlay: false,
-    volume: 1,
-    muted: true,
-    poster: null,
-    preload: 'auto',
-    loop: false,
-    isVAST: false,
-    fullscreen: false,
-    playsinline: true
-};

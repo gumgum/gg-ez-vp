@@ -16,7 +16,7 @@ import {
 } from './constants';
 
 // List of events fired by the instance instead of events the <video> tag
-const internalEvents = [DATA_READY, PLAYBACK_PROGRESS, PRE_DESTROY, READY, RESIZE];
+const internalEvents = [DATA_READY, PLAYBACK_PROGRESS, PLAYER_CLICK, PRE_DESTROY, READY, RESIZE];
 
 export default class GgEzVp {
     constructor(options) {
@@ -43,10 +43,10 @@ export default class GgEzVp {
         // set vast data default
         this.VASTData = null;
         // set up any extra processes
-        this.init();
+        this.__init();
     }
 
-    init = () => {
+    __init = () => {
         const { container: containerId, isVAST } = this.config;
         const currentContainer = document.getElementById(containerId);
         if (!currentContainer) {
@@ -54,23 +54,23 @@ export default class GgEzVp {
         }
         currentContainer.classList.add('gg-ez-container');
         // set click listener on player
-        this.nodeOn(currentContainer, 'click', this.emitPlayerClick);
+        this.__nodeOn(currentContainer, 'click', this.__emitPlayerClick);
         // listen for <video> tag resize
-        this.nodeOn(window, RESIZE, this.playerResizeListener());
+        this.__nodeOn(window, RESIZE, this.__playerResizeListener());
         this.container = currentContainer;
-        this.renderVideoElement(isVAST);
+        this.__renderVideoElement(isVAST);
         if (isVAST) {
-            return this.fetchVASTData();
+            return this.__fetchVASTData();
         }
     };
 
-    mountVideoElement = mountVideoElement;
+    __mountVideoElement = mountVideoElement;
 
     // Renders the video element once the data to render it is ready
-    renderVideoElement = isVAST => {
+    __renderVideoElement = isVAST => {
         const renderer = () => {
             const { controls } = this.config;
-            this.mountVideoElement();
+            this.__mountVideoElement();
             this.controlContainer = controls ? videoControls(this) : null;
             if (this.controlContainer)
                 this.container.addEventListener('mouseenter', () =>
@@ -80,7 +80,7 @@ export default class GgEzVp {
                 this.controlContainer.classList.remove('active')
             );
             // set up playback progress listener
-            this.on('timeupdate', this.playbackProgressReporter);
+            this.on('timeupdate', this.__playbackProgressReporter);
             this.ready = true;
             const callback = () => this.emitter.emit(READY);
             if (requestAnimationFrame) {
@@ -96,7 +96,7 @@ export default class GgEzVp {
     };
 
     // helps retrieve and parse the VAST data
-    fetchVASTData = async () => {
+    __fetchVASTData = async () => {
         try {
             this.VASTData = await parseAdXML(this);
             this.emitter.emit(DATA_READY);
@@ -105,22 +105,73 @@ export default class GgEzVp {
         }
     };
 
-    storedListeners = {
-        on: [],
-        once: []
+    __isInternalEvent = eventName => internalEvents.includes(eventName);
+
+    __nodeOn = (node, eventName, ...args) => {
+        node.addEventListener(eventName, ...args);
+        // Store listener for teardown on this.destroy
+        const eventData = [node, eventName, ...args];
+        this.__nodeListeners.push(eventData);
+        // return the node teardown function
+        return () => {
+            this.__nodeListeners = this.__nodeListeners.filter(data => data !== eventData);
+            node.removeEventListener(eventName, ...args);
+        };
     };
 
-    isInternalEvent = eventName => internalEvents.includes(eventName);
+    __nodeListeners = [];
+
+    __emitPlayerClick = (...args) => {
+        this.emitter.emit(PLAYER_CLICK, ...args);
+    };
+
+    __playerResizeListener = () => {
+        const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
+        this.dimensions.width = initialWidth;
+        this.dimensions.height = initialHeight;
+        return this.__resizeHandler;
+    };
+
+    __resizeHandler = () => {
+        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = this.player;
+        const changedWidth = currentWidth !== this.dimensions.width;
+        const changedHeight = currentHeight !== this.dimensions.height;
+        if (changedWidth || changedHeight) {
+            const newDimensions = { width: currentWidth, height: currentHeight };
+            this.dimensions = newDimensions;
+            this.emitter.emit(RESIZE, newDimensions);
+        }
+    };
+
+    // Listens for timeupdate and emits an event with duration, currentTime and readableTime
+    __playbackProgressReporter = () => {
+        const { currentTime, duration } = this.player;
+        const mins = Math.floor(currentTime / 60);
+        const secs = Math.floor(currentTime % 60);
+        const readableTime = `${mins}:${secs < 10 ? `0${secs}` : secs}`;
+        this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
+    };
+
+    // Teardown methods
+    __removeListeners = () => {
+        // remove internal listeners
+        unbindAll(this.emitter);
+
+        // remove player listeners
+        this.__nodeListeners.forEach(([node, ...args]) => {
+            node.removeEventListener(...args);
+        });
+    };
 
     // event handler
     on = (eventName, ...args) => {
-        const isInternal = this.isInternalEvent(eventName);
+        const isInternal = this.__isInternalEvent(eventName);
 
         const teardown = isInternal
             ? // Set instance listener
               this.emitter.on.apply(this.emitter, [eventName, ...args])
             : // Set player listeners
-              this.nodeOn(this.player, eventName, ...args);
+              this.__nodeOn(this.player, eventName, ...args);
 
         // return the teardown function
         return teardown;
@@ -136,45 +187,9 @@ export default class GgEzVp {
         return unbind;
     };
 
-    nodeOn = (node, eventName, ...args) => {
-        node.addEventListener(eventName, ...args);
-        // Store listener for teardown on this.destroy
-        const eventData = [node, eventName, ...args];
-        this.nodeListeners.push(eventData);
-        // return the node teardown function
-        return () => {
-            this.nodeListeners = this.nodeListeners.filter(data => data !== eventData);
-            node.removeEventListener(eventName, ...args);
-        };
-    };
-
-    nodeListeners = [];
-
-    emitPlayerClick = (...args) => {
-        this.emitter.emit(PLAYER_CLICK, ...args);
-    };
-
     dimensions = {
         width: 0,
         height: 0
-    };
-
-    playerResizeListener = () => {
-        const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
-        this.dimensions.width = initialWidth;
-        this.dimensions.height = initialHeight;
-        return this.resizeHandler;
-    };
-
-    resizeHandler = () => {
-        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = this.player;
-        const changedWidth = currentWidth !== this.dimensions.width;
-        const changedHeight = currentHeight !== this.dimensions.height;
-        if (changedWidth || changedHeight) {
-            const newDimensions = { width: currentWidth, height: currentHeight };
-            this.dimensions = newDimensions;
-            this.emitter.emit(RESIZE, newDimensions);
-        }
     };
 
     play = () => {
@@ -249,30 +264,10 @@ export default class GgEzVp {
         }
     };
 
-    // Listens for timeupdate and emits an event with duration, currentTime and readableTime
-    playbackProgressReporter = () => {
-        const { currentTime, duration } = this.player;
-        const mins = Math.floor(currentTime / 60);
-        const secs = Math.floor(currentTime % 60);
-        const readableTime = `${mins}:${secs < 10 ? `0${secs}` : secs}`;
-        this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
-    };
-
-    // Teardown methods
-    removeListeners = () => {
-        // remove internal listeners
-        unbindAll(this.emitter);
-
-        // remove player listeners
-        this.nodeListeners.forEach(([node, ...args]) => {
-            node.removeEventListener(...args);
-        });
-    };
-
     destroy = () => {
         this.emitter.emit(PRE_DESTROY);
         this.pause();
-        this.removeListeners();
+        this.__removeListeners();
         this.container.innerHTML = '';
     };
 }

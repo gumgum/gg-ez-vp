@@ -67,7 +67,7 @@ This minimal configuration will create a unique video player instance using the 
 
 ## Customization
 
-Here's the full list of options available
+### Options:
 
 |key|defaultValue|required|description|
 |---|---|---|---|
@@ -79,48 +79,59 @@ Here's the full list of options available
 | autoplay  |false   |false | whether to play the video automatically or not  |
 | volume  |1   |false | initial volume for playback must be between 0.0 and 1  |
 | muted  |true   |false | video will be muted by default  |
+| playsinline  | true   |false | [A Boolean attribute indicating that the video is to be played within the element's playback area.](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#attr-playsinline) |
 | poster  |null   |false | source for an image to be used as video poster  |
 | preload  |'auto'   |false | standard HTML values for preload (none|metadata|auto)  |
 | loop  | false   |false | whether to loop video or not  |
 | isVAST  | false   |false | enables support for a single VAST / VPAID / MOAT TAG to be parsed and used as source  |
 
-## Customizing Controls
+### Controls
 
 TBD
 
-## APIs
-
-`ggEzVpInstance.play()`: start video playback
-
-`ggEzVpInstance.pause()`: stop video playback
-
-`ggEzVpInstance.playPause()`: toggle pause state on/off
-
-`ggEzVpInstance.volume(floatNum)`: sets the video volume, see volume configuration
-
-`ggEzVpInstance.mute()`: disable video sound
-
-`ggEzVpInstance.unmute()`: enable video sound
-
-`ggEzVpInstance.muteUnmute()`: toggle video sound on/off
-
-`ggEzVpInstance.destroy()`: removes the instance listeners and the DOM element originally attached to
+## Public methods
+|method name|parameters|description|
+|---|---|---|
+|destroy|none|removes all instance and video tag listeners, removes the player from the DOM leaving behind the original container|
+|fullscreenToggle|none|toggles the fullscreen mode|
+|getCurrentTime|none|returns the currentTime from the video tag, this data is also provided by the playback-progress event|
+|muteUnmute|none|toggle video sound on/off|
+|mute|none|disable video sound|
+|on|`eventName, listenerFn`|attaches a listener function to either the video tag or the player instance, the function will be run every time the event is fired, [see events](#events)|
+|once|`eventName, listenerFn`|attaches a listener function to either the video tag or the player instance, the function will fire just on time, [see events](#events)|
+|pause|none|stop video playback|
+|playPause|none|toggle pause state on/off|
+|play|none|start video playback|
+|unmute|none|enable video sound|
+|volume|float number|sets the video volume, [see volume configuration](#customization)|
 
 ## Events
 
-All events emitted from the <video> tag can be listened to by setting a listener on your active player instances:
+Listen for any `<video>` tag [events](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Events) or GgEzVp events:
 
 ```
 ggEzVpInstance.on('play', myPlayListener);
+ggEzVpInstance.on('playback-progress', myPlaybackListener);
 ```
 
-The class also emits custom events to extend the behavior:
+Listen to them only once:
 
-|event name|description|
-|---|---|
-|ready| emitted when the class is ready for playback|
-|dataready| emitted when a source for the video is received, either by configuration or VAST parsing|
-|predestroy| emitted before removing listeners and the container node|
+```
+ggEzVpInstance.once('play', myPlayListener);
+ggEzVpInstance.once('playback-progress', myProgressListener);
+```
+
+
+The player also emits custom events to extend the video tag behavior:
+
+|event name|description|payload|
+|---|---|---|
+|data-ready| emitted when a source for the video is received, either by configuration or after asynchronous VAST parsing | `undefined` |
+|playback-progress| emitted when the video currentTime changes | `{ readableTime, duration, currentTime }` |
+|player-click| emitted when clicks are detected inside the container element | click event |
+|pre-destroy| emitted before removing listeners and the container node| `undefined` |
+|ready| emitted when the class is ready for playback| `undefined` |
+|resize| emitted when video tag changes either width or height | `{ width, height }` |
 
 Custom events are provided by [Nano Events](https://github.com/ai/nanoevents)
 

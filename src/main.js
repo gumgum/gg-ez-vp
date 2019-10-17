@@ -59,14 +59,6 @@ export default class GgEzVp {
 
     mountVideoElement = mountVideoElement;
 
-    play = () => {
-        this.player.play();
-    };
-
-    pause = () => {
-        this.player.pause();
-    };
-
     // Renders the video element once the data to render it is ready
     renderVideoElement = isVAST => {
         const renderer = () => {
@@ -151,6 +143,14 @@ export default class GgEzVp {
         this.emitter.emit(PLAYER_CLICK, ...args);
     };
 
+    play = () => {
+        this.player.play();
+    };
+
+    pause = () => {
+        this.player.pause();
+    };
+
     // Playback methods
     playPause = () => {
         if (this.player.paused) {
@@ -177,6 +177,11 @@ export default class GgEzVp {
 
     unmute = () => {
         this.player.muted = false;
+    };
+
+    getCurrentTime = () => {
+        const { currentTime } = this.player;
+        return currentTime;
     };
 
     fullscreenToggle = () => {

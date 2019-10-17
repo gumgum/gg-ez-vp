@@ -6,14 +6,24 @@ import mountVideoElement from './lib/renderVideoElement';
 import parseAdXML from './lib/parseAdXML';
 import videoControls from './lib/controls';
 
-import { DATA_READY, READY, PRE_DESTROY, PLAYBACK_PROGRESS, PLAYER_CLICK } from './constants';
+import {
+    DATA_READY,
+    PLAYBACK_PROGRESS,
+    PLAYER_CLICK,
+    PRE_DESTROY,
+    READY,
+    RESIZE
+} from './constants';
 
-const internalEvents = [READY, DATA_READY, PRE_DESTROY, PLAYBACK_PROGRESS];
+// List of events fired by the instance instead of events the <video> tag
+const internalEvents = [DATA_READY, PLAYBACK_PROGRESS, PRE_DESTROY, READY, RESIZE];
 
 export default class GgEzVp {
     constructor(options) {
         // set up the event emitter
         this.emitter = new NanoEvents();
+        // flag than can be used from the outside to check if the instance is ready
+        this.ready = false;
 
         // merge default options with user provided options
         this.config = {
@@ -30,11 +40,6 @@ export default class GgEzVp {
 
         // Create the video node
         this.player = document.createElement('video');
-        // Set instance methods dependent on player existence
-        //this.play = this.player.play.bind(this.player);
-        //this.pause = this.player.pause.bind(this.player);
-        // flag than can be used from the outside to check if the instance is ready
-        this.ready = false;
         // set vast data default
         this.VASTData = null;
         // set up any extra processes
@@ -50,6 +55,8 @@ export default class GgEzVp {
         currentContainer.classList.add('gg-ez-container');
         // set click listener on player
         this.nodeOn(currentContainer, 'click', this.emitPlayerClick);
+        // listen for <video> tag resize
+        this.nodeOn(window, RESIZE, this.playerResizeListener());
         this.container = currentContainer;
         this.renderVideoElement(isVAST);
         if (isVAST) {
@@ -75,7 +82,11 @@ export default class GgEzVp {
             // set up playback progress listener
             this.on('timeupdate', this.playbackProgressReporter);
             this.ready = true;
-            requestAnimationFrame(() => this.emitter.emit(READY));
+            const callback = () => this.emitter.emit(READY);
+            if (requestAnimationFrame) {
+                return requestAnimationFrame(callback);
+            }
+            setTimeout(callback);
         };
         if (isVAST) {
             this.on(DATA_READY, renderer);
@@ -141,6 +152,29 @@ export default class GgEzVp {
 
     emitPlayerClick = (...args) => {
         this.emitter.emit(PLAYER_CLICK, ...args);
+    };
+
+    dimensions = {
+        width: 0,
+        height: 0
+    };
+
+    playerResizeListener = () => {
+        const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
+        this.dimensions.width = initialWidth;
+        this.dimensions.height = initialHeight;
+        return this.resizeHandler;
+    };
+
+    resizeHandler = () => {
+        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = this.player;
+        const changedWidth = currentWidth !== this.dimensions.width;
+        const changedHeight = currentHeight !== this.dimensions.height;
+        if (changedWidth || changedHeight) {
+            const newDimensions = { width: currentWidth, height: currentHeight };
+            this.dimensions = newDimensions;
+            this.emitter.emit(RESIZE, newDimensions);
+        }
     };
 
     play = () => {

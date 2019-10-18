@@ -1,9 +1,22 @@
-export default function renderVideoElement(playerInstance) {
+export default function renderVideoElement() {
     const {
+        player,
         container,
         VASTData,
-        config: { src, isVAST, width, height, autoplay, volume, muted, poster, preload, loop }
-    } = playerInstance;
+        config: {
+            src,
+            isVAST,
+            width,
+            height,
+            autoplay,
+            volume,
+            muted,
+            poster,
+            preload,
+            loop,
+            playsinline
+        }
+    } = this;
 
     // Group all the video element attributes
     const attrsConfig = {
@@ -13,7 +26,9 @@ export default function renderVideoElement(playerInstance) {
         autoplay,
         poster,
         preload,
-        loop
+        loop,
+        playsinline,
+        'webkit-playsinline': playsinline
     };
 
     // Validate that there is a source
@@ -47,15 +62,12 @@ export default function renderVideoElement(playerInstance) {
     // Find the sources for media playback
     const sources = VASTSources || (typeof src === 'string' ? [src] : src);
 
-    // Create the video node
-    const video = document.createElement('video');
-
     // Set the default muted value
-    video.muted = muted;
+    player.muted = muted;
 
     // Add all attributes to the video node
     attributes.forEach(([key, value]) => {
-        video.setAttribute(key, isBooleanAttr(key) ? key : value);
+        player.setAttribute(key, isBooleanAttr(key) ? '' : value);
     });
 
     // Add all sources to the video node
@@ -64,14 +76,12 @@ export default function renderVideoElement(playerInstance) {
         source.src = s;
         // TODO: need a better way to set type
         source.type = `video/${s.split('.').reverse()[0]}`;
-        video.appendChild(source);
+        console.log({ source });
+        player.appendChild(source);
     });
 
     // Insert the video node
-    container.appendChild(video);
-
-    // Return the video container to the class
-    return video;
+    container.appendChild(player);
 }
 
-const isBooleanAttr = k => ['autoplay', 'loop'].includes(k);
+const isBooleanAttr = k => ['autoplay', 'loop', 'playsinline', 'webkit-playsinline'].includes(k);

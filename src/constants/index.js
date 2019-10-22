@@ -46,3 +46,12 @@ export const DEFAULT_OPTIONS = {
     fullscreen: false,
     playsinline: true
 };
+// resolveAll will return the first Ad or AdPod in the VAST
+export const DEFAULT_VAST_OPTIONS = { resolveAll: false };
+export const JAVASCRIPT_MIME_TYPES = [
+    'application/x-javascript',
+    'application/javascript',
+    'application/ecmascript',
+    'text/javascript',
+    'text/ecmascript'
+];

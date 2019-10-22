@@ -31,15 +31,7 @@ export default function renderVideoElement() {
         'webkit-playsinline': playsinline
     };
 
-    // Validate that there is a source
-    if (!src) {
-        throw new Error('No file source found. Is src set?');
-    }
-
-    // validate the source is an accepted type (string | array)
-    if (typeof src !== 'string' && !Array.isArray(src)) {
-        throw new Error('src should be either a string or an array of strings');
-    }
+    console.log({ VASTData });
 
     // Validate VASTData exists
     if (isVAST && !VASTData) {
@@ -54,13 +46,14 @@ export default function renderVideoElement() {
         }
         return attrs;
     }, []);
+    console.log({ VASTData });
 
-    const VASTSources = isVAST
-        ? VASTData.ads[0].creatives[0].mediaFiles.map(({ fileURL }) => fileURL)
-        : null;
+    const VASTSources = isVAST ? VASTData?.sources.media.map(({ fileURL }) => fileURL) : null;
 
     // Find the sources for media playback
     const sources = VASTSources || (typeof src === 'string' ? [src] : src);
+    console.log('sources');
+    console.log({ sources });
 
     // Set the default muted value
     player.muted = muted;
@@ -76,7 +69,6 @@ export default function renderVideoElement() {
         source.src = s;
         // TODO: need a better way to set type
         source.type = `video/${s.split('.').reverse()[0]}`;
-        console.log({ source });
         player.appendChild(source);
     });
 

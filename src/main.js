@@ -1,10 +1,12 @@
 // external modules
 import NanoEvents from 'nanoevents';
 import unbindAll from 'nanoevents/unbind-all';
-// own modules
-import mountVideoElement from './lib/renderVideoElement';
-import parseAdXML from './lib/parseAdXML';
+// instance methods
+import renderVideoElement from './lib/renderVideoElement';
 import videoControls from './lib/controls';
+// helper functions
+import isElement from './helpers/isElement';
+import parseVAST from './helpers/parseVAST';
 
 import {
     DATA_READY,
@@ -50,64 +52,98 @@ export default class GgEzVp {
     // set up controls and internal listeners
     // fetch VAST data if necessary
     __init = () => {
-        const { container: containerId, isVAST } = this.config;
-        const currentContainer = document.getElementById(containerId);
-        if (!currentContainer) {
-            throw new Error(`No container found. Is the id correct? (${containerId})`);
-        }
-        currentContainer.classList.add('gg-ez-container');
+        const { container, isVAST } = this.config;
+        this.container = isElement(container) ? container : document.getElementById(container);
+        this.__validateConfig();
+        this.container.classList.add('gg-ez-container');
         // set click listener on player
-        this.__nodeOn(currentContainer, 'click', this.__emitPlayerClick);
+        this.__nodeOn(this.container, 'click', this.__emitPlayerClick);
         // listen for <video> tag resize
         this.__nodeOn(window, RESIZE, this.__playerResizeListener());
-        this.container = currentContainer;
-        this.__renderVideoElement(isVAST);
+        this.__renderVideoElement();
         if (isVAST) {
-            return this.__fetchVASTData();
+            return this.__parseVASTData();
+        }
+    };
+
+    __validateConfig = () => {
+        const { src, container } = this.config;
+        let err = '';
+
+        // Validate that there is a source
+        if (!src || (typeof src !== 'string' && !Array.isArray(src))) {
+            err = 'video src should be a string or an array of strings';
+        }
+
+        if (!this.container) {
+            err = `container should be a DOM node or a node's id. Current container: ${container}`;
+        }
+
+        if (err) {
+            throw new Error(`GgEzVp Error: ${err}`);
         }
     };
 
     // add pass all the required data into the video element
-    __mountVideoElement = mountVideoElement;
+    __mountVideoElement = renderVideoElement;
 
     // renders the video element once the data to render it is ready
     // emits: READY
-    __renderVideoElement = isVAST => {
+    __renderVideoElement = () => {
+        const { isVAST } = this.config;
         const renderer = () => {
-            const { controls } = this.config;
             this.__mountVideoElement();
-            this.controlContainer = controls ? videoControls(this) : null;
-            if (this.controlContainer)
-                this.container.addEventListener('mouseenter', () =>
-                    this.controlContainer.classList.add('active')
-                );
-            this.container.addEventListener('mouseleave', () =>
-                this.controlContainer.classList.remove('active')
-            );
+            // set up controls
+            this.__renderControls();
             // set up playback progress listener
             this.on('timeupdate', this.__playbackProgressReporter);
-            this.ready = true;
-            const callback = () => this.emitter.emit(READY);
-            if (requestAnimationFrame) {
-                return requestAnimationFrame(callback);
+            // Execute the callback in the next cycle, using requestAnimationFrame
+            // if available or setTimeout as a fallback
+            if (window.requestAnimationFrame) {
+                return requestAnimationFrame(this.__setReady);
             }
-            setTimeout(callback);
+            setTimeout(this.__setReady);
         };
+
         if (isVAST) {
             this.on(DATA_READY, renderer);
-        } else {
-            return renderer();
+            return;
         }
+
+        return renderer();
+    };
+
+    __setReady = () => {
+        this.ready = true;
+        this.emitter.emit(READY);
+    };
+
+    //TODO: REFACTOR CONTROLS
+    __renderControls = () => {
+        const { controls } = this.config;
+        this.controlContainer = controls ? videoControls(this) : null;
+        if (this.controlContainer)
+            this.container.addEventListener('mouseenter', () =>
+                this.controlContainer.classList.add('active')
+            );
+        this.container.addEventListener('mouseleave', () =>
+            this.controlContainer.classList.remove('active')
+        );
     };
 
     // helps retrieve and parse the VAST data
     // emits: DATA_READY || error
-    __fetchVASTData = async () => {
+    __parseVASTData = async () => {
         try {
-            this.VASTData = await parseAdXML(this);
+            const {
+                config: { src }
+            } = this;
+            this.VASTData = await parseVAST(src);
+            // TODO: set up VAST tracking
+            // __setVASTTracking
             this.emitter.emit(DATA_READY);
         } catch (err) {
-            this.emitter.emit('error', err.toString());
+            this.emitter.emit('error', err);
         }
     };
 

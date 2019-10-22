@@ -1,3 +1,4 @@
+import builtins from 'rollup-plugin-node-builtins';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
@@ -18,6 +19,7 @@ export default [
         },
         plugins: [
             resolve(),
+            builtins(),
             babel({ runtimeHelpers: true }),
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')

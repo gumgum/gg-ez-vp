@@ -1,36 +1,31 @@
 import { VASTClient } from 'vast-client';
-import { JAVASCRIPT_MIME_TYPES, DEFAULT_VAST_OPTIONS } from '../constants';
+import { DEFAULT_VAST_OPTIONS } from '../constants';
+import mediaFilesReducer from '../helpers/mediaFilesReducer';
+import replaceVASTMacros from '../helpers/replaceVASTMacros';
 
 // Wrapper for VAST-Client.get()
 export default async function parseVAST(src, options = DEFAULT_VAST_OPTIONS) {
-    try {
-        // Instantiate VASTClient
-        const vastClient = new VASTClient();
-        // Request and parse vast tag
-        const parsedVAST = await vastClient.get(src, options);
-        const mediaFiles = parsedVAST.ads[0].creatives[0].mediaFiles;
-        // Separate any JavaScript files from MediaFiles
-        const sources = mediaFiles.reduce(
-            (acc, mediaFile) => {
-                const isJavaScript = JAVASCRIPT_MIME_TYPES.includes(mediaFile.mimeType);
-                if (isJavaScript) {
-                    acc.javascript.push(mediaFile);
-                } else {
-                    acc.media.push(mediaFile);
-                }
-                return acc;
-            },
-            { javascript: [], media: [] }
-        );
-        // TODO: execute javascript files
-        // TODO: get javascript files for VAST 4.1
-        // TODO: set up tracking events
-        return {
-            parsedVAST,
-            sources
-        };
-    } catch (e) {
-        console.log(e);
-        throw e;
+    // Instantiate VASTClient
+    const vastClient = new VASTClient();
+    const srcWithSupportedMacros = replaceVASTMacros(src);
+    // Request and parse vast tag
+    const parsedVAST = await vastClient.get(srcWithSupportedMacros, options);
+    const ad = parsedVAST?.ads[0];
+    const linearCreative = ad?.creatives?.find(({ type }) => type === 'linear');
+    if (!linearCreative) return;
+
+    const { mediaFiles = [] } = linearCreative;
+    // Separate any JavaScript files from MediaFiles
+    const sources = mediaFilesReducer(mediaFiles);
+    this.VASTSources = sources;
+    const VPAIDSource = sources.javascript.find(({ apiFramework }) => apiFramework === 'VPAID');
+
+    // Load VPAID and run it
+    if (VPAIDSource) {
+        this.isVPAID = true;
+        return this.__runVPAID(linearCreative, VPAIDSource);
     }
+
+    // if there is no VPAID, fallback to VAST tracking
+    this.__enableVASTTracking(vastClient, ad, linearCreative);
 }

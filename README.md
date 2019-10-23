@@ -4,12 +4,12 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 
 ## Features:
 
+- Easy setup
 - Customizable controls (or use our defaults)
 - Lightweight
-- Easy setup
 - Programmatic access to video playback APIs
 - UMD, CommonJS and ES module versions
-- VAST / VPAID / MOAT Support, provided by [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js)
+- VAST / VPAID / MOAT Support for a single Linear Creative. Parsing is provided by [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js). *Note* that at the time, only one Ad is loaded, and only Linear Creatives are played and tracked.
 
 ## Installation
 
@@ -105,6 +105,18 @@ TBD
 |unmute|none|enable video sound|
 |volume|float number|sets the video volume, [see volume configuration](#customization)|
 
+## Accessible properties
+All properties are read-only:
+
+|property name|type|description|
+|---|---|---|
+|ready|boolean|helps identify when the video/ad is rendered and ready for playback|
+|dataReady|boolean|helps identify when the player has all the data it needs to render the video and all listeners have been set|
+|config|object|current player's configuration, see Options|
+|player|DOM node|current video tag, it is not recommended to interact directly with it, and instead rely on the player's methods, but is provided if necessary|
+|dimensions|object|current player dimensions|
+|VPAIDWrapper|object|wrapper that allows direct interaction with a VPAID creative if available, it is not recommended to interact directly with it, but it is possible if necessary|
+
 ## Events
 
 Listen for any `<video>` tag [events](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Events) or GgEzVp events:
@@ -127,13 +139,39 @@ The player also emits custom events to extend the video tag behavior:
 |event name|description|payload|
 |---|---|---|
 |data-ready| emitted when a source for the video is received, either by configuration or after asynchronous VAST parsing | `undefined` |
-|playback-progress| emitted when the video currentTime changes | `{ readableTime, duration, currentTime }` |
+|playback-progress| emitted when the video currentTime changes | `{ remainingTime, readableTime, duration, currentTime }` |
 |player-click| emitted when clicks are detected inside the container element | click event |
 |pre-destroy| emitted before removing listeners and the container node| `undefined` |
 |ready| emitted when the class is ready for playback| `undefined` |
 |resize| emitted when video tag changes either width or height | `{ width, height }` |
+|error| emitted when player encounters an error | error message or object |
 
 Custom events are provided by [Nano Events](https://github.com/ai/nanoevents)
+
+## VAST
+VAST 3.0 is supported, thanks to [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js) for the playback of a **single Linear Creative**.
+If a VPAID is detected, it will be loaded and executed, otherwise, the player will track and emit all the events in the VAST tag.
+
+## VPAID
+The player is capable of playing VPAID 2.0 if the `src` is a VAST tag and `isVAST` is set to `true` in the configuration.
+Player events will not be set immediately, instead they will be stored and attached after the VPAID has emitted the `onAdLoaded` event.
+
+### Event mapping
+Some VPAID events are mapped as follows:
+
+|VPAID event name| GgEzVp event name|
+|---|---|
+|AdLoaded|data-ready|
+|AdStarted|play|
+|AdPlaying|play|
+|AdVideoStart|play|
+|AdPaused|pause|
+|AdStopped|ended|
+|AdRemainingTimeChange|playback-progress|
+|AdError|error|
+
+It is encouraged to use these events mapped by the player, but if you require listening to other events, [all VPAID events](https://www.iab.com/wp-content/uploads/2015/06/VPAID_2_0_Final_04-10-2012.pdf) are emitted as well with exception of the `AdRemainingTimeChange` event (use `playback-progress` instead).
+All data is retrieved from the VPAID creative, not the video tag itself.
 
 ## Development
 

@@ -4,6 +4,9 @@ export const PLAYER_CLICK = 'player-click';
 export const PRE_DESTROY = 'pre-destroy';
 export const READY = 'ready';
 export const RESIZE = 'resize';
+export const ERROR = 'error';
+export const SUPPORTED_VPAID_VERSION = '2.0';
+export const VPAID_STARTED = 'VPAID_STARTED';
 export const DEFAULT_OPTIONS = {
     container: null,
     width: null,

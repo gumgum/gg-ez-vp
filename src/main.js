@@ -3,10 +3,15 @@ import NanoEvents from 'nanoevents';
 import unbindAll from 'nanoevents/unbind-all';
 // instance methods
 import renderVideoElement from './lib/renderVideoElement';
+import runVPAID from './lib/runVPAID';
+import initVPAIDAd from './lib/initVPAIDAd';
+import enableVASTTracking from './lib/enableVASTTracking';
+import configureVPAID from './lib/configureVPAID';
 import videoControls from './lib/controls';
 // helper functions
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
+import secondsToReadableTime from './helpers/secondsToReadableTime';
 
 import {
     DATA_READY,
@@ -15,11 +20,22 @@ import {
     PRE_DESTROY,
     READY,
     RESIZE,
+    VPAID_STARTED,
+    ERROR,
     DEFAULT_OPTIONS as defaultOptions
 } from './constants';
 
 // List of events fired by the instance instead of events the <video> tag
-const internalEvents = [DATA_READY, PLAYBACK_PROGRESS, PLAYER_CLICK, PRE_DESTROY, READY, RESIZE];
+const internalEvents = [
+    DATA_READY,
+    PLAYBACK_PROGRESS,
+    PLAYER_CLICK,
+    PRE_DESTROY,
+    READY,
+    RESIZE,
+    VPAID_STARTED,
+    ERROR
+];
 
 export default class GgEzVp {
     constructor(options) {
@@ -27,6 +43,9 @@ export default class GgEzVp {
         this.emitter = new NanoEvents();
         // flag than can be used from the outside to check if the instance is ready
         this.ready = false;
+        // flag than can be used from the outside to check if the data needed to render is ready
+        this.dataReady = false;
+        this.prevVol = options.volume;
 
         // merge default options with user provided options
         this.config = {
@@ -45,6 +64,7 @@ export default class GgEzVp {
         this.player = document.createElement('video');
         // set vast data default
         this.VASTData = null;
+        this.VPAIDWrapper = null;
         // set up any extra processes
         this.__init();
     }
@@ -52,17 +72,21 @@ export default class GgEzVp {
     // set up controls and internal listeners
     // fetch VAST data if necessary
     __init = () => {
-        const { container, isVAST } = this.config;
-        this.container = isElement(container) ? container : document.getElementById(container);
-        this.__validateConfig();
-        this.container.classList.add('gg-ez-container');
-        // set click listener on player
-        this.__nodeOn(this.container, 'click', this.__emitPlayerClick);
-        // listen for <video> tag resize
-        this.__nodeOn(window, RESIZE, this.__playerResizeListener());
-        this.__renderVideoElement();
-        if (isVAST) {
-            return this.__parseVASTData();
+        try {
+            const { container, isVAST } = this.config;
+            this.container = isElement(container) ? container : document.getElementById(container);
+            this.__validateConfig();
+            this.container.classList.add('gg-ez-container');
+            // listen for <video> tag resize
+            this.__nodeOn(window, RESIZE, this.__playerResizeListener());
+            // set click listener on player
+            this.on('click', this.__emitPlayerClick);
+            if (isVAST) {
+                return this.__runVAST();
+            }
+            this.__renderVideoElement();
+        } catch (err) {
+            console.log(err);
         }
     };
 
@@ -90,27 +114,21 @@ export default class GgEzVp {
     // renders the video element once the data to render it is ready
     // emits: READY
     __renderVideoElement = () => {
-        const { isVAST } = this.config;
-        const renderer = () => {
-            this.__mountVideoElement();
-            // set up controls
-            this.__renderControls();
-            // set up playback progress listener
-            this.on('timeupdate', this.__playbackProgressReporter);
-            // Execute the callback in the next cycle, using requestAnimationFrame
-            // if available or setTimeout as a fallback
-            if (window.requestAnimationFrame) {
-                return requestAnimationFrame(this.__setReady);
-            }
-            setTimeout(this.__setReady);
-        };
+        this.__mountVideoElement();
+        // set up controls
+        this.__renderControls();
+        // set up playback progress listener
+        this.on('timeupdate', this.__playbackProgressReporter);
+        this.__setReadyNextTick();
+    };
 
-        if (isVAST) {
-            this.on(DATA_READY, renderer);
-            return;
+    __setReadyNextTick = () => {
+        // Execute the callback in the next cycle, using requestAnimationFrame
+        // if available or setTimeout as a fallback
+        if (window.requestAnimationFrame) {
+            return requestAnimationFrame(this.__setReady);
         }
-
-        return renderer();
+        setTimeout(this.__setReady);
     };
 
     __setReady = () => {
@@ -131,19 +149,26 @@ export default class GgEzVp {
         );
     };
 
+    __parseVAST = parseVAST;
+
+    __enableVASTTracking = enableVASTTracking;
+
+    __runVPAID = runVPAID;
+
+    __initVPAIDAd = initVPAIDAd;
+
+    __configureVPAID = configureVPAID;
+
     // helps retrieve and parse the VAST data
     // emits: DATA_READY || error
-    __parseVASTData = async () => {
+    __runVAST = async () => {
         try {
             const {
                 config: { src }
             } = this;
-            this.VASTData = await parseVAST(src);
-            // TODO: set up VAST tracking
-            // __setVASTTracking
-            this.emitter.emit(DATA_READY);
+            this.VASTData = await this.__parseVAST(src);
         } catch (err) {
-            this.emitter.emit('error', err);
+            this.emitter.emit(ERROR, err);
         }
     };
 
@@ -192,14 +217,15 @@ export default class GgEzVp {
         }
     };
 
-    // listens for timeupdate and emits an event with duration, currentTime and readableTime
+    // listens for timeupdate and emits an event with duration, currentTime and readableTime of the <video> tag, for VPAID, see VPAIDWrapper.onAdRemainingTimeChange
     // emits: PLAYBACK_PROGRESS
+    // { remainingTime, readableTime, duration, currentTime }
     __playbackProgressReporter = () => {
         const { currentTime, duration } = this.player;
-        const mins = Math.floor(currentTime / 60);
-        const secs = Math.floor(currentTime % 60);
-        const readableTime = `${mins}:${secs < 10 ? `0${secs}` : secs}`;
-        this.emitter.emit(PLAYBACK_PROGRESS, { readableTime, duration, currentTime });
+        const readableTime = secondsToReadableTime(currentTime);
+        const remainingTime = duration - currentTime;
+        const payload = { remainingTime, readableTime, duration, currentTime };
+        this.emitter.emit(PLAYBACK_PROGRESS, payload);
     };
 
     // teardown methods
@@ -213,15 +239,56 @@ export default class GgEzVp {
         });
     };
 
+    __listenerStore = {
+        on: [],
+        once: []
+    };
+
+    __storeListener = type => (...args) => {
+        this.__listenerStore?.[type].push(args);
+    };
+
+    // attach pending listeners
+    // emits: 'attaching-EVENT_NAME', where EVENT_NAME is the original event name
+    // this event is useful when the user wants access to the teardown function
+    __attachStoredListeners = () => {
+        for (let key in this.__listenerStore) {
+            this.__listenerStore[key].forEach(args => {
+                const teardown = this[key](...args);
+                const storageEvent = `attaching-${key}`;
+                // emit an event that allows recovering the teardown fn of async listeners
+                this.emitter.emit(storageEvent, teardown);
+            });
+        }
+        this.__listenerStore = null;
+    };
+
+    __shouldStoreListener = eventName => {
+        const isInternal = this.__isInternalEvent(eventName);
+        const {
+            config: { isVAST },
+            dataReady
+        } = this;
+        const shouldStoreListener = !isInternal && isVAST && !dataReady;
+        return shouldStoreListener;
+    };
+
     // event handler
     on = (eventName, ...args) => {
-        const isInternal = this.__isInternalEvent(eventName);
+        const { isVPAID } = this;
 
-        const teardown = isInternal
-            ? // Set instance listener
-              this.emitter.on.apply(this.emitter, [eventName, ...args])
-            : // Set player listeners
-              this.__nodeOn(this.player, eventName, ...args);
+        if (this.__shouldStoreListener(eventName)) {
+            this.__storeListener('on')(eventName, ...args);
+            return;
+        }
+
+        const teardown =
+            // All VPAID events are considered as internal and mapped in VPAIDWrapper
+            isVPAID || this.__isInternalEvent(eventName)
+                ? // Set instance listener
+                  this.emitter.on.apply(this.emitter, [eventName, ...args])
+                : // Set player listeners
+                  this.__nodeOn(this.player, eventName, ...args);
 
         // return the teardown function
         return teardown;
@@ -229,6 +296,11 @@ export default class GgEzVp {
 
     // listen for an event just once
     once = (eventName, callback) => {
+        if (this.__shouldStoreListener(eventName)) {
+            this.__storeListener('once')(eventName, callback);
+            return;
+        }
+
         const unbind = this.on(eventName, (...args) => {
             unbind();
             callback.apply(this, args);
@@ -245,11 +317,22 @@ export default class GgEzVp {
 
     // start media playback
     play = () => {
+        const { isVPAID, VPAIDStarted, VPAIDWrapper } = this;
+        if (isVPAID) {
+            if (VPAIDStarted) {
+                return VPAIDWrapper.resumeAd();
+            }
+            return VPAIDWrapper.startAd();
+        }
         this.player.play();
     };
 
     // stop media playback
     pause = () => {
+        const { isVPAID, VPAIDWrapper } = this;
+        if (isVPAID) {
+            return VPAIDWrapper.pauseAd();
+        }
         this.player.pause();
     };
 
@@ -263,17 +346,31 @@ export default class GgEzVp {
 
     // set the media volume, accepts float numbers between 0 and 1
     volume = value => {
+        const { isVPAID, VPAIDWrapper } = this;
         const volume = Math.min(Math.max(value, 0), 1);
+        if (isVPAID) {
+            return VPAIDWrapper.setAdVolume(volume);
+        }
         this.player.volume = volume;
     };
 
     // mute audio
     mute = () => {
+        const { isVPAID, VPAIDWrapper } = this;
+        if (isVPAID) {
+            this.prevVol = VPAIDWrapper.getAdVolume();
+            return VPAIDWrapper.setAdVolume(0);
+        }
         this.player.muted = true;
     };
 
     // unmute audio
     unmute = () => {
+        const { isVPAID, VPAIDWrapper, prevVol, config } = this;
+        if (isVPAID) {
+            const volume = prevVol || config.volume;
+            return VPAIDWrapper.setAdVolume(volume);
+        }
         this.player.muted = false;
     };
 
@@ -287,6 +384,9 @@ export default class GgEzVp {
 
     // return the currentTime of the video
     getCurrentTime = () => {
+        if (this.isVPAID) {
+            return this.VPAIDWrapper.currentTime;
+        }
         const { currentTime } = this.player;
         return currentTime;
     };

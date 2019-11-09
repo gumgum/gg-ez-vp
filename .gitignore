@@ -34,6 +34,8 @@ node_modules/
 yarn-error.log
 tmp
 package-lock.json
+dist/
+dist
 
 # Vim specific
 .vim

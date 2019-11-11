@@ -33,6 +33,7 @@ node_modules/
 .tmp
 yarn-error.log
 tmp
+dist
 package-lock.json
 dist/
 dist

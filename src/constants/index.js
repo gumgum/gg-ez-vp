@@ -4,6 +4,9 @@ export const PLAYER_CLICK = 'player-click';
 export const PRE_DESTROY = 'pre-destroy';
 export const READY = 'ready';
 export const RESIZE = 'resize';
+export const ERROR = 'error';
+export const SUPPORTED_VPAID_VERSION = '2.0';
+export const VPAID_STARTED = 'VPAID_STARTED';
 export const DEFAULT_OPTIONS = {
     container: null,
     width: null,
@@ -46,3 +49,12 @@ export const DEFAULT_OPTIONS = {
     fullscreen: false,
     playsinline: true
 };
+// resolveAll will return the first Ad or AdPod in the VAST
+export const DEFAULT_VAST_OPTIONS = { resolveAll: false };
+export const JAVASCRIPT_MIME_TYPES = [
+    'application/x-javascript',
+    'application/javascript',
+    'application/ecmascript',
+    'text/javascript',
+    'text/ecmascript'
+];

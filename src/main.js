@@ -7,7 +7,7 @@ import runVPAID from './lib/runVPAID';
 import initVPAIDAd from './lib/initVPAIDAd';
 import enableVASTTracking from './lib/enableVASTTracking';
 import configureVPAID from './lib/configureVPAID';
-import videoControls from './lib/controls';
+import renderControls from './lib/controls';
 // helper functions
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
@@ -76,7 +76,7 @@ export default class GgEzVp {
             const { container, isVAST } = this.config;
             this.container = isElement(container) ? container : document.getElementById(container);
             this.__validateConfig();
-            this.container.classList.add('gg-ez-container');
+            this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
             // set click listener on player
@@ -89,6 +89,8 @@ export default class GgEzVp {
             console.log(err);
         }
     };
+
+    __getCSSClass = (suffix = '') => CSS_ROOT + (suffix ? `--${suffix}` : '');
 
     __validateConfig = () => {
         const { src, container } = this.config;
@@ -136,18 +138,7 @@ export default class GgEzVp {
         this.emitter.emit(READY);
     };
 
-    //TODO: REFACTOR CONTROLS
-    __renderControls = () => {
-        const { controls } = this.config;
-        this.controlContainer = controls ? videoControls(this) : null;
-        if (this.controlContainer)
-            this.container.addEventListener('mouseenter', () =>
-                this.controlContainer.classList.add('active')
-            );
-        this.container.addEventListener('mouseleave', () =>
-            this.controlContainer.classList.remove('active')
-        );
-    };
+    __renderControls = renderControls;
 
     __parseVAST = parseVAST;
 

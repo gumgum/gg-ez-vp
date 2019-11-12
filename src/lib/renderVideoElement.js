@@ -9,6 +9,8 @@ export default function renderVideoElement() {
         config: { src, width, height, autoplay, volume, muted, poster, preload, loop, playsinline }
     } = this;
 
+    player.classList.add(this.__getCSSClass('viewer'));
+
     // Group all the video element attributes
     const configAttributes = {
         muted,

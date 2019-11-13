@@ -174,8 +174,15 @@ export default class VPAIDWrapper {
         if (remainingTime >= 0) {
             const duration = this._creative.getAdDuration();
             const currentTime = duration - remainingTime;
-            const readableTime = secondsToReadableTime(currentTime);
-            const payload = { remainingTime, readableTime, duration, currentTime };
+            const fancyDuration = secondsToReadableTime(duration);
+            const fancyCurrentTime = secondsToReadableTime(currentTime);
+            const payload = {
+                remainingTime,
+                fancyCurrentTime,
+                fancyDuration,
+                duration,
+                currentTime
+            };
             this.currentTime = currentTime;
             this.emitter.emit(PLAYBACK_PROGRESS, payload);
         }

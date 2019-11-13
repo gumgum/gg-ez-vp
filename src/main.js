@@ -14,6 +14,7 @@ import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
 
 import {
+    CSS_ROOT,
     DATA_READY,
     PLAYBACK_PROGRESS,
     PLAYER_CLICK,
@@ -52,8 +53,10 @@ export default class GgEzVp {
             ...defaultOptions,
             ...options,
             controls:
-                options.controls !== undefined
-                    ? options.controls && {
+                options.controls === false || options.controls === null
+                    ? false
+                    : options.controls
+                    ? {
                           ...defaultOptions.controls,
                           ...options.controls
                       }
@@ -213,9 +216,16 @@ export default class GgEzVp {
     // { remainingTime, readableTime, duration, currentTime }
     __playbackProgressReporter = () => {
         const { currentTime, duration } = this.player;
-        const readableTime = secondsToReadableTime(currentTime);
+        const fancyCurrentTime = secondsToReadableTime(currentTime);
+        const fancyDuration = secondsToReadableTime(duration);
         const remainingTime = duration - currentTime;
-        const payload = { remainingTime, readableTime, duration, currentTime };
+        const payload = {
+            remainingTime,
+            fancyCurrentTime,
+            fancyDuration,
+            duration,
+            currentTime
+        };
         this.emitter.emit(PLAYBACK_PROGRESS, payload);
     };
 
@@ -371,6 +381,15 @@ export default class GgEzVp {
             return this.unmute();
         }
         return this.mute();
+    };
+
+    // return the duration of the video
+    getDuration = () => {
+        if (this.isVPAID) {
+            return this.VPAIDWrapper.duration;
+        }
+        const { duration } = this.player;
+        return duration || 0;
     };
 
     // return the currentTime of the video

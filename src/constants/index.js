@@ -9,15 +9,23 @@ export const READY = 'ready';
 export const RESIZE = 'resize';
 export const ERROR = 'error';
 export const VPAID_STARTED = 'VPAID-started';
-// Controls
+// Control Names
+export const TIMESTAMP_AD = 'timestampAd';
+export const SKIP = 'skip';
+export const VOLUME = 'volume';
+export const PROGRESS = 'progress';
+export const TIMESTAMP = 'timestamp';
+export const PLAY = 'play';
+export const EXPAND = 'expand';
+// Default Controls Config
 const controls = {
-    timestampAd: false,
-    skip: false,
-    volume: true,
-    progress: true,
-    timestamp: true,
-    play: true,
-    expand: true
+    [TIMESTAMP_AD]: false,
+    [SKIP]: false,
+    [VOLUME]: true,
+    [PROGRESS]: true,
+    [TIMESTAMP]: true,
+    [PLAY]: true,
+    [EXPAND]: true
 };
 // Config
 export const DEFAULT_OPTIONS = {

@@ -4,9 +4,9 @@ import createNode from '../../helpers/createNode';
 
 export default function timestamp(container) {
     const currentTime = this.getCurrentTime();
-    const duration = this.getDuration();
+    const initialDuration = this.getDuration();
     const fancyCurrentTime = secondsToReadableTime(currentTime);
-    const fancyDuration = secondsToReadableTime(duration);
+    const fancyDuration = secondsToReadableTime(initialDuration);
 
     const classNameRoot = this.__getCSSClass(TIMESTAMP);
     const timestampNode = createNode('div', classNameRoot);
@@ -23,8 +23,10 @@ export default function timestamp(container) {
     });
 
     // Set duration once playback starts if it wasn't available
-    this.once(PLAYBACK_PROGRESS, ({ fancyDuration }) => {
-        if (!duration) {
+    this.once('loadedmetadata', () => {
+        const duration = this.getDuration();
+        const fancyDuration = secondsToReadableTime(duration);
+        if (!initialDuration) {
             timestampDuration.innerText = fancyDuration;
         }
     });

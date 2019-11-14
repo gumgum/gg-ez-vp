@@ -9,7 +9,7 @@ import timestamp from './timestamp';
 import play from './play';
 
 export default function renderControls() {
-    const { container, player, config } = this;
+    const { container, config } = this;
     if (!config.controls) return;
 
     const controls = document.createElement('div');

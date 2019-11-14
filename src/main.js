@@ -383,6 +383,14 @@ export default class GgEzVp {
         return this.mute();
     };
 
+    // return the video volume
+    getVolume = () => {
+        if (this.isVPAID) {
+            return this.VPAIDWrapper.getAdVolume();
+        }
+        return this.player.volume;
+    };
+
     // return the duration of the video
     getDuration = () => {
         if (this.isVPAID) {

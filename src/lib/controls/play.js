@@ -1,11 +1,12 @@
+import createNode from '../../helpers/createNode';
 import { PLAY } from '../../constants';
 const PAUSE = 'pause';
 const REPLAY = 'replay';
 
 export default function play(container) {
-    const button = document.createElement('button');
-    button.setAttribute('type', 'button');
-    button.classList.add(this.__getCSSClass('button-icon'), PLAY);
+    const button = createNode('button', [this.__getCSSClass('button-icon'), PLAY], {
+        type: 'button'
+    });
 
     this.__nodeOn(button, 'click', e => {
         e.stopPropagation?.();

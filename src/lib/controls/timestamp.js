@@ -1,5 +1,6 @@
 import { PLAYBACK_PROGRESS, TIMESTAMP } from '../../constants';
 import secondsToReadableTime from '../../helpers/secondsToReadableTime';
+import createNode from '../../helpers/createNode';
 
 export default function timestamp(container) {
     const currentTime = this.getCurrentTime();
@@ -7,17 +8,15 @@ export default function timestamp(container) {
     const fancyCurrentTime = secondsToReadableTime(currentTime);
     const fancyDuration = secondsToReadableTime(duration);
 
-    const timestampNode = document.createElement('div');
     const classNameRoot = this.__getCSSClass(TIMESTAMP);
-    timestampNode.classList.add(classNameRoot);
+    const timestampNode = createNode('div', classNameRoot);
 
     const [timestampCurrent, , timestampDuration] = [
         ['current', fancyCurrentTime],
         ['break', '/'],
         ['total', fancyDuration]
     ].map(([name, content]) => {
-        const node = document.createElement('div');
-        node.classList.add(`${classNameRoot}-${name}`);
+        const node = createNode('div', `${classNameRoot}-${name}`);
         node.innerText = content;
         timestampNode.appendChild(node);
         return node;
@@ -30,6 +29,7 @@ export default function timestamp(container) {
         }
     });
 
+    //TODO: Throttle DOM updates when fancyCurrentTime is the same
     // Update currentTime
     this.on(PLAYBACK_PROGRESS, ({ fancyCurrentTime }) => {
         timestampCurrent.innerText = fancyCurrentTime;

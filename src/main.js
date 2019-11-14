@@ -8,6 +8,7 @@ import initVPAIDAd from './lib/initVPAIDAd';
 import enableVASTTracking from './lib/enableVASTTracking';
 import configureVPAID from './lib/configureVPAID';
 import renderControls from './lib/controls';
+import fullscreenToggle from './lib/fullscreenToggle';
 // helper functions
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
@@ -47,6 +48,7 @@ export default class GgEzVp {
         // flag than can be used from the outside to check if the data needed to render is ready
         this.dataReady = false;
         this.prevVol = options.volume;
+        this.isFullscreen = false;
 
         // merge default options with user provided options
         this.config = {
@@ -410,36 +412,7 @@ export default class GgEzVp {
     };
 
     // turn fullscreen on/off
-    fullscreenToggle = () => {
-        const el = this.player;
-        if (!this.config.fullscreen) {
-            if (el.requestFullscreen) {
-                el.requestFullscreen();
-            } else if (el.mozRequestFullScreen) {
-                /* Firefox */
-                el.mozRequestFullScreen();
-            } else if (el.webkitRequestFullscreen) {
-                /* Chrome, Safari and Opera */
-                el.webkitRequestFullscreen();
-            } else if (el.msRequestFullscreen) {
-                /* IE/Edge */
-                el.msRequestFullscreen();
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                /* Firefox */
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                /* Chrome, Safari and Opera */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                /* IE/Edge */
-                document.msExitFullscreen();
-            }
-        }
-    };
+    fullscreenToggle = fullscreenToggle;
 
     // remove all event listeners and remove everything inside the container
     // emits PRE_DESTROY

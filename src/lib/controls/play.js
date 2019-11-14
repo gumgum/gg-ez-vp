@@ -5,34 +5,22 @@ const REPLAY = 'replay';
 export default function play(container) {
     const button = document.createElement('button');
     button.setAttribute('type', 'button');
-
-    const classNames = [this.__getCSSClass('button-icon'), PLAY];
-    classNames.forEach(className => {
-        button.classList.add(className);
-    });
+    button.classList.add(this.__getCSSClass('button-icon'), PLAY);
 
     this.__nodeOn(button, 'click', e => {
         e.stopPropagation?.();
         this.playPause();
     });
 
-    this.on(PLAY, () => {
-        button.classList.remove(REPLAY);
-        button.classList.remove(PAUSE);
-        button.classList.add(PLAY);
-    });
-
-    this.on(PAUSE, () => {
-        button.classList.remove(REPLAY);
-        button.classList.remove(PLAY);
-        button.classList.add(PAUSE);
-    });
-
-    this.on('ended', () => {
-        button.classList.remove(PLAY);
-        button.classList.remove(PAUSE);
-        button.classList.add(REPLAY);
-    });
+    this.on(PLAY, listenerCreator(button, [REPLAY, PLAY], PAUSE));
+    this.on(PAUSE, listenerCreator(button, [REPLAY, PAUSE], PLAY));
+    this.on('ended', listenerCreator(button, [PLAY, PAUSE], REPLAY));
 
     container.appendChild(button);
 }
+
+const listenerCreator = (node, classNamesRm = [], classNameAdd = '') => () => {
+    if (!node) return;
+    node.classList.remove(...classNamesRm);
+    node.classList.add(classNameAdd);
+};

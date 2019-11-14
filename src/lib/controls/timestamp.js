@@ -8,7 +8,8 @@ export default function timestamp(container) {
     const fancyDuration = secondsToReadableTime(duration);
 
     const timestampNode = document.createElement('div');
-    timestampNode.classList.add(this.__getCSSClass(TIMESTAMP));
+    const classNameRoot = this.__getCSSClass(TIMESTAMP);
+    timestampNode.classList.add(classNameRoot);
 
     const [timestampCurrent, , timestampDuration] = [
         ['current', fancyCurrentTime],
@@ -16,7 +17,7 @@ export default function timestamp(container) {
         ['total', fancyDuration]
     ].map(([name, content]) => {
         const node = document.createElement('div');
-        node.classList.add(this.__getCSSClass(`${TIMESTAMP}-${name}`));
+        node.classList.add(`${classNameRoot}-${name}`);
         node.innerText = content;
         timestampNode.appendChild(node);
         return node;

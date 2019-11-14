@@ -33,7 +33,7 @@ export default function volume(container) {
         }
     };
 
-    const setVolume = e => {
+    const setVolume = () => {
         this.volume(volumeRange.value);
     };
 

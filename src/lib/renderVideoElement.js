@@ -25,7 +25,14 @@ export default function renderVideoElement() {
         'webkit-playsinline': playsinline
     };
 
-    applyConfigToVideoElement({ src, configAttributes, player, isVPAID, VASTSources });
+    applyConfigToVideoElement({
+        src,
+        configAttributes,
+        player,
+        isVPAID,
+        VASTSources,
+        setVolume: this.volume
+    });
 
     // Insert the video node
     container.appendChild(player);

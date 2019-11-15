@@ -407,13 +407,16 @@ div.gg-ez-vp--progress-filled:hover::after {
     transition: all .3s;
 }
 
+.gg-ez-vp--volume-only.gg-ez-vp--no-scrub .gg-ez-vp--controls {
+    bottom: -15px;
+}
+
 .gg-ez-vp:hover.gg-ez-vp--volume-only .gg-ez-vp--controls {
     transform: translateY(0);
     background: none;
 }
 
-.gg-ez-vp--volume-only .gg-ez-vp--middle,
-.gg-ez-vp--volume-only .gg-ez-vp--bottom {
+.gg-ez-vp--volume-only .gg-ez-vp--middle {
     display: none;
 }
 

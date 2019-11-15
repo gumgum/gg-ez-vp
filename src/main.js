@@ -25,6 +25,7 @@ import {
     VPAID_STARTED,
     ERROR,
     TIMESTAMP_AD,
+    TIMESTAMP,
     SKIP,
     DEFAULT_OPTIONS as defaultOptions
 } from './constants';
@@ -67,7 +68,8 @@ export default class GgEzVp {
         const adControlOpts = isAd
             ? {
                   [TIMESTAMP_AD]: options.controls?.[TIMESTAMP_AD] ?? true,
-                  [SKIP]: options.controls?.[SKIP] ?? true
+                  [SKIP]: options.controls?.[SKIP] ?? true,
+                  [TIMESTAMP]: false
               }
             : {
                   [TIMESTAMP_AD]: defaultOptions.controls[TIMESTAMP_AD],

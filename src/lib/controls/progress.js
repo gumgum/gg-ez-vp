@@ -7,10 +7,14 @@ export default function progress(container) {
     const progressBar = createNode('div', `${classNameRoot}-bar`);
     const progressFill = createNode('div', `${classNameRoot}-filled`);
     const isAd = this.config.isAd || this.config.isVAST;
+    let mouseOverBar = false;
 
     this.on(PLAYBACK_PROGRESS, ({ currentTime, duration }) => {
-        const percentage = Math.floor((100 / duration) * currentTime);
-        progressFill.style.flexBasis = `${percentage}%`;
+        //prevent bar from jumping while playing
+        if (!mouseOverBar) {
+            const percentage = Math.floor((100 / duration) * currentTime);
+            progressFill.style.flexBasis = `${percentage}%`;
+        }
     });
 
     if (!isAd) {
@@ -22,8 +26,8 @@ export default function progress(container) {
         });
 
         this.__nodeOn(progressBar, 'mousemove', e => {
-            const duration = this.getDuration();
             const percentage = (e.offsetX / progressBar.offsetWidth) * 100;
+            mouseOverBar = true;
             progressFill.style.flexBasis = `${percentage}%`;
         });
 
@@ -31,6 +35,7 @@ export default function progress(container) {
             const duration = this.getDuration();
             const currentTime = this.getCurrentTime();
             const percentage = Math.floor((100 / duration) * currentTime);
+            mouseOverBar = false;
             progressFill.style.flexBasis = `${percentage}%`;
         });
     }

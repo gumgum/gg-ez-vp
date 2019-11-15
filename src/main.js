@@ -151,7 +151,7 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.__setReadyNextTick();
         }
-        this.on('canplay', this.__setReadyNextTick);
+        this.once('canplay', this.__setReadyNextTick);
     };
 
     __setReadyNextTick = () => {

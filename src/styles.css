@@ -339,7 +339,6 @@ div.gg-ez-vp--progress-filled:hover::after {
 }
 
 
-
 /* Show Ad Unit Countdown Timestamp & Volume  */
 /* Example: <div class="gg-ez-vp  gg-ez-vp--ad"> */
 .gg-ez-vp--ad .gg-ez-vp--top > .gg-ez-vp--item-left {
@@ -388,7 +387,7 @@ div.gg-ez-vp--progress-filled:hover::after {
 
 
 
-/* Video Volume Only w/ extra padding - ie ISEV Video */
+/* Video Volume Only w/ extra padding  */
 /* Add class gg-ez-vp--volume-only */
 /* Example: <div class="gg-ez-vp  gg-ez-vp--volume-only"> */
 

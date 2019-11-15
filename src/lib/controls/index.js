@@ -11,8 +11,11 @@ import play from './play';
 export default function renderControls() {
     const { container, config } = this;
     if (!config.controls) return;
-
+    const isAd = config.isAd || config.isVAST;
     const controls = document.createElement('div');
+    if (isAd) {
+        container.classList.add(this.__getCSSClass('no-scrub'));
+    }
     controls.classList.add(this.__getCSSClass('controls'));
     nodeRenderer.call(this, config, sections, controls);
     container.appendChild(controls);
@@ -20,9 +23,8 @@ export default function renderControls() {
 
 function nodeRenderer(config, sections, container) {
     const { isVAST, controls, isAd } = config;
-    const shouldRenderAdBar = isAd || isVAST;
-    sections.forEach(({ name, tagType, children, component, showOnAd }) => {
-        const isAllowed = shouldNodeRender(showOnAd, shouldRenderAdBar);
+    sections.forEach(({ name, tagType, children, component, isAdComponent }) => {
+        const isAllowed = shouldNodeRender(isAdComponent, isAd || isVAST);
         if (!isAllowed) return;
         if (tagType) {
             const node = document.createElement(tagType);
@@ -35,14 +37,8 @@ function nodeRenderer(config, sections, container) {
     });
 }
 
-const shouldNodeRender = (showOnAd, shouldRenderAdBar) => {
-    if (
-        showOnAd === undefined ||
-        (shouldRenderAdBar && showOnAd) ||
-        (!shouldRenderAdBar && !showOnAd)
-    )
-        return true;
-    return false;
+const shouldNodeRender = (isAdComponent, isAd) => {
+    return isAdComponent === undefined || (isAd && isAdComponent) || (!isAd && !isAdComponent);
 };
 
 const sections = [
@@ -53,7 +49,7 @@ const sections = [
             {
                 name: 'item-left',
                 tagType: 'div',
-                showOnAd: true,
+                isAdComponent: true,
                 children: [
                     {
                         name: TIMESTAMP_AD,
@@ -68,7 +64,7 @@ const sections = [
             {
                 name: 'item-right',
                 tagType: 'div',
-                showOnAd: true,
+                isAdComponent: true,
                 children: [
                     {
                         name: EXPAND,
@@ -94,7 +90,7 @@ const sections = [
             {
                 name: 'item-left',
                 tagType: 'div',
-                showOnAd: false,
+                isAdComponent: false,
                 children: [
                     {
                         name: TIMESTAMP,
@@ -113,7 +109,7 @@ const sections = [
             {
                 name: 'item-right',
                 tagType: 'div',
-                showOnAd: false,
+                isAdComponent: false,
                 children: [
                     {
                         name: EXPAND,

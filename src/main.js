@@ -50,7 +50,6 @@ export default class GgEzVp {
         this.ready = false;
         // flag than can be used from the outside to check if the data needed to render is ready
         this.dataReady = false;
-        this.prevVol = options.volume;
         this.isFullscreen = false;
         this.config = this.__getConfig(options);
         // Create the video node
@@ -64,7 +63,6 @@ export default class GgEzVp {
 
     __getConfig = options => {
         const isAd = options?.isAd || options?.isVAST;
-        console.log({ isAd });
 
         const adControlOpts = isAd
             ? {
@@ -75,8 +73,6 @@ export default class GgEzVp {
                   [TIMESTAMP_AD]: defaultOptions.controls[TIMESTAMP_AD],
                   [SKIP]: defaultOptions.controls[SKIP]
               };
-
-        console.log({ adControlOpts });
 
         // merge default options with user provided options
         const config = {
@@ -93,7 +89,8 @@ export default class GgEzVp {
                       }
                     : { ...defaultOptions.controls, ...adControlOpts }
         };
-        console.log({ config });
+        config.volume = parseFloat(config.volume);
+        this.__prevVol = config.volume;
         return config;
     };
 
@@ -114,7 +111,7 @@ export default class GgEzVp {
             }
             this.__renderVideoElement();
         } catch (err) {
-            console.log(err);
+            console.log(err); //eslint-disable-line no-console
         }
     };
 
@@ -383,29 +380,22 @@ export default class GgEzVp {
     // mute audio
     mute = () => {
         const { isVPAID, VPAIDWrapper } = this;
-        if (isVPAID) {
-            this.prevVol = VPAIDWrapper.getAdVolume();
-            return VPAIDWrapper.setAdVolume(0);
-        }
-        this.player.muted = true;
+        this.__prevVol = this.getVolume();
+        this.volume(0);
     };
 
     // unmute audio
     unmute = () => {
-        const { isVPAID, VPAIDWrapper, prevVol, config } = this;
-        if (isVPAID) {
-            const volume = prevVol || config.volume;
-            return VPAIDWrapper.setAdVolume(volume);
-        }
-        this.player.muted = false;
+        this.volume(this.__prevVol);
     };
 
     // toggle mute
     muteUnmute = () => {
-        if (this.player.muted) {
-            return this.unmute();
+        const currentVol = this.getVolume();
+        if (currentVol) {
+            return this.mute();
         }
-        return this.mute();
+        return this.unmute();
     };
 
     // return the video volume

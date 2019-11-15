@@ -13,7 +13,6 @@ export default function volume(container) {
         if (key === VOLUME) return false;
         return controls[key];
     });
-    console.log({ controls, volumeOnly });
     let volumeRange, button;
 
     const volumeClassRoot = this.__getCSSClass(VOLUME);

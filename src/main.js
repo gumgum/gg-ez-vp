@@ -148,7 +148,10 @@ export default class GgEzVp {
         this.__renderControls();
         // set up playback progress listener
         this.on('timeupdate', this.__playbackProgressReporter);
-        this.__setReadyNextTick();
+        if (this.isVPAID) {
+            return this.__setReadyNextTick();
+        }
+        this.on('canplay', this.__setReadyNextTick);
     };
 
     __setReadyNextTick = () => {

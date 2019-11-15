@@ -24,6 +24,8 @@ import {
     RESIZE,
     VPAID_STARTED,
     ERROR,
+    TIMESTAMP_AD,
+    SKIP,
     DEFAULT_OPTIONS as defaultOptions
 } from './constants';
 
@@ -36,6 +38,7 @@ const internalEvents = [
     READY,
     RESIZE,
     VPAID_STARTED,
+    SKIP,
     ERROR
 ];
 
@@ -49,22 +52,7 @@ export default class GgEzVp {
         this.dataReady = false;
         this.prevVol = options.volume;
         this.isFullscreen = false;
-
-        // merge default options with user provided options
-        this.config = {
-            ...defaultOptions,
-            ...options,
-            controls:
-                options.controls === false || options.controls === null
-                    ? false
-                    : options.controls
-                    ? {
-                          ...defaultOptions.controls,
-                          ...options.controls
-                      }
-                    : defaultOptions.controls
-        };
-
+        this.config = this.__getConfig(options);
         // Create the video node
         this.player = document.createElement('video');
         // set vast data default
@@ -73,6 +61,41 @@ export default class GgEzVp {
         // set up any extra processes
         this.__init();
     }
+
+    __getConfig = options => {
+        const isAd = options?.isAd || options?.isVAST;
+        console.log({ isAd });
+
+        const adControlOpts = isAd
+            ? {
+                  [TIMESTAMP_AD]: options.controls?.[TIMESTAMP_AD] ?? true,
+                  [SKIP]: options.controls?.[SKIP] ?? true
+              }
+            : {
+                  [TIMESTAMP_AD]: defaultOptions.controls[TIMESTAMP_AD],
+                  [SKIP]: defaultOptions.controls[SKIP]
+              };
+
+        console.log({ adControlOpts });
+
+        // merge default options with user provided options
+        const config = {
+            ...defaultOptions,
+            ...options,
+            controls:
+                options.controls === false || options.controls === null
+                    ? false
+                    : options.controls
+                    ? {
+                          ...defaultOptions.controls,
+                          ...options.controls,
+                          ...adControlOpts
+                      }
+                    : { ...defaultOptions.controls, ...adControlOpts }
+        };
+        console.log({ config });
+        return config;
+    };
 
     // set up controls and internal listeners
     // fetch VAST data if necessary

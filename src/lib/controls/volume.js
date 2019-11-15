@@ -5,12 +5,10 @@ const MUTE = 'mute';
 
 export default function volume(container) {
     const {
-        config: {
-            controls: { volumeControl, volumeButton },
-            volume: currentVolume,
-            muted
-        }
+        config: { controls, volume: currentVolume, muted }
     } = this;
+    const { volumeControl, volumeButton } = controls;
+    // TODO: set -volume-only modifier
 
     let volumeRange, button;
     const volumeClassRoot = this.__getCSSClass(VOLUME);
@@ -19,6 +17,7 @@ export default function volume(container) {
     const volumeChangeEvt = this.isVPAID ? 'AdVolumeChange' : 'volumechange';
 
     const setControlsState = () => {
+        //TODO: fix issues dragging input
         const currentVolume = this.getVolume();
         const isMuted = this.isVPAID ? currentVolume : this.player.muted;
 

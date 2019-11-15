@@ -212,7 +212,6 @@ export default class GgEzVp {
         this.emitter.emit(PLAYER_CLICK, ...args);
     };
 
-    // listen for clicks inside the player container
     __playerResizeListener = () => {
         const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
         this.dimensions.width = initialWidth;
@@ -275,7 +274,8 @@ export default class GgEzVp {
     // emits: 'attaching-EVENT_NAME', where EVENT_NAME is the original event name
     // this event is useful when the user wants access to the teardown function
     __attachStoredListeners = () => {
-        for (let key in this.__listenerStore) {
+        let key;
+        for (key in this.__listenerStore) {
             this.__listenerStore[key].forEach(args => {
                 const teardown = this[key](...args);
                 const storageEvent = `attaching-${key}`;
@@ -379,7 +379,6 @@ export default class GgEzVp {
 
     // mute audio
     mute = () => {
-        const { isVPAID, VPAIDWrapper } = this;
         this.__prevVol = this.getVolume();
         this.volume(0);
     };

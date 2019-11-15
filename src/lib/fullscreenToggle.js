@@ -1,3 +1,4 @@
+import { EXPAND } from '../../constants';
 export default function fullscreenToggle() {
     if (
         document.fullscreenElement ||
@@ -23,6 +24,7 @@ const requestFullscreen = el => {
         /* IE/Edge */
         el.msRequestFullscreen();
     }
+    this.emitter.emit(EXPAND, true);
 };
 
 const exitFullscreen = () => {
@@ -38,4 +40,5 @@ const exitFullscreen = () => {
         /* IE/Edge */
         document.msExitFullscreen();
     }
+    this.emitter.emit(EXPAND, false);
 };

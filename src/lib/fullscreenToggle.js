@@ -1,4 +1,4 @@
-import { EXPAND } from '../../constants';
+import { EXPAND } from '../constants';
 export default function fullscreenToggle() {
     if (
         document.fullscreenElement ||
@@ -6,12 +6,12 @@ export default function fullscreenToggle() {
         document.mozFullScreenElement ||
         document.msFullscreenElement
     ) {
-        return exitFullscreen();
+        return exitFullscreen.call(this);
     }
-    return requestFullscreen(this.container);
+    return requestFullscreen.call(this, this.container);
 }
 
-const requestFullscreen = el => {
+function requestFullscreen(el) {
     if (el.requestFullscreen) {
         el.requestFullscreen();
     } else if (el.mozRequestFullScreen) {
@@ -25,9 +25,9 @@ const requestFullscreen = el => {
         el.msRequestFullscreen();
     }
     this.emitter.emit(EXPAND, true);
-};
+}
 
-const exitFullscreen = () => {
+function exitFullscreen() {
     if (document.exitFullscreen) {
         document.exitFullscreen();
     } else if (document.mozCancelFullScreen) {
@@ -41,4 +41,4 @@ const exitFullscreen = () => {
         document.msExitFullscreen();
     }
     this.emitter.emit(EXPAND, false);
-};
+}

@@ -7,7 +7,9 @@ window.onload = function onload() {
     let playerInstance = new GgEzVp({
         container: 'videoContainer1',
         src: 'https://aba.gumgum.com/13861/8/big_buck_bunny_640x360.mp4',
-        autoplay: false
+        autoplay: false,
+        volume: '0.5',
+        isAd: true
     });
 
     // Set listeners
@@ -32,17 +34,16 @@ window.onload = function onload() {
     });
 
     // Set listeners
-    playerInstance1.on('ready', () => {
-        playerInstance1.play();
-        playerInstance1.on('play', console.log);
-        playerInstance1.on('pause', console.log);
-        playerInstance1.on('timeupdate', console.log);
-        playerInstance1.on('predestroy', () => {
-            console.log('DESTROYING SECOND CONTAINER');
-            playerInstance1 = null;
-        });
-    });
-    playerInstance1.on('error', console.log);
+    //playerInstance1.on('ready', () => {
+    //    playerInstance1.on('play', console.log);
+    //    playerInstance1.on('pause', console.log);
+    //    playerInstance1.on('timeupdate', console.log);
+    //    playerInstance1.on('predestroy', () => {
+    //        console.log('DESTROYING SECOND CONTAINER');
+    //        playerInstance1 = null;
+    //    });
+    //});
+    //playerInstance1.on('error', console.log);
 
     // Configure instance 1 buttons
     const playBtn = document.getElementById('play-btn');

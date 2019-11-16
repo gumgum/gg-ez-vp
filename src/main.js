@@ -7,13 +7,15 @@ import runVPAID from './lib/runVPAID';
 import initVPAIDAd from './lib/initVPAIDAd';
 import enableVASTTracking from './lib/enableVASTTracking';
 import configureVPAID from './lib/configureVPAID';
-import videoControls from './lib/controls';
+import renderControls from './lib/controls';
+import fullscreenToggle from './lib/fullscreenToggle';
 // helper functions
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
 
 import {
+    CSS_ROOT,
     DATA_READY,
     PLAYBACK_PROGRESS,
     PLAYER_CLICK,
@@ -22,6 +24,9 @@ import {
     RESIZE,
     VPAID_STARTED,
     ERROR,
+    TIMESTAMP_AD,
+    TIMESTAMP,
+    SKIP,
     DEFAULT_OPTIONS as defaultOptions
 } from './constants';
 
@@ -34,6 +39,7 @@ const internalEvents = [
     READY,
     RESIZE,
     VPAID_STARTED,
+    SKIP,
     ERROR
 ];
 
@@ -45,21 +51,8 @@ export default class GgEzVp {
         this.ready = false;
         // flag than can be used from the outside to check if the data needed to render is ready
         this.dataReady = false;
-        this.prevVol = options.volume;
-
-        // merge default options with user provided options
-        this.config = {
-            ...defaultOptions,
-            ...options,
-            controls:
-                options.controls !== undefined
-                    ? options.controls && {
-                          ...defaultOptions.controls,
-                          ...options.controls
-                      }
-                    : defaultOptions.controls
-        };
-
+        this.isFullscreen = false;
+        this.config = this.__getConfig(options);
         // Create the video node
         this.player = document.createElement('video');
         // set vast data default
@@ -69,6 +62,40 @@ export default class GgEzVp {
         this.__init();
     }
 
+    __getConfig = options => {
+        const isAd = options?.isAd || options?.isVAST;
+
+        const adControlOpts = isAd
+            ? {
+                  [TIMESTAMP_AD]: options.controls?.[TIMESTAMP_AD] ?? true,
+                  [SKIP]: options.controls?.[SKIP] ?? true,
+                  [TIMESTAMP]: false
+              }
+            : {
+                  [TIMESTAMP_AD]: defaultOptions.controls[TIMESTAMP_AD],
+                  [SKIP]: defaultOptions.controls[SKIP]
+              };
+
+        // merge default options with user provided options
+        const config = {
+            ...defaultOptions,
+            ...options,
+            controls:
+                options.controls === false || options.controls === null
+                    ? false
+                    : options.controls
+                    ? {
+                          ...defaultOptions.controls,
+                          ...options.controls,
+                          ...adControlOpts
+                      }
+                    : { ...defaultOptions.controls, ...adControlOpts }
+        };
+        config.volume = parseFloat(config.volume);
+        this.__prevVol = config.volume;
+        return config;
+    };
+
     // set up controls and internal listeners
     // fetch VAST data if necessary
     __init = () => {
@@ -76,7 +103,7 @@ export default class GgEzVp {
             const { container, isVAST } = this.config;
             this.container = isElement(container) ? container : document.getElementById(container);
             this.__validateConfig();
-            this.container.classList.add('gg-ez-container');
+            this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
             // set click listener on player
@@ -86,9 +113,11 @@ export default class GgEzVp {
             }
             this.__renderVideoElement();
         } catch (err) {
-            console.log(err);
+            console.log(err); //eslint-disable-line no-console
         }
     };
+
+    __getCSSClass = (suffix = '') => CSS_ROOT + (suffix ? `--${suffix}` : '');
 
     __validateConfig = () => {
         const { src, container } = this.config;
@@ -119,7 +148,10 @@ export default class GgEzVp {
         this.__renderControls();
         // set up playback progress listener
         this.on('timeupdate', this.__playbackProgressReporter);
-        this.__setReadyNextTick();
+        if (this.isVPAID) {
+            return this.__setReadyNextTick();
+        }
+        this.once('canplay', this.__setReadyNextTick);
     };
 
     __setReadyNextTick = () => {
@@ -136,18 +168,7 @@ export default class GgEzVp {
         this.emitter.emit(READY);
     };
 
-    //TODO: REFACTOR CONTROLS
-    __renderControls = () => {
-        const { controls } = this.config;
-        this.controlContainer = controls ? videoControls(this) : null;
-        if (this.controlContainer)
-            this.container.addEventListener('mouseenter', () =>
-                this.controlContainer.classList.add('active')
-            );
-        this.container.addEventListener('mouseleave', () =>
-            this.controlContainer.classList.remove('active')
-        );
-    };
+    __renderControls = renderControls;
 
     __parseVAST = parseVAST;
 
@@ -196,7 +217,6 @@ export default class GgEzVp {
         this.emitter.emit(PLAYER_CLICK, ...args);
     };
 
-    // listen for clicks inside the player container
     __playerResizeListener = () => {
         const { offsetWidth: initialWidth, offsetHeight: initialHeight } = this.player;
         this.dimensions.width = initialWidth;
@@ -222,9 +242,16 @@ export default class GgEzVp {
     // { remainingTime, readableTime, duration, currentTime }
     __playbackProgressReporter = () => {
         const { currentTime, duration } = this.player;
-        const readableTime = secondsToReadableTime(currentTime);
+        const fancyCurrentTime = secondsToReadableTime(currentTime);
+        const fancyDuration = secondsToReadableTime(duration);
         const remainingTime = duration - currentTime;
-        const payload = { remainingTime, readableTime, duration, currentTime };
+        const payload = {
+            remainingTime,
+            fancyCurrentTime,
+            fancyDuration,
+            duration,
+            currentTime
+        };
         this.emitter.emit(PLAYBACK_PROGRESS, payload);
     };
 
@@ -252,7 +279,8 @@ export default class GgEzVp {
     // emits: 'attaching-EVENT_NAME', where EVENT_NAME is the original event name
     // this event is useful when the user wants access to the teardown function
     __attachStoredListeners = () => {
-        for (let key in this.__listenerStore) {
+        let key;
+        for (key in this.__listenerStore) {
             this.__listenerStore[key].forEach(args => {
                 const teardown = this[key](...args);
                 const storageEvent = `attaching-${key}`;
@@ -356,30 +384,39 @@ export default class GgEzVp {
 
     // mute audio
     mute = () => {
-        const { isVPAID, VPAIDWrapper } = this;
-        if (isVPAID) {
-            this.prevVol = VPAIDWrapper.getAdVolume();
-            return VPAIDWrapper.setAdVolume(0);
-        }
-        this.player.muted = true;
+        this.__prevVol = this.getVolume();
+        this.volume(0);
     };
 
     // unmute audio
     unmute = () => {
-        const { isVPAID, VPAIDWrapper, prevVol, config } = this;
-        if (isVPAID) {
-            const volume = prevVol || config.volume;
-            return VPAIDWrapper.setAdVolume(volume);
-        }
-        this.player.muted = false;
+        this.volume(this.__prevVol);
     };
 
     // toggle mute
     muteUnmute = () => {
-        if (this.player.muted) {
-            return this.unmute();
+        const currentVol = this.getVolume();
+        if (currentVol) {
+            return this.mute();
         }
-        return this.mute();
+        return this.unmute();
+    };
+
+    // return the video volume
+    getVolume = () => {
+        if (this.isVPAID) {
+            return this.VPAIDWrapper.getAdVolume();
+        }
+        return this.player.volume;
+    };
+
+    // return the duration of the video
+    getDuration = () => {
+        if (this.isVPAID) {
+            return this.VPAIDWrapper.duration;
+        }
+        const { duration } = this.player;
+        return duration || 0;
     };
 
     // return the currentTime of the video
@@ -392,36 +429,7 @@ export default class GgEzVp {
     };
 
     // turn fullscreen on/off
-    fullscreenToggle = () => {
-        const el = this.player;
-        if (!this.config.fullscreen) {
-            if (el.requestFullscreen) {
-                el.requestFullscreen();
-            } else if (el.mozRequestFullScreen) {
-                /* Firefox */
-                el.mozRequestFullScreen();
-            } else if (el.webkitRequestFullscreen) {
-                /* Chrome, Safari and Opera */
-                el.webkitRequestFullscreen();
-            } else if (el.msRequestFullscreen) {
-                /* IE/Edge */
-                el.msRequestFullscreen();
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                /* Firefox */
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                /* Chrome, Safari and Opera */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                /* IE/Edge */
-                document.msExitFullscreen();
-            }
-        }
-    };
+    fullscreenToggle = fullscreenToggle;
 
     // remove all event listeners and remove everything inside the container
     // emits PRE_DESTROY

@@ -35,6 +35,8 @@ yarn-error.log
 tmp
 dist
 package-lock.json
+dist/
+dist
 
 # Vim specific
 .vim

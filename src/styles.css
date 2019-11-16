@@ -282,11 +282,6 @@ div.gg-ez-vp--progress-filled:hover::after {
     border: 0.2px solid rgba(1, 1, 1, 0);
 }
 
-/* .gg-ez-vp--input-range:focus::-webkit-slider-runnable-track {
-    background: #bada55;
-    outline: none;
-  } */
-
 .gg-ez-vp--input-range::-webkit-slider-thumb {
     height: 9px;
     width: 9px;

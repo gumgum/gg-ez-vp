@@ -1,10 +1,15 @@
 import checkVPAIDInterface from '../helpers/checkVPAIDInterface';
 import secondsToReadableTime from '../helpers/secondsToReadableTime';
 import setCallbacksForCreative from './setCallbacksForCreative';
-import { DATA_READY, ERROR, PLAYBACK_PROGRESS, VPAID_STARTED } from '../constants';
+import { DATA_READY, ERROR, PLAYBACK_PROGRESS, VPAID_STARTED, SKIP, EXPAND } from '../constants';
 
 export default class VPAIDWrapper {
-    constructor(VPAIDCreative, emitter) {
+    constructor(
+        VPAIDCreative,
+        emitter,
+        { width: containerWidth, height: containerHeight },
+        creativeVersion
+    ) {
         this._creative = VPAIDCreative;
         this.emitter = emitter;
         const isValidVPAID = this.__checkVPAIDInterface(VPAIDCreative);
@@ -14,6 +19,16 @@ export default class VPAIDWrapper {
             return;
         }
         this.__setCallbacksForCreative();
+        this.emitter.on(SKIP, this.skipAd);
+        this.emitter.on(EXPAND, isExpanded => {
+            const expandAdArgs = isExpanded
+                ? [window.screen.width, window.screen.height, 'fullscreen']
+                : [containerWidth, containerHeight, 'thumbnail'];
+            if (parseFloat(creativeVersion) < 2) {
+                return this.stopAd();
+            }
+            this.expandAd(...expandAdArgs);
+        });
     }
 
     __checkVPAIDInterface = checkVPAIDInterface;
@@ -62,6 +77,12 @@ export default class VPAIDWrapper {
     // Pass through for getAdSkippableState
     getAdSkippableState() {
         return this._creative.getAdSkippableState();
+    }
+
+    skipAd() {
+        if (this.getAdSkippableState()) {
+            return this._creative.skipAd();
+        }
     }
 
     // Pass through for setAdVolume
@@ -174,8 +195,15 @@ export default class VPAIDWrapper {
         if (remainingTime >= 0) {
             const duration = this._creative.getAdDuration();
             const currentTime = duration - remainingTime;
-            const readableTime = secondsToReadableTime(currentTime);
-            const payload = { remainingTime, readableTime, duration, currentTime };
+            const fancyDuration = secondsToReadableTime(duration);
+            const fancyCurrentTime = secondsToReadableTime(currentTime);
+            const payload = {
+                remainingTime,
+                fancyCurrentTime,
+                fancyDuration,
+                duration,
+                currentTime
+            };
             this.currentTime = currentTime;
             this.emitter.emit(PLAYBACK_PROGRESS, payload);
         }

@@ -1,5 +1,4 @@
 import { VASTTracker } from 'vast-client';
-//TODO: pending event controls skip, expandButton
 
 export default function enableVASTTracking(vastClient, ad, creative) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
@@ -25,12 +24,11 @@ const VASTEventListeners = {
     click: tracker => () => tracker.click(),
     ended: tracker => () => tracker.complete(),
     error: tracker => () => tracker.errorWithCode(405),
-    fullscreenchange: tracker => () => {
-        const isFullscreen = !!document.fullscreenElement;
-        tracker.setFullscreen(isFullscreen);
-    },
     pause: tracker => () => tracker.setPaused(true),
+    skip: tracker => () => tracker.skip(),
     play: tracker => () => tracker.setPaused(false),
-    volumechange: tracker => e => tracker.setMuted(e.target.muted),
-    timeupdate: tracker => e => tracker.setProgress(e.target.currentTime)
+    expand: tracker => isFullscreen => tracker.setFullscreen(isFullscreen),
+    volumechange: tracker => e => tracker.setMuted(e.target.muted || !e.target.volume),
+    timeupdate: tracker => e => tracker.setProgress(e.target.currentTime),
+    loadedmetadata: tracker => e => tracker.setDuration(e.target.duration)
 };

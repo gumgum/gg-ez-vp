@@ -1,11 +1,12 @@
 export default function applyConfigToVideoElement({
     src,
-    configAttributes: { muted, ...configAttributes },
+    configAttributes: { muted, volume, ...configAttributes },
     player,
     isVPAID,
-    VASTSources
+    VASTSources,
+    setVolume
 }) {
-    player.muted = muted;
+    setVolume(muted ? 0 : volume);
     appendVideoAttributes(configAttributes, player);
     if (isVPAID) return;
     appendVideoSources(src, player, VASTSources);

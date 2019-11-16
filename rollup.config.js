@@ -28,7 +28,7 @@ export default [
             copy({
                 targets: [
                     { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
-                    { src: 'src/img/*', dest: 'dist/img' }
+                    { src: 'src/icons/*', dest: 'dist/icons' }
                 ]
             })
         ]

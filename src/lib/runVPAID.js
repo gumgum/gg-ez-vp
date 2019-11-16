@@ -8,8 +8,15 @@ export default async function runVPAID(creative, VPAIDSource) {
     const VPAIDCreative = await loadVPAID(VPAIDSource.fileURL, this.container);
     const VPAIDCreativeVersion = VPAIDCreative.handshakeVersion(SUPPORTED_VPAID_VERSION);
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
+    const { offsetWidth: width, offsetHeight: height } = this.container;
+    const originalDimensions = { width, height };
     if (canSupportVPAID) {
-        this.VPAIDWrapper = new VPAIDWrapper(VPAIDCreative, this.emitter);
+        this.VPAIDWrapper = new VPAIDWrapper(
+            VPAIDCreative,
+            this.emitter,
+            originalDimensions,
+            VPAIDCreativeVersion
+        );
         this.once(DATA_READY, () => {
             this.dataReady = true;
             this.__attachStoredListeners();

@@ -1,11 +1,15 @@
 {
   "name": "gg-ez-vp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "GumGum EZ video player",
   "main": "dist/gg-ez-vp.cjs.js",
   "module": "dist/gg-ez-vp.esm.js",
   "browser": "dist/gg-ez-vp.umd.js",
+  "files": [
+    "dist"
+  ],
   "repository": "git@github.com:gumgum/gg-ez-vp.git",
+  "bugs": "https://github.com/gumgum/gg-ez-vp/issues",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.5.4",
@@ -37,6 +41,7 @@
     "prebuild": "yarn run clean",
     "build": "rollup -c",
     "build:dev": "rollup -c -w",
-    "devServer": "http-server"
-  }
+    "devServer": "http-server "
+  },
+  "author": "Eder Sanchez <eder@gumgum.com>"
 }

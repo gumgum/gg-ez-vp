@@ -1,6 +1,6 @@
 {
   "name": "gg-ez-vp",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "GumGum EZ video player",
   "main": "dist/gg-ez-vp.cjs.js",
   "module": "dist/gg-ez-vp.esm.js",

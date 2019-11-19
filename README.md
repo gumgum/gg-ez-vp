@@ -24,7 +24,7 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 - [Usage](#usage)
 - [Customization](#customization)
     - [Options](#options)
-    - [Controls](#options)
+    - [Controls](#controls)
         - [Control configuration examples](#control-configuration-examples)
     - [Styles](#styles)
 - [Public methods](#public-methods)
@@ -41,11 +41,11 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 <!-- latest version of the player -->
 <script src="https://c.gumgum.com/vp/latest/gg-ez-vp.js">
 
-<!-- or specific release, replace "x.x" with the tag you want -->
+<!-- or specific release, replace "v1.x.x" with the release you want to use -->
 <script src="https://c.gumgum.com/vp/v1.x.x/gg-ez-vp.js">
 ```
 
-**Note:** GumGum's CDN is blocked by ad blockers; if the scripts are not loading, disable the ad blocker or use an external CDN (TBD #21).
+**Note:** One of [GumGum's solutions, is contextual advertising](https://gumgum.com/advertising), as such, our CDN is blocked by ad blockers; if the scripts are not loading, disable the ad blocker or use an external CDN (TBD #21).
 
 #### CommonJS
 TODO: Installation

@@ -1,8 +1,6 @@
 name: Node CI
 on:
   push:
-    branches:
-      - master
     tags:
       - v1.*.*
 
@@ -18,14 +16,6 @@ jobs:
         echo ::set-env name=LATEST_DIR::vp/latest
         echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
         echo ::set-env name=VERSIONED_DIR::vp/${GITHUB_REF:10}
-    - name: Use Node.js 12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    - name: yarn install and build
-      run: |
-        yarn install --pure-lockfile
-        yarn build
       env:
         CI: true
     - name: ECHO dirs

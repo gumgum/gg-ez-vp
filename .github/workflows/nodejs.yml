@@ -19,4 +19,34 @@ jobs:
       env:
         CI: true
     - name: ECHO dirs
-      run: echo "latest ${LATEST_DIR} - versioned ${VERSIONED_DIR}"
+      run: echo "latest ${LATEST_DIR} | versioned ${VERSIONED_DIR}"
+    - name: Use Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: yarn install and build
+      run: |
+        yarn install --pure-lockfile
+        yarn build
+      env:
+        CI: true
+    - name: Copy to S3 | latest
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SOURCE_DIR: 'dist'
+        DEST_DIR: ${{LATEST_DIR}}
+    - name: Copy to S3 | ${RELEASE_VERSION}
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SOURCE_DIR: 'dist'
+        DEST_DIR: ${{ VERSIONED_DIR }}

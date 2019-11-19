@@ -10,47 +10,52 @@ import pkg from './package.json';
 export default [
     // browser-friendly UMD build
     {
-        input: 'src/main.js',
+        input: 'src/index.js',
         output: {
             name: 'GgEzVp',
             file: pkg.browser,
             format: 'umd',
             sourcemap: true
         },
+        external: [],
         plugins: [
-            resolve(),
             builtins(),
+            resolve({ preferBuiltins: false }),
             babel({ runtimeHelpers: true }),
+            commonjs(),
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
-            commonjs(),
             copy({
                 targets: [
                     { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
-                    { src: 'src/icons/*', dest: 'dist/icons' }
+                    { src: 'src/icons/*', dest: 'dist/icons' },
+                    { src: 'src/images/*', dest: 'dist/images' }
                 ]
             })
         ]
     },
     // Node and ES module version
     {
-        input: 'src/main.js',
+        input: 'src/index.js',
         output: [
             { file: pkg.main, format: 'cjs', sourcemap: true },
             { file: pkg.module, format: 'es', sourcemap: true }
         ],
+        external: ['events'],
         plugins: [
-            resolve(),
+            builtins(),
+            resolve({ preferBuiltins: true }),
             babel({ runtimeHelpers: true }),
+            commonjs(),
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
-            commonjs(),
             copy({
                 targets: [
                     { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
-                    { src: 'src/img/*', dest: 'dist/img' }
+                    { src: 'src/icons/*', dest: 'dist/icons' },
+                    { src: 'src/images/*', dest: 'dist/images' }
                 ]
             })
         ]

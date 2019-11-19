@@ -4,6 +4,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import copy from 'rollup-plugin-copy';
+import license from 'rollup-plugin-license';
+import path from 'path';
 
 import pkg from './package.json';
 
@@ -19,6 +21,16 @@ export default [
         },
         external: [],
         plugins: [
+            license({
+                banner: {
+                    content: {
+                        file: path.join(__dirname, 'LICENSE')
+                    }
+                },
+                thirdParty: {
+                    output: path.join(__dirname, 'dist', 'dependencies.txt')
+                }
+            }),
             builtins(),
             resolve({ preferBuiltins: false }),
             babel({ runtimeHelpers: true }),
@@ -44,6 +56,16 @@ export default [
         ],
         external: ['events'],
         plugins: [
+            license({
+                banner: {
+                    content: {
+                        file: path.join(__dirname, 'LICENSE')
+                    }
+                },
+                thirdParty: {
+                    output: path.join(__dirname, 'dist', 'dependencies.txt')
+                }
+            }),
             builtins(),
             resolve({ preferBuiltins: true }),
             babel({ runtimeHelpers: true }),

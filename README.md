@@ -2,7 +2,7 @@
 
 Simple video player with minimal setup, intuitive API and straightforward features.
 
-![Player](./player.png)
+![Player](./images/player.png)
 
 ## Features:
 
@@ -10,35 +10,56 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 - Customizable controls (or use our slick defaults!)
 - Lightweight
 - Programmatic access to video playback APIs
-- UMD, CommonJS and ES module versions
+- Browser (UMD), CommonJS and ES module versions
 - VAST / VPAID / MOAT Support for a single Linear Creative. Parsing is provided by [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js). *Note* that at the time, only one Ad is loaded, and only Linear Creatives are played and tracked.
+
+## Table of contents
+
+- [Features](#features)
+- [Table of contents](#table-of-contents)
+- [Installation](#installation)
+    - [Browser](#browser)
+    - [CommonJS](#commonjs)
+    - [ES Modules](#es-modules)
+- [Usage](#usage)
+- [Customization](#customization)
+    - [Options](#options)
+    - [Controls](#options)
+        - [Control configuration examples](#control-configuration-examples)
+    - [Styles](#styles)
+- [Public methods](#public-methods)
+- [Events](#events)
+- [VAST](#vast)
+- [VPAID](#vpaid)
+    - [Event mapping](#event-mapping)
+- [Development](#development)
 
 ## Installation
 
-There is no package available, but in the meantime, we provide different builds in the `dist/` directory:
-
+#### Browser
 ```
-gg-ez-vp.umd.js // Browser
-gg-ez-vp.cjs.js // CommonJs
-gg-ez-vp.esm.js // ES Module
+<!-- latest version of the player -->
+<script src="https://c.gumgum.com/vp/latest/gg-ez-vp.js">
 
+<!-- or specific release, replace "x.x" with the tag you want -->
+<script src="https://c.gumgum.com/vp/v1.x.x/gg-ez-vp.js">
+```
+
+**Note:** GumGum's CDN is blocked by ad blockers; if the scripts are not loading, disable the ad blocker or use an external CDN (TBD #21).
+
+#### CommonJS
+TODO: Installation
+```
+const GgEzVp = require('gg-ez-vp');
+```
+
+#### ES Modules
+TODO: Installation
+```
+import GgEzVp from 'gg-ez-vp';
 ```
 
 ## Usage
-
-First import or load the library:
-
-```
-// Browser
-<script src="dist/gg-ez-vp.umd.js">
-
-//CJS
-const GgEzVp = require('gg-ez-vp')
-
-// ES
-import GgEzVp from 'gg-ez-vp'
-```
-
 GgEzVp works by attaching itself to a unique container, ideally an empty `<div>` with a unique id:
 
 ```
@@ -92,7 +113,7 @@ This minimal configuration will create a unique video player instance using the 
 Besides the programmatic interaction with the player, there are also a number of controls displayed by default, they can be toggled by passing a `controls` property in the initial configuration.
 See the Styles section for information on how to customize the visuals.
 
-![Player](./player.png)
+![Player](./images/player.png)
 
 |controlName|defaultValue|description|
 |---|---|---|
@@ -107,7 +128,7 @@ See the Styles section for information on how to customize the visuals.
 
 Additionally, passing the `isVAST: true` or `isAd: true` options, will display a different set of controls for Ads:
 
-![Ad Controls](./ad_controls.png)
+![Ad Controls](./images/ad_controls.png)
 
 |controlName|defaultValue|description|
 |---|---|---|
@@ -119,7 +140,7 @@ Additionally, passing the `isVAST: true` or `isAd: true` options, will display a
 
  **Note:** the `timestamp` control will be disabled when either `isVAST` or `isAd` are true and instead `timestampAd` will be displayed.
 
-#### Examples
+#### Control configuration examples
 ```
 // Controls off
 const controlsOffConfig = {
@@ -153,7 +174,12 @@ const customControls = {
 
 ### Styles
 
-To use the default styles, just include the `styles.css` file before loading the player's javscript.
+To use the default styles, just include the `styles.css` file before loading the player's javascript:
+```
+<!-- latest version of the styles -->
+<link src="https://c.gumgum.com/vp/latest/gg-ez-vp.css">
+
+```
 
 The default styles that can be overridden by any custom styles you may need:
 
@@ -173,29 +199,29 @@ Use these selectors to override the styles:
 
 |selector|component|
 |---|---|
-|.gg-ez-vp| player container|
-|.gg-ez-vp--viewer| video element|
-|.gg-ez-vp--controls| control bar|
-|.gg-ez-vp--timestamp| current video time |
-|.gg-ez-vp--timestamp-break| bar dividing currentime / duration |
-|.gg-ez-vp--timestamp-ad| ad remaining time |
-|.gg-ez-vp--volume| volume controls container |
-|.gg-ez-vp--volume-control| volume slider container |
-|.gg-ez-vp--volume-control-slider| volume slider |
-|.gg-ez-vp--input-range|volume slider input styles|
-|.gg-ez-vp--progress| progress container |
-|.gg-ez-vp--progress-bar| progress track |
-|.gg-ez-vp--progress-filled| progress bar fill |
-|.gg-ez-vp--progress-filled:after| progress bar scrub |
-|.gg-ez-vp--button-icon| play and volume buttons |
-|.gg-ez-vp--button-icon.mute| muted state of the volume control |
-|.gg-ez-vp--button-icon.low| low volume state of the volume control (under 33%) |
-|.gg-ez-vp--button-icon.medium| medium volume state of the volume control (between 34% and 66%) |
-|.gg-ez-vp--button-icon.high| high volume state of the volume control (above 66%) |
-|.gg-ez-vp--button-icon.play| shown while video is not playing on the play control |
-|.gg-ez-vp--button-icon.pause| shown while video is playing on the play control |
-|.gg-ez-vp--button-icon.replay| shown after the video ends |
-|.gg-ez-vp--button-icon.expand| expand button icon  |
+| .gg-ez-vp | player container|
+| .gg-ez-vp--viewer | video element|
+| .gg-ez-vp--controls | control bar|
+| .gg-ez-vp--timestamp | current video time |
+| .gg-ez-vp--timestamp-break | bar dividing currentime / duration |
+| .gg-ez-vp--timestamp-ad | ad remaining time |
+| .gg-ez-vp--volume | volume controls container |
+| .gg-ez-vp--volume-control | volume slider container |
+| .gg-ez-vp--volume-control-slider | volume slider |
+| .gg-ez-vp--input-range |volume slider input styles|
+| .gg-ez-vp--progress | progress container |
+| .gg-ez-vp--progress-bar | progress track |
+| .gg-ez-vp--progress-filled | progress bar fill |
+| .gg-ez-vp--progress-filled:after | progress bar scrub |
+| .gg-ez-vp--button-icon | play and volume buttons |
+| .gg-ez-vp--button-icon.mute | muted state of the volume control |
+| .gg-ez-vp--button-icon.low | low volume state of the volume control (under 33%) |
+| .gg-ez-vp--button-icon.medium | medium volume state of the volume control (between 34% and 66%) |
+| .gg-ez-vp--button-icon.high | high volume state of the volume control (above 66%) |
+| .gg-ez-vp--button-icon.play | shown while video is not playing on the play control |
+| .gg-ez-vp--button-icon.pause | shown while video is playing on the play control |
+| .gg-ez-vp--button-icon.replay | shown after the video ends |
+| .gg-ez-vp--button-icon.expand | expand button icon  |
 
 There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 
@@ -208,6 +234,7 @@ There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 
 
 ## Public methods
+
 |method name|parameters|description|
 |---|---|---|
 |destroy|none|removes all instance and video tag listeners, removes the player from the DOM leaving behind the original container|
@@ -299,6 +326,6 @@ All data is retrieved from the VPAID creative, not the video tag itself.
 
 `yarn install` to install dependencies
 
-`yarn start` to fire dev server and node watcher, the server can be accessed at localhost:8080
+`yarn start` to fire dev server and node watcher, the server can be accessed at localhost:8080, and the demo at localhost:8080/demo
 
 See scripts section of package.json for all available scripts

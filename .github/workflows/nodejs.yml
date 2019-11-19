@@ -18,8 +18,6 @@ jobs:
         echo ::set-env name=VERSIONED_DIR::vp/${GITHUB_REF:10}
       env:
         CI: true
-    - name: ECHO dirs
-      run: echo "latest ${LATEST_DIR} | versioned ${VERSIONED_DIR}"
     - name: Use Node.js 12
       uses: actions/setup-node@v1
       with:
@@ -30,6 +28,8 @@ jobs:
         yarn build
       env:
         CI: true
+    - name: ECHO dirs
+      run: echo "latest ${LATEST_DIR} | versioned ${VERSIONED_DIR}"
     - name: Copy to S3 | latest
       uses: jakejarvis/s3-sync-action@master
       with:

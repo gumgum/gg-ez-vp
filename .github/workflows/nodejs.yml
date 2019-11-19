@@ -27,4 +27,4 @@ jobs:
       env:
         CI: true
     - name: ECHO dirs
-      run: echo "latest $(LATEST_DIR) - versioned $(VERSIONED_DIR)"
+      run: echo "latest ${LATEST_DIR} - versioned ${VERSIONED_DIR}"

@@ -1,9 +1,14 @@
+import path from 'path';
 import builtins from 'rollup-plugin-node-builtins';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import copy from 'rollup-plugin-copy';
+import license from 'rollup-plugin-license';
+import { terser } from 'rollup-plugin-terser';
+// TODO: optimize build, currently running postcss three times
+import postcss from 'rollup-plugin-postcss';
 
 import pkg from './package.json';
 
@@ -26,11 +31,25 @@ export default [
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
+            postcss({
+                extract: path.join(__dirname, 'dist', 'gg-ez-vp.css'),
+                minimize: true
+            }),
+            terser(),
+            license({
+                banner: {
+                    content: {
+                        file: path.join(__dirname, 'LICENSE')
+                    }
+                },
+                thirdParty: {
+                    output: path.join(__dirname, 'dist', 'dependencies.txt')
+                }
+            }),
             copy({
                 targets: [
-                    { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
                     { src: 'src/icons/*', dest: 'dist/icons' },
-                    { src: 'src/images/*', dest: 'dist/images' }
+                    { src: 'images/*', dest: 'dist/images' }
                 ]
             })
         ]
@@ -51,12 +70,20 @@ export default [
             replace({
                 'process.env.NODE_ENV': JSON.stringify('production')
             }),
-            copy({
-                targets: [
-                    { src: 'src/styles.css', dest: 'dist/', rename: 'gg-ez-vp.css' },
-                    { src: 'src/icons/*', dest: 'dist/icons' },
-                    { src: 'src/images/*', dest: 'dist/images' }
-                ]
+            postcss({
+                extract: path.join(__dirname, 'dist', 'gg-ez-vp.css'),
+                minimize: true
+            }),
+            terser(),
+            license({
+                banner: {
+                    content: {
+                        file: path.join(__dirname, 'LICENSE')
+                    }
+                },
+                thirdParty: {
+                    output: path.join(__dirname, 'dist', 'dependencies.txt')
+                }
             })
         ]
     }

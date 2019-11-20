@@ -1,5 +1,5 @@
 import path from 'path';
-import builtins from 'rollup-plugin-node-builtins';
+import builtins from '@joseph184/rollup-plugin-node-builtins';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';

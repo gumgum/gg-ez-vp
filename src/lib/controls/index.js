@@ -23,8 +23,9 @@ export default function renderControls() {
 
 function nodeRenderer(config, sections, container) {
     const { isVAST, controls, isAd } = config;
-    sections.forEach(({ name, tagType, children, component, isAdComponent }) => {
-        const isAllowed = shouldNodeRender(isAdComponent, isAd || isVAST);
+    sections.forEach(node => {
+        const { name, tagType, children, component } = node;
+        const isAllowed = shouldNodeRender(node, isAd || isVAST, controls);
         if (!isAllowed) return;
         if (tagType) {
             const node = document.createElement(tagType);
@@ -33,12 +34,18 @@ function nodeRenderer(config, sections, container) {
             if (children?.length) nodeRenderer.call(this, config, children, node);
             container.appendChild(node);
         }
-        if (component && controls[name]) component.call(this, container);
+        if (component) component.call(this, container);
     });
 }
 
-const shouldNodeRender = (isAdComponent, isAd) => {
-    return isAdComponent === undefined || (isAd && isAdComponent) || (!isAd && !isAdComponent);
+const shouldNodeRender = (node, isAd, controlsConfig) => {
+    const { isAdComponent, tagType, children, component, name } = node;
+    const nodeTypeAllowed =
+        isAdComponent === undefined || (isAd && isAdComponent) || (!isAd && !isAdComponent);
+    const componentIsOn = controlsConfig[name];
+    if (!tagType && component) return nodeTypeAllowed && componentIsOn;
+    const childrenWillRender = children?.some(c => shouldNodeRender(c, isAd, controlsConfig));
+    return nodeTypeAllowed && childrenWillRender;
 };
 
 const sections = [

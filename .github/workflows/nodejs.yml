@@ -28,8 +28,9 @@ jobs:
         yarn build
       env:
         CI: true
-    - name: ECHO dirs
+    - name: ECHO upload directories
       run: echo "latest ${LATEST_DIR} | versioned ${VERSIONED_DIR}"
+    # Upload to CDN vp/latest
     - name: Copy to S3 | latest
       uses: jakejarvis/s3-sync-action@master
       with:
@@ -40,6 +41,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE_DIR: 'dist'
         DEST_DIR: ${LATEST_DIR}
+    # Upload to CDN vp/1.x.x
     - name: Copy to S3 | ${RELEASE_VERSION}
       uses: jakejarvis/s3-sync-action@master
       with:

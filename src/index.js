@@ -13,6 +13,8 @@ import fullscreenToggle from './lib/fullscreenToggle';
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
+// styles
+import './styles.css';
 
 import {
     CSS_ROOT,

@@ -1,3 +1,4 @@
+import path from 'path';
 import builtins from 'rollup-plugin-node-builtins';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -5,7 +6,7 @@ import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import copy from 'rollup-plugin-copy';
 import license from 'rollup-plugin-license';
-import path from 'path';
+import { terser } from 'rollup-plugin-terser';
 
 import pkg from './package.json';
 
@@ -21,6 +22,14 @@ export default [
         },
         external: [],
         plugins: [
+            builtins(),
+            resolve({ preferBuiltins: false }),
+            babel({ runtimeHelpers: true }),
+            commonjs(),
+            replace({
+                'process.env.NODE_ENV': JSON.stringify('production')
+            }),
+            terser(),
             license({
                 banner: {
                     content: {
@@ -30,13 +39,6 @@ export default [
                 thirdParty: {
                     output: path.join(__dirname, 'dist', 'dependencies.txt')
                 }
-            }),
-            builtins(),
-            resolve({ preferBuiltins: false }),
-            babel({ runtimeHelpers: true }),
-            commonjs(),
-            replace({
-                'process.env.NODE_ENV': JSON.stringify('production')
             }),
             copy({
                 targets: [
@@ -56,6 +58,14 @@ export default [
         ],
         external: ['events'],
         plugins: [
+            builtins(),
+            resolve({ preferBuiltins: true }),
+            babel({ runtimeHelpers: true }),
+            commonjs(),
+            replace({
+                'process.env.NODE_ENV': JSON.stringify('production')
+            }),
+            terser(),
             license({
                 banner: {
                     content: {
@@ -65,13 +75,6 @@ export default [
                 thirdParty: {
                     output: path.join(__dirname, 'dist', 'dependencies.txt')
                 }
-            }),
-            builtins(),
-            resolve({ preferBuiltins: true }),
-            babel({ runtimeHelpers: true }),
-            commonjs(),
-            replace({
-                'process.env.NODE_ENV': JSON.stringify('production')
             }),
             copy({
                 targets: [

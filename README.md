@@ -119,6 +119,7 @@ See the Styles section for information on how to customize the visuals.
 |---|---|---|
 |timestamp|true|display the current time of the video in the format [m:ss]|
 |volume|true|display the volume controls (mute toggle and range input)|
+|volumeRange|true|the volume range input can be hidden if only the volume button is needed|
 |progress|true|display the playback progress bar, clicking on the bar will set the video currentTime to the selected percentage (except on Ads)|
 |play|true|show the play/pause button|
 |expand|true|show the expand to fullscreen button|
@@ -229,7 +230,9 @@ There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 |---|---|
 |.gg-ez-vp--no-scrub| applied on `isVAST: true` or `isAd: true`. Prevents displaying the scrub and adjusts ad styles.|
 |.gg-ez-vp--skip| applied when the skip button will be displayed|
-|.gg-ez-vp--volume-only| adjusts the styles when only the volume button is displayed for better distribution|
+|.gg-ez-vp--volume-only| adjusts the styles when only the volume toggle button is displayed|
+
+See src/styles.css for all styles.
 
 
 

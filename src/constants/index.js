@@ -13,6 +13,7 @@ export const VPAID_STARTED = 'VPAID-started';
 export const TIMESTAMP_AD = 'timestampAd';
 export const SKIP = 'skip';
 export const VOLUME = 'volume';
+export const VOLUME_RANGE = `${VOLUME}Range`;
 export const PROGRESS = 'progress';
 export const TIMESTAMP = 'timestamp';
 export const PLAY = 'play';
@@ -22,6 +23,7 @@ const controls = {
     [TIMESTAMP_AD]: false,
     [SKIP]: false,
     [VOLUME]: true,
+    [VOLUME_RANGE]: true,
     [PROGRESS]: true,
     [TIMESTAMP]: true,
     [PLAY]: true,

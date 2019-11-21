@@ -9,7 +9,7 @@ export default function volume(container) {
     const {
         config: { controls, volume: initialVolume, muted: initialMuted }
     } = this;
-    const volumeOnly = !Object.keys(controls).some(key => {
+    const muteToggleOnly = !Object.keys(controls).some(key => {
         if (key === VOLUME) return false;
         return controls[key];
     });
@@ -19,7 +19,7 @@ export default function volume(container) {
     const volumeContainer = createNode('div', volumeClassRoot);
     const volumeChangeEvt = this.isVPAID ? 'AdVolumeChange' : 'volumechange';
 
-    if (volumeOnly) {
+    if (muteToggleOnly) {
         // Show different styles when only the volume control is enabled
         this.container.classList.add(`${volumeClassRoot}-only`);
     }
@@ -30,7 +30,7 @@ export default function volume(container) {
         const currentIntensity = getVolumeIntensity(currentVolume, isMuted);
         button.classList.remove('mute', 'low', 'medium', 'high');
         button.classList.add(currentIntensity);
-        volumeRange.value = currentVolume;
+        if (volumeRange) volumeRange.value = currentVolume;
     };
 
     const setVolume = () => {
@@ -52,18 +52,23 @@ export default function volume(container) {
     const controlsClassName = `${volumeClassRoot}-control`;
     const volumeControl = createNode('div', controlsClassName);
 
-    volumeRange = createNode(
-        'input',
-        [`${controlsClassName}-slider`, this.__getCSSClass('input-range')],
-        inputAttrs
-    );
-    volumeRange.value = initialMuted ? 0 : initialVolume;
+    volumeRange = muteToggleOnly
+        ? null
+        : createNode(
+              'input',
+              [`${controlsClassName}-slider`, this.__getCSSClass('input-range')],
+              inputAttrs
+          );
 
-    volumeControl.appendChild(volumeRange);
+    if (volumeRange) {
+        volumeRange.value = initialMuted ? 0 : initialVolume;
+        volumeControl.appendChild(volumeRange);
+
+        this.__nodeOn(volumeRange, 'change', setVolume);
+        this.__nodeOn(volumeRange, 'input', setVolume);
+    }
+
     volumeContainer.appendChild(volumeControl);
-
-    this.__nodeOn(volumeRange, 'change', setVolume);
-    this.__nodeOn(volumeRange, 'input', setVolume);
 
     this.on(volumeChangeEvt, setControlsState);
 

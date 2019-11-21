@@ -386,20 +386,22 @@ div.gg-ez-vp--progress-filled:hover::after {
 /* Add class gg-ez-vp--volume-only */
 /* Example: <div class="gg-ez-vp  gg-ez-vp--volume-only"> */
 
-.gg-ez-vp.gg-ez-vp--volume-only .gg-ez-vp--top > .gg-ez-vp--item-left {
-    display: inherit;
-}
-
 .gg-ez-vp--volume-only .gg-ez-vp--controls {
     position: absolute;
     left: 20px;
     bottom: 20px;
-    height: 70px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    width: 30px;
+    height: auto;
     transform: translateY(0);
     transition: all .3s;
+}
+
+.gg-ez-vp.gg-ez-vp--volume-only .gg-ez-vp--bottom,
+.gg-ez-vp.gg-ez-vp--volume-only .gg-ez-vp--bottom,
+.gg-ez-vp.gg-ez-vp--volume-only .gg-ez-vp--volume,
+.gg-ez-vp.gg-ez-vp--volume-only .gg-ez-vp--bottom > .gg-ez-vp--item-left {
+    display: inline-block;
+    width: auto;
 }
 
 .gg-ez-vp--volume-only.gg-ez-vp--no-scrub .gg-ez-vp--controls {

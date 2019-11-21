@@ -32,6 +32,8 @@ import {
     DEFAULT_OPTIONS as defaultOptions
 } from './constants';
 
+const JS_FILENAME = `/${CSS_ROOT}.js`;
+
 // List of events fired by the instance instead of events the <video> tag
 const internalEvents = [
     DATA_READY,
@@ -60,6 +62,8 @@ export default class GgEzVp {
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
+        // find the base URL that the file was loaded from
+        this.__baseURL = this.__getBaseURL();
         // set up any extra processes
         this.__init();
     }
@@ -96,6 +100,18 @@ export default class GgEzVp {
         config.volume = parseFloat(config.volume);
         this.__prevVol = config.volume;
         return config;
+    };
+
+    // find the base URL that the file was loaded from
+    // only one URL ending in '/gg-ez-vp.js' is allowed
+    __getBaseURL = () => {
+        const ggEzVpScripts = [].slice
+            .call(document.getElementsByTagName('script'))
+            .filter(a => a.src.includes(JS_FILENAME));
+        if (ggEzVpScripts.length > 1) {
+            throw Error(`GgEzVp [Error]: loading more than one ${JS_FILENAME}`);
+        }
+        return ggEzVpScripts[0].src.replace(JS_FILENAME, '');
     };
 
     // set up controls and internal listeners

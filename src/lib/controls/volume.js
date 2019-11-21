@@ -1,9 +1,15 @@
 import { VOLUME } from '../../constants';
 import createNode from '../../helpers/createNode';
+import preloadIcons from '../../helpers/preloadIcons';
 
 /* note: for initial volume, see applyConfigToVideoElement */
 
 const MUTE = 'mute';
+const LOW = 'low';
+const MEDIUM = 'medium';
+const HIGH = 'high';
+
+const intensities = [MUTE, LOW, MEDIUM, HIGH];
 
 export default function volume(container) {
     const {
@@ -38,6 +44,14 @@ export default function volume(container) {
     };
 
     const initialIntensity = getVolumeIntensity(initialVolume, initialMuted);
+    const iconsToLoad = intensities
+        .filter(i => i !== initialIntensity)
+        .map(i => {
+            if (i === MUTE) return i;
+            if (i === MEDIUM) i = 'med';
+            return `${i}-volume`;
+        });
+    preloadIcons(iconsToLoad, this.__baseURL);
 
     button = createNode('button', [this.__getCSSClass('button-icon'), initialIntensity], {
         type: 'button'
@@ -86,7 +100,7 @@ const inputAttrs = {
 const getVolumeIntensity = (currentVolume, muted) => {
     const volume = parseFloat(currentVolume);
     if (muted || volume === 0) return MUTE;
-    if (volume <= 0.33) return 'low';
-    if (volume > 0.33 && volume < 0.66) return 'medium';
-    return 'high';
+    if (volume <= 0.33) return LOW;
+    if (volume > 0.33 && volume < 0.66) return MEDIUM;
+    return HIGH;
 };

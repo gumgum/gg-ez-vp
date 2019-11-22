@@ -10,6 +10,7 @@ import configureVPAID from './lib/configureVPAID';
 import renderControls from './lib/controls';
 import fullscreenToggle from './lib/fullscreenToggle';
 // helper functions
+import inIframe from './helpers/inIframe';
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
@@ -64,7 +65,7 @@ export default class GgEzVp {
         this.VASTData = null;
         this.VPAIDWrapper = null;
         this.__onTouchScreen = hasTouchScreen();
-        // find the base URL that the file was loaded from
+        // find the base url that the file was loaded from
         this.__baseURL = this.__getBaseURL();
         // set up any extra processes
         this.__init();
@@ -123,6 +124,7 @@ export default class GgEzVp {
             const { container, isVAST } = this.config;
             this.container = isElement(container) ? container : document.getElementById(container);
             this.__validateConfig();
+            this.__allowIframeFullscreen();
             this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
@@ -134,6 +136,15 @@ export default class GgEzVp {
             this.__renderVideoElement();
         } catch (err) {
             console.log(err); //eslint-disable-line no-console
+        }
+    };
+
+    __allowIframeFullscreen = () => {
+        // This will allow fullscreen in firefox when inside iframes
+        // https://stackoverflow.com/a/9747340/1335287
+        if (inIframe()) {
+            window.frameElement.setAttribute('allowfullscreen', '');
+            window.frameElement.setAttribute('allow', 'fullscreen');
         }
     };
 

@@ -41,10 +41,11 @@ const shouldNodeRender = (node, isAd, controlsConfig) => {
     const { isAdComponent, tagType, children, component, name } = node;
     const nodeTypeAllowed =
         isAdComponent === undefined || (isAd && isAdComponent) || (!isAd && !isAdComponent);
+    const isBottom = name === 'bottom'; // display bottom container all the time
     const componentIsOn = controlsConfig[name];
     if (!tagType && component) return nodeTypeAllowed && componentIsOn;
     const childrenWillRender = children?.some(c => shouldNodeRender(c, isAd, controlsConfig));
-    return nodeTypeAllowed && childrenWillRender;
+    return isBottom || (nodeTypeAllowed && childrenWillRender);
 };
 
 const sections = [

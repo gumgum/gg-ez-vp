@@ -211,7 +211,6 @@
 .gg-ez-vp--volume-control {
     opacity: 0;
     transition: all .3s ease-in-out;
-    margin-bottom: 8px;
 }
 
 .gg-ez-vp--touchscreen  .gg-ez-vp--volume-control,
@@ -376,6 +375,7 @@ div.gg-ez-vp--progress-filled:hover::after {
     margin: 0;
 }
 
+.gg-ez-vp--no-scrub:hover .expand,
 .gg-ez-vp:hover.gg-ez-vp--no-scrub .gg-ez-vp--top > .gg-ez-vp--item-left {
     display: inherit;
 }
@@ -384,6 +384,7 @@ div.gg-ez-vp--progress-filled:hover::after {
     cursor: not-allowed;
 }
 
+.gg-ez-vp--no-scrub .expand,
 .gg-ez-vp--no-scrub .gg-ez-vp--progress-filled::after {
     display: none;
 }

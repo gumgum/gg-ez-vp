@@ -98,6 +98,7 @@
     -ms-user-select: none;
 }
 
+.gg-ez-vp--touchscreen .gg-ez-vp--timestamp-ad,
 .gg-ez-vp:hover .gg-ez-vp--timestamp-ad {
     opacity: 1;
 }
@@ -120,6 +121,7 @@
     transition: all .3s;
 }
 
+.gg-ez-vp--touchscreen .gg-ez-vp--button-skip,
 .gg-ez-vp--button-skip:hover {
     opacity: 1;
 }
@@ -137,6 +139,7 @@
     opacity: .7;
 }
 
+.gg-ez-vp--touchscreen .gg-ez-vp--button-icon,
 .gg-ez-vp--button-icon:hover {
     opacity: 1;
 }
@@ -208,8 +211,10 @@
 .gg-ez-vp--volume-control {
     opacity: 0;
     transition: all .3s ease-in-out;
+    margin-bottom: 8px;
 }
 
+.gg-ez-vp--touchscreen  .gg-ez-vp--volume-control,
 .gg-ez-vp--volume:hover > .gg-ez-vp--volume-control,
 .gg-ez-vp--volume:hover > .gg-ez-vp--button-icon {
     opacity: 1;
@@ -317,6 +322,7 @@ div.gg-ez-vp--progress-filled:hover::after {
 /* Player Overrides */
 
 /* Standard Video Player */
+.gg-ez-vp--touchscreen .gg-ez-vp--controls,
 .gg-ez-vp:hover .gg-ez-vp--controls {
     transform: translateY(0);
     background: rgb(0, 0, 0);
@@ -358,12 +364,14 @@ div.gg-ez-vp--progress-filled:hover::after {
 /* Add class gg-ez-vp--no-scrub */
 /* Example: <div class="gg-ez-vp  gg-ez-vp--ad gg-ez-vp--no-scrub"> */
 
+.gg-ez-vp--touchscreen.gg-ez-vp--no-scrub .gg-ez-vp--controls,
 .gg-ez-vp:hover.gg-ez-vp--no-scrub .gg-ez-vp--controls {
     transform: translateY(100%) translateY(-39px);
     background: rgb(0, 0, 0);
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
+.gg-ez-vp--touchscreen.gg-ez-vp--no-scrub .gg-ez-vp--progress-bar,
 .gg-ez-vp:hover.gg-ez-vp--no-scrub .gg-ez-vp--progress-bar {
     margin: 0;
 }
@@ -408,6 +416,7 @@ div.gg-ez-vp--progress-filled:hover::after {
     bottom: -15px;
 }
 
+.gg-ez-vp.gg-ez-vp--touchscreen.gg-ez-vp--volume-only .gg-ez-vp--controls,
 .gg-ez-vp:hover.gg-ez-vp--volume-only .gg-ez-vp--controls {
     transform: translateY(0);
     background: none;
@@ -423,4 +432,15 @@ div.gg-ez-vp--progress-filled:hover::after {
 
 .gg-ez-vp:hover.gg-ez-vp--volume-only .gg-ez-vp--top > .gg-ez-vp--item-left {
     display: inherit;
+}
+
+/* Portrait */
+@media screen and (orientation:portrait) {
+    .gg-ez-vp.gg-ez-vp--touchscreen:fullscreen .gg-ez-vp--viewer {
+        margin: 50% auto;
+    }
+
+    .gg-ez-vp.gg-ez-vp--touchscreen:-webkit-full-screen .gg-ez-vp--viewer {
+        margin: 50% auto;
+    }
 }

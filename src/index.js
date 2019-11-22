@@ -13,6 +13,7 @@ import fullscreenToggle from './lib/fullscreenToggle';
 import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
+import hasTouchScreen from './helpers/hasTouchScreen';
 // styles
 import './styles.css';
 
@@ -62,6 +63,7 @@ export default class GgEzVp {
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
+        this.__onTouchScreen = hasTouchScreen();
         // find the base URL that the file was loaded from
         this.__baseURL = this.__getBaseURL();
         // set up any extra processes

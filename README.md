@@ -231,6 +231,7 @@ There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 |.gg-ez-vp--no-scrub| applied on `isVAST: true` or `isAd: true`. Prevents displaying the scrub and adjusts ad styles.|
 |.gg-ez-vp--skip| applied when the skip button will be displayed|
 |.gg-ez-vp--volume-only| adjusts the styles when only the volume toggle button is displayed|
+|.gg-ez-vp--touchscreen| added when the device uses a touchscreen, this will show all enabled controls instead of activating them on hover  |
 
 See src/styles.css for all styles.
 

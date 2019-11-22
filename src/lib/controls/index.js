@@ -9,13 +9,12 @@ import timestamp from './timestamp';
 import play from './play';
 
 export default function renderControls() {
-    const { container, config } = this;
+    const { container, config, __onTouchScreen } = this;
     if (!config.controls) return;
     const isAd = config.isAd || config.isVAST;
     const controls = document.createElement('div');
-    if (isAd) {
-        container.classList.add(this.__getCSSClass('no-scrub'));
-    }
+    if (isAd) container.classList.add(this.__getCSSClass('no-scrub'));
+    if (__onTouchScreen) container.classList.add(this.__getCSSClass('touchscreen'));
     controls.classList.add(this.__getCSSClass('controls'));
     nodeRenderer.call(this, config, sections, controls);
     container.appendChild(controls);

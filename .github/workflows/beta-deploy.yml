@@ -1,0 +1,37 @@
+name: Node CI
+on:
+  push:
+      branches:
+          - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set env
+      run: echo ::set-env name=BETA_DIR::vp/beta
+    - name: Use Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: yarn install and build
+      run: |
+        yarn install --pure-lockfile
+        yarn build
+      env:
+        CI: true
+    - name: ECHO upload directories
+      run: echo "beta dir: ${BETA_DIR}"
+    - name: Copy to S3 | beta
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SOURCE_DIR: 'dist'
+        DEST_DIR: ${BETA_DIR}

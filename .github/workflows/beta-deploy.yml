@@ -24,7 +24,7 @@ jobs:
       env:
         CI: true
     - name: ECHO upload directories
-      run: echo "beta dir: ${BETA_DIR}"
+      run: echo "beta dir ${BETA_DIR}"
     - name: Copy to S3 | beta
       uses: jakejarvis/s3-sync-action@master
       with:

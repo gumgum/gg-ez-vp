@@ -38,7 +38,10 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 
 #### Browser
 ```
-<!-- latest version of the player -->
+<!-- latest stable version -->
+<script src="https://c.gumgum.com/vp/latest/gg-ez-vp.js">
+
+<!-- beta version | synced with develop branch  -->
 <script src="https://c.gumgum.com/vp/latest/gg-ez-vp.js">
 
 <!-- or specific release, replace "v1.x.x" with the release you want to use -->

@@ -44,8 +44,8 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 <!-- beta version | synced with develop branch  -->
 <script src="https://c.gumgum.com/vp/beta/gg-ez-vp.js">
 
-<!-- or specific release, replace "v1.x.x" with the release you want to use -->
-<script src="https://c.gumgum.com/vp/v1.x.x/gg-ez-vp.js">
+<!-- or specific release, replace "1.x.x" with the release you want to use -->
+<script src="https://c.gumgum.com/vp/1.x.x/gg-ez-vp.js">
 ```
 
 **Note:** One of [GumGum's solutions, is contextual advertising](https://gumgum.com/advertising), as such, our CDN is blocked by ad blockers; if the scripts are not loading, disable the ad blocker or use an external CDN (TBD #21).

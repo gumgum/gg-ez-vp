@@ -9,7 +9,7 @@ window.onload = function onload() {
         src: 'https://aba.gumgum.com/13861/8/big_buck_bunny_640x360.mp4',
         autoplay: false,
         volume: '0.5',
-        isAd: true
+        adControls: true
     });
 
     // Set listeners

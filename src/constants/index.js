@@ -41,7 +41,7 @@ export const DEFAULT_OPTIONS = {
     poster: null,
     preload: 'auto',
     loop: false,
-    isAd: false,
+    adControls: false,
     isVAST: false,
     fullscreen: false,
     playsinline: true,

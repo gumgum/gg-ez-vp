@@ -11,7 +11,7 @@ import play from './play';
 export default function renderControls() {
     const { container, config, __onTouchScreen } = this;
     if (!config.controls) return;
-    const isAd = config.isAd || config.isVAST;
+    const isAd = config.adControls;
     const controls = document.createElement('div');
     if (isAd) container.classList.add(this.__getCSSClass('no-scrub'));
     if (__onTouchScreen) container.classList.add(this.__getCSSClass('touchscreen'));
@@ -21,10 +21,10 @@ export default function renderControls() {
 }
 
 function nodeRenderer(config, sections, container) {
-    const { isVAST, controls, isAd } = config;
+    const { controls, adControls } = config;
     sections.forEach(node => {
         const { name, tagType, children, component } = node;
-        const isAllowed = shouldNodeRender(node, isAd || isVAST, controls);
+        const isAllowed = shouldNodeRender(node, adControls, controls);
         if (!isAllowed) return;
         if (tagType) {
             const node = document.createElement(tagType);

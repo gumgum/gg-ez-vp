@@ -110,7 +110,7 @@ This minimal configuration will create a unique video player instance using the 
 | preload  |'auto'   |false | standard HTML values for preload (none|metadata|auto)  |
 | loop  | false   |false | whether to loop video or not  |
 | isVAST  | false   |false | enables support for a single VAST / VPAID / MOAT TAG to be parsed and used as source, will force displaying the ad controls  |
-| isAd  | false   |false | forces displaying the ad controls instead of the regular contols  |
+| adControls  | false   |false | forces displaying the ad controls instead of the regular contols  |
 
 ### Controls
 Besides the programmatic interaction with the player, there are also a number of controls displayed by default, they can be toggled by passing a `controls` property in the initial configuration.
@@ -130,7 +130,7 @@ See the Styles section for information on how to customize the visuals.
 |skip|false|**used only for Ads**, will display a skip button|
 
 
-Additionally, passing the `isVAST: true` or `isAd: true` options, will display a different set of controls for Ads:
+Additionally, passing the `adControls: true` option, will display a different set of controls for Ads:
 
 ![Ad Controls](./images/ad_controls.png)
 
@@ -142,7 +142,7 @@ Additionally, passing the `isVAST: true` or `isAd: true` options, will display a
 |play|true|show the play/pause button|
 |expand|true|show the expand to fullscreen button|
 
- **Note:** the `timestamp` control will be disabled when either `isVAST` or `isAd` are true and instead `timestampAd` will be displayed.
+ **Note:** the `timestamp` control will be disabled when `adControls` is true and instead `timestampAd` will be displayed.
 
 #### Control configuration examples
 ```
@@ -167,7 +167,7 @@ const customControls = {
 const customControls = {
     container: 'myVideo',
     src: 'myvideo.mp4',
-    isAd: true, // using isVAST will also enable ad controls
+    adControls: true, // will enable ad controls
     controls: {
         timestampAd: false,
         expand: false,
@@ -231,7 +231,7 @@ There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 
 |selector|description|
 |---|---|
-|.gg-ez-vp--no-scrub| applied on `isVAST: true` or `isAd: true`. Prevents displaying the scrub and adjusts ad styles.|
+|.gg-ez-vp--no-scrub| applied on `adControls: true`. Prevents displaying the scrub and adjusts ad styles.|
 |.gg-ez-vp--skip| applied when the skip button will be displayed|
 |.gg-ez-vp--volume-only| adjusts the styles when only the volume toggle button is displayed|
 |.gg-ez-vp--touchscreen| added when the device uses a touchscreen, this will show all enabled controls instead of activating them on hover  |

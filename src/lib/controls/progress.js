@@ -6,7 +6,6 @@ export default function progress(container) {
     const progressContainer = createNode('div', classNameRoot);
     const progressBar = createNode('div', `${classNameRoot}-bar`);
     const progressFill = createNode('div', `${classNameRoot}-filled`);
-    const isAd = this.config.isAd || this.config.isVAST;
     let mouseOverBar = false;
 
     this.on(PLAYBACK_PROGRESS, ({ currentTime, duration }) => {
@@ -17,7 +16,7 @@ export default function progress(container) {
         }
     });
 
-    if (!isAd) {
+    if (!this.config.adControls) {
         this.__nodeOn(progressBar, 'click', e => {
             e.stopPropagation?.();
             const duration = this.getDuration();

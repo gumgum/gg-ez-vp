@@ -130,7 +130,7 @@ See the Styles section for information on how to customize the visuals.
 |skip|false|**used only for Ads**, will display a skip button|
 
 
-Additionally, passing the `isVAST: true` or `adControls: true` options, will display a different set of controls for Ads:
+Additionally, passing the `adControls: true` option, will display a different set of controls for Ads:
 
 ![Ad Controls](./images/ad_controls.png)
 
@@ -142,7 +142,7 @@ Additionally, passing the `isVAST: true` or `adControls: true` options, will dis
 |play|true|show the play/pause button|
 |expand|true|show the expand to fullscreen button|
 
- **Note:** the `timestamp` control will be disabled when either `isVAST` or `adControls` are true and instead `timestampAd` will be displayed.
+ **Note:** the `timestamp` control will be disabled when `adControls` is true and instead `timestampAd` will be displayed.
 
 #### Control configuration examples
 ```
@@ -167,7 +167,7 @@ const customControls = {
 const customControls = {
     container: 'myVideo',
     src: 'myvideo.mp4',
-    adControls: true, // using isVAST will also enable ad controls
+    adControls: true, // will enable ad controls
     controls: {
         timestampAd: false,
         expand: false,

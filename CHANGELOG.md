@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.1] - 2019-12-09
+- use production script in demo page
+- Prevent ad timestamp display when isNaN (#51)
+- Feature/optional ad controls (#50)
+- Bugfix/firefox fullscreen toggle (#39)
+
+    * push ad controls to the top #38
+
+    * toggle expand visibility on ad controls
+
+    * allow fullscreen when inside iframe
+
+    * improve moz fullscreen comments
+
 ## [1.1.5] - 2019-11-22
 - README URL fixes
 

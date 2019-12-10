@@ -72,9 +72,7 @@ export default class GgEzVp {
     }
 
     __getConfig = options => {
-        const isAd = options?.isAd || options?.isVAST;
-
-        const adControlOpts = isAd
+        const adControlOpts = options?.adControls
             ? {
                   [TIMESTAMP_AD]: options.controls?.[TIMESTAMP_AD] ?? true,
                   [SKIP]: options.controls?.[SKIP] ?? true,

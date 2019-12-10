@@ -1,5 +1,4 @@
 import { PLAYBACK_PROGRESS, TIMESTAMP } from '../../constants';
-import secondsToReadableTime from '../../helpers/secondsToReadableTime';
 import createNode from '../../helpers/createNode';
 
 export default function timestampAd(container) {
@@ -29,6 +28,10 @@ export default function timestampAd(container) {
     container.appendChild(timestampNode);
 }
 
+const isNan = Number.isNaN || isNaN;
+
 const setNodeText = node => remainingTime => {
-    node.innerText = `Ad ${Math.floor(remainingTime)}`;
+    const time = Math.floor(remainingTime);
+    const text = !isNan(time) ? `Ad ${time}` : '';
+    node.innerText = text;
 };

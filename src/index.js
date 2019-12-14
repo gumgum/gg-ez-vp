@@ -412,13 +412,14 @@ export default class GgEzVp {
 
     // mute audio
     mute = () => {
-        this.__prevVol = this.getVolume();
+        this.__prevVol = this.getVolume() || this.config.volume || 1;
         this.volume(0);
     };
 
     // unmute audio
     unmute = () => {
-        this.volume(this.__prevVol);
+        const vol = this.__prevVol || this.config.volume || 1;
+        this.volume(vol);
     };
 
     // toggle mute
@@ -435,7 +436,7 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.VPAIDWrapper.getAdVolume();
         }
-        return this.player.volume;
+        return this.player.muted ? 0 : this.player.volume;
     };
 
     // return the duration of the video

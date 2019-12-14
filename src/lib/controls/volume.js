@@ -2,7 +2,11 @@ import { VOLUME } from '../../constants';
 import createNode from '../../helpers/createNode';
 import preloadIcons from '../../helpers/preloadIcons';
 
-/* note: for initial volume, see applyConfigToVideoElement */
+/* Note: volume can only be set by the user in Safari Mobile.
+ * this.player.volume is read-only and will always return 1.
+ * https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+ * On other browsers, the muted configuration will take precedence over volume.
+ */
 
 const MUTE = 'mute';
 const LOW = 'low';
@@ -43,7 +47,7 @@ export default function volume(container) {
         this.volume(volumeRange.value);
     };
 
-    const initialIntensity = getVolumeIntensity(initialVolume, initialMuted);
+    const initialIntensity = getVolumeIntensity(initialMuted ? 0 : initialVolume, initialMuted);
     const iconsToLoad = intensities
         .filter(i => i !== initialIntensity)
         .map(i => {

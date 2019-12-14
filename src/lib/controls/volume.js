@@ -47,7 +47,7 @@ export default function volume(container) {
         this.volume(volumeRange.value);
     };
 
-    const initialIntensity = getVolumeIntensity(initialMuted ? 0 : initialVolume, initialMuted);
+    const initialIntensity = getVolumeIntensity(initialMuted ? 0 : initialVolume);
     const iconsToLoad = intensities
         .filter(i => i !== initialIntensity)
         .map(i => {
@@ -101,9 +101,9 @@ const inputAttrs = {
     step: '0.05'
 };
 
-const getVolumeIntensity = (currentVolume, muted) => {
+const getVolumeIntensity = currentVolume => {
     const volume = parseFloat(currentVolume);
-    if (muted || volume === 0) return MUTE;
+    if (volume === 0) return MUTE;
     if (volume <= 0.33) return LOW;
     if (volume > 0.33 && volume < 0.66) return MEDIUM;
     return HIGH;

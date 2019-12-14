@@ -180,16 +180,14 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.__setReadyNextTick();
         }
-        this.once('canplay', this.__setReadyNextTick);
+        this.once('loadedmetadata', this.__setReadyNextTick);
     };
 
     __setReadyNextTick = () => {
+        const nextTick = requestAnimationFrame || setTimeout;
         // Execute the callback in the next cycle, using requestAnimationFrame
         // if available or setTimeout as a fallback
-        if (window.requestAnimationFrame) {
-            return requestAnimationFrame(this.__setReady);
-        }
-        setTimeout(this.__setReady);
+        nextTick(this.__setReady);
     };
 
     __setReady = () => {
@@ -409,17 +407,19 @@ export default class GgEzVp {
             return VPAIDWrapper.setAdVolume(volume);
         }
         this.player.volume = volume;
+        this.player.muted = !volume;
     };
 
     // mute audio
     mute = () => {
-        this.__prevVol = this.getVolume();
+        this.__prevVol = this.getVolume() || this.config.volume || 1;
         this.volume(0);
     };
 
     // unmute audio
     unmute = () => {
-        this.volume(this.__prevVol);
+        const vol = this.__prevVol || this.config.volume || 1;
+        this.volume(vol);
     };
 
     // toggle mute
@@ -436,7 +436,7 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.VPAIDWrapper.getAdVolume();
         }
-        return this.player.volume;
+        return this.player.muted ? 0 : this.player.volume;
     };
 
     // return the duration of the video

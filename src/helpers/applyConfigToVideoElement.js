@@ -1,3 +1,9 @@
+/* Note: volume can only be set by the user in Safari Mobile.
+ * this.player.volume is read-only and will always return 1.
+ * https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+ * On other browsers, the muted configuration will take precedence over volume.
+ */
+
 export default function applyConfigToVideoElement({
     src,
     configAttributes: { muted, volume, ...configAttributes },
@@ -6,8 +12,9 @@ export default function applyConfigToVideoElement({
     VASTSources,
     setVolume
 }) {
-    setVolume(muted ? 0 : volume);
-    appendVideoAttributes(configAttributes, player);
+    const initialVolume = muted || !volume ? 0 : volume;
+    setVolume(initialVolume);
+    appendVideoAttributes({ ...configAttributes, volume: initialVolume }, player);
     if (isVPAID) return;
     appendVideoSources(src, player, VASTSources);
 }

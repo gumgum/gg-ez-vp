@@ -126,11 +126,11 @@ export default class GgEzVp {
             this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
-            // set click listener on player
-            this.on('click', this.__emitPlayerClick);
             if (isVAST) {
                 return this.__runVAST();
             }
+            // set click listener on player
+            this.on('click', this.__emitPlayerClick);
             this.__renderVideoElement();
         } catch (err) {
             console.log(err); //eslint-disable-line no-console

@@ -10,7 +10,6 @@ export default async function parseVAST(src, options = DEFAULT_VAST_OPTIONS) {
     const srcWithSupportedMacros = replaceVASTMacros(src);
     // Request and parse vast tag
     const parsedVAST = await vastClient.get(srcWithSupportedMacros, options);
-    console.log({ parsedVAST });
     const ad = parsedVAST?.ads[0];
     const linearCreative = ad?.creatives?.find(({ type }) => type === 'linear');
     if (!linearCreative) return;

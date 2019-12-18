@@ -7,6 +7,9 @@ export default function enableVASTTracking(vastClient, ad, creative) {
     setVASTTracking(vastTracker, this.on);
     this.dataReady = true;
     this.VASTTracker = vastTracker;
+    this.VASTTracker.on('clickthrough', VASTClickUrl => {
+        window.top.open(VASTClickUrl);
+    });
     this.__attachStoredListeners();
     this.__renderVideoElement();
 }

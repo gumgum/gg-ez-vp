@@ -15,6 +15,7 @@ import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
 import hasTouchScreen from './helpers/hasTouchScreen';
+import createNode from './helpers/createNode';
 // styles
 import './styles.css';
 

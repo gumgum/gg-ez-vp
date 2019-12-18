@@ -17,6 +17,7 @@ export default class VPAIDWrapper {
         if (!isValidVPAID) {
             /* eslint-disable-next-line no-console */
             console.log("GgEzVp [WARN]: The VPAIDCreative doesn't conform to the VPAID spec");
+            VASTTracker.errorWithCode(901);
             return;
         }
         this.VASTTracker = VASTTracker;
@@ -187,8 +188,6 @@ export default class VPAIDWrapper {
     onAdSizeChange() {
         const width = this._creative.getAdWidth();
         const height = this._creative.getAdHeight();
-        console.log('onAdSizeChange');
-        console.log({ width, height });
         this.emitter.emit('AdSizeChange', { width, height });
     }
 
@@ -232,13 +231,11 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        console.log({ url, id, playerHandles });
         this.emitter.emit('AdClickThru', { url, id, playerHandles });
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {
-                console.log({ url, VASTClickUrl });
                 // use VPAID URL if available, fallback to VASTClickUrl
-                window.open(url || VASTClickUrl);
+                window.top.open(url || VASTClickUrl);
             });
         }
         this.VASTTracker.click();

@@ -60,8 +60,10 @@ export default class GgEzVp {
         this.dataReady = false;
         this.isFullscreen = false;
         this.config = this.__getConfig(options);
+        // Create the video container
+        this.playerContainer = createNode('div', this.__getCSSClass('player-container'));
         // Create the video node
-        this.player = document.createElement('video');
+        this.player = createNode('video', this.__getCSSClass('viewer'));
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
@@ -127,6 +129,10 @@ export default class GgEzVp {
             this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
+            // Insert the video node into its container
+            this.playerContainer.appendChild(this.player);
+            // Insert the video container into the main container
+            this.container.appendChild(this.playerContainer);
             if (isVAST) {
                 return this.__runVAST();
             }
@@ -189,6 +195,13 @@ export default class GgEzVp {
         // Execute the callback in the next cycle, using requestAnimationFrame
         // if available or setTimeout as a fallback
         nextTick(this.__setReady);
+    };
+
+    __addBlockerOverlay = () => {
+        if (this.isVPAID) {
+            const blocker = createNode('div', this.__getCSSClass('blocker'));
+            this.container.appendChild(blocker);
+        }
     };
 
     __setReady = () => {

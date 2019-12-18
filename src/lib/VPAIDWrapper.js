@@ -231,9 +231,11 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
+        console.log({ url, id, playerHandles });
         this.emitter.emit('AdClickThru', { url, id, playerHandles });
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {
+                console.log({ VASTClickUrl });
                 // use VPAID URL if available, fallback to VASTClickUrl
                 window.top.open(url || VASTClickUrl);
             });

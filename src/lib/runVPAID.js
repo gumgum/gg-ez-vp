@@ -7,10 +7,14 @@ import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants
 export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
     const { adParameters } = creative;
-    const VPAIDCreative = await loadVPAID(VPAIDSource.fileURL, this.container);
+    const VPAIDCreative = await loadVPAID(VPAIDSource.fileURL, this.playerContainer);
     const VPAIDCreativeVersion = VPAIDCreative.handshakeVersion(SUPPORTED_VPAID_VERSION);
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
-    const { offsetWidth: width, offsetHeight: height } = this.container;
+    const { offsetWidth: width, offsetHeight: height } = this.playerContainer;
+    //TODO: CONTINUE HERE
+    // TODO: VPAID IFRAME WIDTH IS LESS THAN THE CONTAINER WHEN NOT VISIBLE
+    console.log(this.playerContainer);
+    console.log({ width, height });
     const originalDimensions = { width, height };
     if (canSupportVPAID) {
         this.VPAIDWrapper = new VPAIDWrapper({
@@ -30,6 +34,7 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             this.VPAIDStarted = true;
         });
         this.__mountVideoElement();
+        this.__renderControls();
         this.__initVPAIDAd({ adParameters });
     }
 }

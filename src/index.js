@@ -15,6 +15,7 @@ import isElement from './helpers/isElement';
 import parseVAST from './helpers/parseVAST';
 import secondsToReadableTime from './helpers/secondsToReadableTime';
 import hasTouchScreen from './helpers/hasTouchScreen';
+import createNode from './helpers/createNode';
 // styles
 import './styles.css';
 
@@ -59,8 +60,10 @@ export default class GgEzVp {
         this.dataReady = false;
         this.isFullscreen = false;
         this.config = this.__getConfig(options);
+        // Create the video container
+        this.playerContainer = createNode('div', this.__getCSSClass('player-container'));
         // Create the video node
-        this.player = document.createElement('video');
+        this.player = createNode('video', this.__getCSSClass('viewer'));
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
@@ -126,11 +129,15 @@ export default class GgEzVp {
             this.container.classList.add(this.__getCSSClass());
             // listen for <video> tag resize
             this.__nodeOn(window, RESIZE, this.__playerResizeListener());
-            // set click listener on player
-            this.on('click', this.__emitPlayerClick);
+            // Insert the video node into its container
+            this.playerContainer.appendChild(this.player);
+            // Insert the video container into the main container
+            this.container.appendChild(this.playerContainer);
             if (isVAST) {
                 return this.__runVAST();
             }
+            // set click listener on player
+            this.on('click', this.__emitPlayerClick);
             this.__renderVideoElement();
         } catch (err) {
             console.log(err); //eslint-disable-line no-console
@@ -180,7 +187,10 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.__setReadyNextTick();
         }
-        this.once('loadedmetadata', this.__setReadyNextTick);
+        this.once('loadedmetadata', () => {
+            this.emitter.emit(DATA_READY);
+            this.__setReadyNextTick();
+        });
     };
 
     __setReadyNextTick = () => {
@@ -188,6 +198,13 @@ export default class GgEzVp {
         // Execute the callback in the next cycle, using requestAnimationFrame
         // if available or setTimeout as a fallback
         nextTick(this.__setReady);
+    };
+
+    __addBlockerOverlay = () => {
+        if (this.isVPAID) {
+            const blocker = createNode('div', this.__getCSSClass('blocker'));
+            this.container.appendChild(blocker);
+        }
     };
 
     __setReady = () => {
@@ -442,7 +459,7 @@ export default class GgEzVp {
     // return the duration of the video
     getDuration = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper.duration;
+            return this.VPAIDWrapper.getAdDuration();
         }
         const { duration } = this.player;
         return duration || 0;

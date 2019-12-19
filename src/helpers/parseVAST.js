@@ -23,7 +23,7 @@ export default async function parseVAST(src, options = DEFAULT_VAST_OPTIONS) {
     // Load VPAID and run it
     if (VPAIDSource) {
         this.isVPAID = true;
-        return this.__runVPAID(linearCreative, VPAIDSource);
+        return this.__runVPAID(linearCreative, VPAIDSource, vastClient, ad);
     }
 
     // if there is no VPAID, fallback to VAST tracking

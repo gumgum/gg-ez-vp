@@ -21,7 +21,7 @@ export default function loadVPAID(url, container) {
             const fn = iframe.contentWindow.getVPAIDAd;
             if (fn && typeof fn == 'function') {
                 const VPAIDCreative = fn();
-                resolve(VPAIDCreative);
+                resolve({VPAIDCreative, iframe});
             }
         };
 

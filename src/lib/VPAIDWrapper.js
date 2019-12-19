@@ -4,20 +4,23 @@ import setCallbacksForCreative from './setCallbacksForCreative';
 import { DATA_READY, ERROR, PLAYBACK_PROGRESS, VPAID_STARTED, SKIP, EXPAND } from '../constants';
 
 export default class VPAIDWrapper {
-    constructor(
+    constructor({
         VPAIDCreative,
         emitter,
-        { width: containerWidth, height: containerHeight },
-        creativeVersion
-    ) {
+        dimensions: { width: containerWidth, height: containerHeight },
+        creativeVersion,
+        VASTTracker
+    }) {
         this._creative = VPAIDCreative;
         this.emitter = emitter;
         const isValidVPAID = this.__checkVPAIDInterface(VPAIDCreative);
         if (!isValidVPAID) {
             /* eslint-disable-next-line no-console */
             console.log("GgEzVp [WARN]: The VPAIDCreative doesn't conform to the VPAID spec");
+            VASTTracker.errorWithCode(901);
             return;
         }
+        this.VASTTracker = VASTTracker;
         this.__setCallbacksForCreative();
         this.emitter.on(SKIP, this.skipAd);
         this.emitter.on(EXPAND, isExpanded => {
@@ -29,6 +32,10 @@ export default class VPAIDWrapper {
             }
             this.expandAd(...expandAdArgs);
         });
+        // listen for window closing to send close events
+        window.onbeforeunload = () => {
+            VASTTracker.close();
+        };
     }
 
     __checkVPAIDInterface = checkVPAIDInterface;
@@ -90,9 +97,14 @@ export default class VPAIDWrapper {
         this._creative.setAdVolume(val);
     }
 
-    // Pass through for setAdVolume
+    // Pass through for getAdVolume
     getAdVolume() {
         return this._creative.getAdVolume();
+    }
+
+    // Pass through for getAdDuration
+    getAdDuration() {
+        return this._creative.getAdDuration();
     }
 
     // Pass through for resizeAd
@@ -126,18 +138,21 @@ export default class VPAIDWrapper {
     onAdPaused() {
         this.emitter.emit('AdPaused');
         this.emitter.emit('pause');
+        this.VASTTracker.setPaused(true);
     }
 
     // Callback for AdPlaying
     onAdPlaying() {
         this.emitter.emit('AdPlaying');
         this.emitter.emit('play');
+        this.VASTTracker.setPaused(false);
     }
 
     // Callback for AdError
     onAdError(message) {
         this.emitter.emit('AdError', message);
         this.emitter.emit(ERROR, message);
+        this.VASTTracker.errorWithCode(901);
     }
 
     // Callback for AdLog
@@ -158,6 +173,7 @@ export default class VPAIDWrapper {
     // Callback for AdUserClose
     onAdUserClose() {
         this.emitter.emit('AdUserClose');
+        this.VASTTracker.close();
     }
 
     // Callback for AdSkippableStateChange
@@ -170,6 +186,7 @@ export default class VPAIDWrapper {
     onAdExpandedChange() {
         const adExpanded = this._creative.getAdExpanded();
         this.emitter.emit('AdExpandedChange', adExpanded);
+        this.VASTTracker.setFullscreen(adExpanded);
     }
 
     // Callback for AdSizeChange
@@ -184,6 +201,7 @@ export default class VPAIDWrapper {
         const duration = this._creative.getAdDuration();
         this.duration = duration;
         this.emitter.emit('AdDurationChange', duration);
+        this.VASTTracker.setDuration(duration);
     }
 
     // Callback for AdRemainingTimeChange
@@ -206,17 +224,26 @@ export default class VPAIDWrapper {
             };
             this.currentTime = currentTime;
             this.emitter.emit(PLAYBACK_PROGRESS, payload);
+            this.VASTTracker.setProgress(currentTime);
         }
     }
 
     // Callback for AdImpression
     onAdImpression() {
         this.emitter.emit('AdImpression');
+        this.VASTTracker.trackImpression();
     }
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        this.emitter.emit({ url, id, playerHandles });
+        this.emitter.emit('AdClickThru', { url, id, playerHandles });
+        if (playerHandles) {
+            this.VASTTracker.on('clickthrough', VASTClickUrl => {
+                // use VPAID URL if available, fallback to VASTClickUrl
+                window.top.open(url || VASTClickUrl);
+            });
+        }
+        this.VASTTracker.click();
     }
 
     // Callback for AdInteraction
@@ -253,6 +280,7 @@ export default class VPAIDWrapper {
     onAdVideoComplete() {
         // Video 100% completed
         this.emitter.emit('AdVideoComplete');
+        this.VASTTracker.complete();
     }
 
     // Callback for AdLinearChange
@@ -281,11 +309,14 @@ export default class VPAIDWrapper {
     // Callback for skipAd
     onSkipAd() {
         this.emitter.emit('AdSkipped');
+        this.VASTTracker.skip();
     }
 
     // Callback for AdVolumeChange
     onAdVolumeChange() {
         const volume = this._creative.getAdVolume();
-        this.emitter.emit('onAdVolumeChange', volume);
+        const isMuted = volume == 0;
+        this.emitter.emit('AdVolumeChange', volume);
+        this.VASTTracker.setMuted(isMuted);
     }
 }

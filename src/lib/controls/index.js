@@ -10,6 +10,8 @@ import play from './play';
 
 export default function renderControls() {
     const { container, config, __onTouchScreen } = this;
+    // Include a blocker div between viewer and controls
+    this.__addBlockerOverlay();
     if (!config.controls) return;
     const isAd = config.adControls;
     const controls = document.createElement('div');

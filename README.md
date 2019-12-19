@@ -210,31 +210,32 @@ The default styles that can be overridden by any custom styles you may need:
 
 Use these selectors to override the styles:
 
-| selector                         | component                                                       |
-| -------------------------------- | --------------------------------------------------------------- |
-| .gg-ez-vp                        | player container                                                |
-| .gg-ez-vp--viewer                | video element                                                   |
-| .gg-ez-vp--controls              | control bar                                                     |
-| .gg-ez-vp--timestamp             | current video time                                              |
-| .gg-ez-vp--timestamp-break       | bar dividing currentime / duration                              |
-| .gg-ez-vp--timestamp-ad          | ad remaining time                                               |
-| .gg-ez-vp--volume                | volume controls container                                       |
-| .gg-ez-vp--volume-control        | volume slider container                                         |
-| .gg-ez-vp--volume-control-slider | volume slider                                                   |
-| .gg-ez-vp--input-range           | volume slider input styles                                      |
-| .gg-ez-vp--progress              | progress container                                              |
-| .gg-ez-vp--progress-bar          | progress track                                                  |
-| .gg-ez-vp--progress-filled       | progress bar fill                                               |
-| .gg-ez-vp--progress-filled:after | progress bar scrub                                              |
-| .gg-ez-vp--button-icon           | play and volume buttons                                         |
-| .gg-ez-vp--button-icon.mute      | muted state of the volume control                               |
-| .gg-ez-vp--button-icon.low       | low volume state of the volume control (under 33%)              |
-| .gg-ez-vp--button-icon.medium    | medium volume state of the volume control (between 34% and 66%) |
-| .gg-ez-vp--button-icon.high      | high volume state of the volume control (above 66%)             |
-| .gg-ez-vp--button-icon.play      | shown while video is not playing on the play control            |
-| .gg-ez-vp--button-icon.pause     | shown while video is playing on the play control                |
-| .gg-ez-vp--button-icon.replay    | shown after the video ends                                      |
-| .gg-ez-vp--button-icon.expand    | expand button icon                                              |
+| selector                         | component                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| .gg-ez-vp                        | player container                                                          |
+| .gg-ez-vp--viewer                | video element                                                             |
+| .gg-ez-vp--controls              | control bar                                                               |
+| .gg-ez-vp--timestamp             | current video time                                                        |
+| .gg-ez-vp--timestamp-break       | bar dividing currentime / duration                                        |
+| .gg-ez-vp--timestamp-ad          | ad remaining time                                                         |
+| .gg-ez-vp--volume                | volume controls container                                                 |
+| .gg-ez-vp--volume-control        | volume slider container                                                   |
+| .gg-ez-vp--volume-control-slider | volume slider                                                             |
+| .gg-ez-vp--input-range           | volume slider input styles                                                |
+| .gg-ez-vp--progress              | progress container                                                        |
+| .gg-ez-vp--progress-bar          | progress track                                                            |
+| .gg-ez-vp--progress-filled       | progress bar fill                                                         |
+| .gg-ez-vp--progress-filled:after | progress bar scrub                                                        |
+| .gg-ez-vp--button-icon           | play and volume buttons                                                   |
+| .gg-ez-vp--button-icon.mute      | muted state of the volume control                                         |
+| .gg-ez-vp--button-icon.low       | low volume state of the volume control (under 33%)                        |
+| .gg-ez-vp--button-icon.medium    | medium volume state of the volume control (between 34% and 66%)           |
+| .gg-ez-vp--button-icon.high      | high volume state of the volume control (above 66%)                       |
+| .gg-ez-vp--button-icon.play      | shown while video is not playing on the play control                      |
+| .gg-ez-vp--button-icon.pause     | shown while video is playing on the play control                          |
+| .gg-ez-vp--button-icon.replay    | shown after the video ends                                                |
+| .gg-ez-vp--button-icon.expand    | expand button icon                                                        |
+| .gg-ez-vp--blocker               | invisible div that can be used to prevent clicks on VPAID/VAST thumbnails |
 
 There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 

@@ -28,6 +28,9 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             this.__configureVPAID();
             this.__setReadyNextTick();
         });
+        this.once('AdSizeChange', dimensions => {
+            this.dimensions = dimensions;
+        });
         this.once(VPAID_STARTED, () => {
             this.VPAIDStarted = true;
         });

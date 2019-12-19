@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.0] - 2019-12-18
+
+-   Prevent context menu over video tag (#40)
+-   Fix VAST/VPAID clickthru and tracking (#48)
+
 ## [1.3.0] - 2019-12-13
 
 -   Set volume icons and mute toggle based on muted property (#56)

@@ -8,6 +8,9 @@ export default function renderVideoElement() {
         config: { src, width, height, autoplay, volume, muted, poster, preload, loop, playsinline }
     } = this;
 
+    // Prevent secondary clicks on the player (aka downloading it)
+    this.__nodeOn(player, 'contextmenu', e => e.preventDefault());
+
     // Group all the video element attributes
     const configAttributes = {
         muted,

@@ -97,9 +97,14 @@ export default class VPAIDWrapper {
         this._creative.setAdVolume(val);
     }
 
-    // Pass through for setAdVolume
+    // Pass through for getAdVolume
     getAdVolume() {
         return this._creative.getAdVolume();
+    }
+
+    // Pass through for getAdDuration
+    getAdDuration() {
+        return this._creative.getAdDuration();
     }
 
     // Pass through for resizeAd
@@ -231,11 +236,9 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        console.log({ url, id, playerHandles });
         this.emitter.emit('AdClickThru', { url, id, playerHandles });
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {
-                console.log({ VASTClickUrl });
                 // use VPAID URL if available, fallback to VASTClickUrl
                 window.top.open(url || VASTClickUrl);
             });
@@ -313,7 +316,7 @@ export default class VPAIDWrapper {
     onAdVolumeChange() {
         const volume = this._creative.getAdVolume();
         const isMuted = volume == 0;
-        this.emitter.emit('onAdVolumeChange', volume);
+        this.emitter.emit('AdVolumeChange', volume);
         this.VASTTracker.setMuted(isMuted);
     }
 }

@@ -1,4 +1,4 @@
-import { PLAYBACK_PROGRESS, TIMESTAMP } from '../../constants';
+import { PLAYBACK_PROGRESS, TIMESTAMP, DATA_READY } from '../../constants';
 import secondsToReadableTime from '../../helpers/secondsToReadableTime';
 import createNode from '../../helpers/createNode';
 
@@ -6,7 +6,7 @@ export default function timestamp(container) {
     const currentTime = this.getCurrentTime();
     const initialDuration = this.getDuration();
     const fancyCurrentTime = secondsToReadableTime(currentTime);
-    const fancyDuration = secondsToReadableTime(initialDuration);
+    const fancyDuration = secondsToReadableTime(Math.max(initialDuration, 0));
 
     const classNameRoot = this.__getCSSClass(TIMESTAMP);
     const timestampNode = createNode('div', classNameRoot);
@@ -23,11 +23,9 @@ export default function timestamp(container) {
     });
 
     // Set duration once playback starts if it wasn't available
-    this.once('loadedmetadata', () => {
-        const duration = this.getDuration();
-        const fancyDuration = secondsToReadableTime(duration);
-        if (!initialDuration) {
-            timestampDuration.innerText = fancyDuration;
+    this.once(PLAYBACK_PROGRESS, ({ fancyDuration: updatedDuration }) => {
+        if (fancyDuration === '0:00') {
+            timestampDuration.innerText = updatedDuration;
         }
     });
 

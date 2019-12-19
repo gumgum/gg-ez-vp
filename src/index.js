@@ -187,7 +187,10 @@ export default class GgEzVp {
         if (this.isVPAID) {
             return this.__setReadyNextTick();
         }
-        this.once('loadedmetadata', this.__setReadyNextTick);
+        this.once('loadedmetadata', () => {
+            this.emitter.emit(DATA_READY);
+            this.__setReadyNextTick();
+        });
     };
 
     __setReadyNextTick = () => {
@@ -456,7 +459,7 @@ export default class GgEzVp {
     // return the duration of the video
     getDuration = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper.duration;
+            return this.VPAIDWrapper.getAdDuration();
         }
         const { duration } = this.player;
         return duration || 0;

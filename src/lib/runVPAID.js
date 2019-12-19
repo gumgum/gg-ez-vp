@@ -2,21 +2,18 @@ import { VASTTracker } from 'vast-client';
 import loadVPAID from '../helpers/loadVPAID';
 import isVPAIDVersionSupported from '../helpers/isVPAIDVersionSupported';
 import VPAIDWrapper from '../lib/VPAIDWrapper';
-import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants';
+import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED, RESIZE } from '../constants';
 
 export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
     const { adParameters } = creative;
-    const VPAIDCreative = await loadVPAID(VPAIDSource.fileURL, this.playerContainer);
+    const { VPAIDCreative, iframe } = await loadVPAID(VPAIDSource.fileURL, this.playerContainer);
     const VPAIDCreativeVersion = VPAIDCreative.handshakeVersion(SUPPORTED_VPAID_VERSION);
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
     const { offsetWidth: width, offsetHeight: height } = this.playerContainer;
-    //TODO: CONTINUE HERE
-    // TODO: VPAID IFRAME WIDTH IS LESS THAN THE CONTAINER WHEN NOT VISIBLE
-    console.log(this.playerContainer);
-    console.log({ width, height });
     const originalDimensions = { width, height };
     if (canSupportVPAID) {
+        this.VPAIDiframe = iframe;
         this.VPAIDWrapper = new VPAIDWrapper({
             VPAIDCreative,
             emitter: this.emitter,
@@ -24,6 +21,7 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             creativeVersion: VPAIDCreativeVersion,
             VASTTracker: vastTracker
         });
+        // Finish setup after VPAID is ready
         this.once(DATA_READY, () => {
             this.dataReady = true;
             this.__attachStoredListeners();
@@ -32,6 +30,11 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
         });
         this.once(VPAID_STARTED, () => {
             this.VPAIDStarted = true;
+        });
+        // Add a resize listener for the VPAID iframe (GH-48)
+        this.__nodeOn(this.VPAIDiframe.contentWindow, RESIZE, () => {
+            const { innerHeight: height, innerWidth: width } = this.VPAIDiframe.contentWindow;
+            this.VPAIDWrapper.resizeAd(width, height, 'normal');
         });
         this.__mountVideoElement();
         this.__renderControls();

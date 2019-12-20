@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.1] - 2019-12-20
+
+-   Change script validation to always use the last gg-ez-vp.js instead of throwing an error
+-   Improve demo page with dynamic source edition
+-   include and replace VAST [timestamp] macro (#60)
+
 ## [1.4.0] - 2019-12-18
 
 -   Prevent context menu over video tag (#40)

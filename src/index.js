@@ -107,15 +107,14 @@ export default class GgEzVp {
     };
 
     // find the base URL that the file was loaded from
-    // only one URL ending in '/gg-ez-vp.js' is allowed
+    // only the last URL ending in '/gg-ez-vp.js' is allowed
+    // Base URL is used to preload icons
+    // TODO: find a better way to preload them, maybe include them in build (#63)
     __getBaseURL = () => {
         const ggEzVpScripts = [].slice
             .call(document.getElementsByTagName('script'))
             .filter(a => a.src.includes(JS_FILENAME));
-        if (ggEzVpScripts.length > 1) {
-            throw Error(`GgEzVp [Error]: loading more than one ${JS_FILENAME}`);
-        }
-        return ggEzVpScripts[0].src.replace(JS_FILENAME, '');
+        return ggEzVpScripts[ggEzVpScripts.length - 1].src.replace(JS_FILENAME, '');
     };
 
     // set up controls and internal listeners

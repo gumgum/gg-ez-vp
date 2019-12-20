@@ -112,10 +112,7 @@ export default class GgEzVp {
         const ggEzVpScripts = [].slice
             .call(document.getElementsByTagName('script'))
             .filter(a => a.src.includes(JS_FILENAME));
-        if (ggEzVpScripts.length > 1) {
-            throw Error(`GgEzVp [Error]: loading more than one ${JS_FILENAME}`);
-        }
-        return ggEzVpScripts[0].src.replace(JS_FILENAME, '');
+        return ggEzVpScripts[ggEzVpScripts.length - 1].src.replace(JS_FILENAME, '');
     };
 
     // set up controls and internal listeners

@@ -13,6 +13,8 @@ Simple video player with minimal setup, intuitive API and straightforward featur
 -   Browser (UMD), CommonJS and ES module versions
 -   VAST / VPAID Support for a single Linear Creative. Parsing is provided by [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js). _Note_ that at the time, only one Ad is loaded, and only Linear Creatives are played and tracked.
 
+[See the demo page](https://gumgum.github.io/gg-ez-vp/demo)
+
 ## Table of contents
 
 -   [Features](#features)

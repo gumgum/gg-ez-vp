@@ -107,7 +107,9 @@ export default class GgEzVp {
     };
 
     // find the base URL that the file was loaded from
-    // only one URL ending in '/gg-ez-vp.js' is allowed
+    // only the last URL ending in '/gg-ez-vp.js' is allowed
+    // Base URL is used to preload icons
+    // TODO: find a better way to preload them, maybe include them in build (#63)
     __getBaseURL = () => {
         const ggEzVpScripts = [].slice
             .call(document.getElementsByTagName('script'))

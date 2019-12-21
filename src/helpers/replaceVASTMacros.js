@@ -3,7 +3,8 @@
 const MACROS_DICT = {
     '[APIFRAMEWORKS]': 2, //VPAID 2.0
     '[SERVERSIDE]': 0, // false, requesting from client
-    '[TIMESTAMP]': () => Date.now() // false, requesting from client
+    '[TIMESTAMP]': Date.now, // current timestamp
+    '[timestamp]': Date.now // current timestamp
     //'[OMIDPARTNER]': 0 // TODO
 };
 
@@ -12,7 +13,7 @@ export default function replaceVASTMacros(src) {
     Object.keys(MACROS_DICT).forEach(macro => {
         const valueContainer = MACROS_DICT[macro];
         const value = typeof valueContainer === 'function' ? valueContainer() : valueContainer;
-        tmpSrc = src.replace(macro, value).replace(macro.toLowerCase(), value);
+        tmpSrc = tmpSrc.replace(macro, value);
     });
     return tmpSrc;
 }

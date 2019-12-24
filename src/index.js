@@ -223,17 +223,48 @@ export default class GgEzVp {
 
     __configureVPAID = configureVPAID;
 
+    __VASTVisibilityListeners = null;
+
     // helps retrieve and parse the VAST data
     // emits: DATA_READY || error
     __runVAST = async () => {
         try {
             const {
-                config: { src }
+                config: { src },
+                container
             } = this;
-            this.VASTData = await this.__parseVAST(src);
+            // Check if container is visible before loading VAST
+            const containerIsVisible = this.__isElementInViewport(container);
+            if (containerIsVisible) {
+                // Remove VAST listeners if available
+                if (this.__VASTVisibilityListeners?.length) {
+                    this.__VASTVisibilityListeners.forEach(fn => fn());
+                    this.__VASTVisibilityListeners = null;
+                }
+                // Parse VAST source
+                this.VASTData = await this.__parseVAST(src);
+                return;
+            }
+            // Set listeners to load VAST on resize or scroll if visible
+            this.__VASTVisibilityListeners = [RESIZE, 'scroll'].map(evtName =>
+                this.__nodeOn(window, evtName, this.__runVAST)
+            );
         } catch (err) {
             this.emitter.emit(ERROR, err);
         }
+    };
+
+    __isElementInViewport = el => {
+        const rect = el.getBoundingClientRect();
+        // Check if container is within viewport and larger than 14px (its initial size)
+        return (
+            rect.width > 14 &&
+            rect.height > 14 &&
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
     };
 
     __isInternalEvent = eventName => internalEvents.includes(eventName);

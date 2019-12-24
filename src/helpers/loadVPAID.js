@@ -8,7 +8,7 @@ export default function loadVPAID(url, container) {
             'style',
             'border: 0px;margin: 0px;opacity: 1;padding:0px;height: 100%;position: absolute;width: 100%;top: 0;left: 0;'
         );
-        container.appendChild(iframe);
+        container.prepend(iframe);
         // url points to the ad js file
         iframe.contentWindow.document.write(
             // split the end script tag to prevent closing js prematurely

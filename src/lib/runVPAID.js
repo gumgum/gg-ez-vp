@@ -33,11 +33,22 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
         });
         this.once(VPAID_STARTED, () => {
             this.VPAIDStarted = true;
+            this.VPAIDFinished = false;
+        });
+        this.once('AdVideoComplete', () => {
+            // Reset all flags
+            this.VPAIDStarted = false;
+            this.VPAIDFinished = true;
+            this.dataReady = false;
+            this.VPAIDWrapper = null;
+            this.VASTData = null;
         });
         // Add a resize listener for the VPAID iframe (GH-48)
         this.__nodeOn(this.VPAIDiframe.contentWindow, RESIZE, () => {
             const { innerHeight: height, innerWidth: width } = this.VPAIDiframe.contentWindow;
-            this.VPAIDWrapper.resizeAd(width, height, 'normal');
+            if (!this.VPAIDFinished) {
+                this.VPAIDWrapper.resizeAd(width, height, 'normal');
+            }
         });
         this.__mountVideoElement();
         this.__renderControls();

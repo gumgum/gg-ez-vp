@@ -67,6 +67,7 @@ export default class GgEzVp {
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
+        this.controlsRendered = false;
         this.__onTouchScreen = hasTouchScreen();
         // find the base url that the file was loaded from
         this.__baseURL = this.__getBaseURL();
@@ -440,6 +441,10 @@ export default class GgEzVp {
 
     // toggle media playback
     playPause = () => {
+        if (this.isVPAID && this.VPAIDFinished) {
+            // REPLAYING VAST
+            return this.__runVAST();
+        }
         if (this.player.paused) {
             return this.play();
         }
@@ -488,17 +493,28 @@ export default class GgEzVp {
 
     // return the duration of the video
     getDuration = () => {
+        let duration;
         if (this.isVPAID) {
-            return this.VPAIDWrapper.getAdDuration();
+            if (this.VPAIDFinished) {
+                // Use last known duration
+                duration = this.duration;
+            } else {
+                // Retrieve duration from VPAID wrapper
+                duration = this.VPAIDWrapper.getAdDuration();
+            }
+        } else {
+            // Get video tag duration
+            duration = this.player.duration;
         }
-        const { duration } = this.player;
+        // store duration
+        this.duration = duration;
         return duration || 0;
     };
 
     // return the currentTime of the video
     getCurrentTime = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper.currentTime;
+            return this.VPAIDFinished ? this.duration : this.VPAIDWrapper.currentTime;
         }
         const { currentTime } = this.player;
         return currentTime;

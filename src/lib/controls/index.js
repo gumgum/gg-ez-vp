@@ -9,7 +9,9 @@ import timestamp from './timestamp';
 import play from './play';
 
 export default function renderControls() {
-    const { container, config, __onTouchScreen } = this;
+    const { container, config, __onTouchScreen, controlsRendered } = this;
+    // Cancel if controls are already rendered
+    if (controlsRendered) return;
     // Include a blocker div between viewer and controls
     this.__addBlockerOverlay();
     if (!config.controls) return;
@@ -20,6 +22,8 @@ export default function renderControls() {
     controls.classList.add(this.__getCSSClass('controls'));
     nodeRenderer.call(this, config, sections, controls);
     container.appendChild(controls);
+    // Set flag for successful controls rendering
+    this.controlsRendered = true;
 }
 
 function nodeRenderer(config, sections, container) {

@@ -12,7 +12,7 @@ export default function loadVPAID(url, container) {
         // url points to the ad js file
         iframe.contentWindow.document.write(
             // split the end script tag to prevent closing js prematurely
-            `<head></head><body><script id="${SCRIPT_ID}" src="${url}"></scr` + 'ipt></body>'
+            `<head></head><body><script id="${SCRIPT_ID}" src="${url}" async></scr` + 'ipt></body>'
         );
 
         const script = iframe.contentWindow.document.getElementById(SCRIPT_ID);

@@ -458,7 +458,7 @@ export default class GgEzVp {
         const { isVPAID, VPAIDWrapper } = this;
         const volume = Math.min(Math.max(value, 0), 1);
         if (isVPAID) {
-            return VPAIDWrapper?.setAdVolume(volume);
+            return this.dataReady ? VPAIDWrapper?.setAdVolume(volume) : 0;
         }
         this.player.volume = volume;
         this.player.muted = !volume;
@@ -488,7 +488,7 @@ export default class GgEzVp {
     // return the video volume
     getVolume = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper?.getAdVolume();
+            return this.dataReady ? this.VPAIDWrapper?.getAdVolume() : 0;
         }
         return this.player.muted ? 0 : this.player.volume;
     };
@@ -502,7 +502,7 @@ export default class GgEzVp {
                 duration = this.duration;
             } else {
                 // Retrieve duration from VPAID wrapper
-                duration = this.VPAIDWrapper?.getAdDuration();
+                duration = this.dataReady && this.VPAIDWrapper?.getAdDuration();
             }
         } else {
             // Get video tag duration

@@ -425,9 +425,9 @@ export default class GgEzVp {
         const { isVPAID, VPAIDStarted, VPAIDWrapper } = this;
         if (isVPAID) {
             if (VPAIDStarted) {
-                return VPAIDWrapper.resumeAd();
+                return VPAIDWrapper?.resumeAd();
             }
-            return VPAIDWrapper.startAd();
+            return VPAIDWrapper?.startAd();
         }
         this.player.play();
     };
@@ -436,7 +436,7 @@ export default class GgEzVp {
     pause = () => {
         const { isVPAID, VPAIDWrapper } = this;
         if (isVPAID) {
-            return VPAIDWrapper.pauseAd();
+            return VPAIDWrapper?.pauseAd();
         }
         this.player.pause();
     };
@@ -488,7 +488,7 @@ export default class GgEzVp {
     // return the video volume
     getVolume = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper.getAdVolume();
+            return this.VPAIDWrapper?.getAdVolume();
         }
         return this.player.muted ? 0 : this.player.volume;
     };
@@ -516,7 +516,7 @@ export default class GgEzVp {
     // return the currentTime of the video
     getCurrentTime = () => {
         if (this.isVPAID) {
-            return this.VPAIDFinished ? this.duration : this.VPAIDWrapper.currentTime;
+            return this.VPAIDFinished ? this.duration : this.VPAIDWrapper?.currentTime;
         }
         const { currentTime } = this.player;
         return currentTime;

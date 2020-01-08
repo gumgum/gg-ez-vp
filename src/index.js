@@ -458,7 +458,7 @@ export default class GgEzVp {
         const { isVPAID, VPAIDWrapper } = this;
         const volume = Math.min(Math.max(value, 0), 1);
         if (isVPAID) {
-            return VPAIDWrapper.setAdVolume(volume);
+            return VPAIDWrapper?.setAdVolume(volume);
         }
         this.player.volume = volume;
         this.player.muted = !volume;

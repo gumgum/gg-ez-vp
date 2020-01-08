@@ -5,7 +5,7 @@ export default function initVPAIDAd({ adParameters }) {
     const creativeData = { AdParameters: adParameters };
 
     const environmentVars = {
-        slot: this.container,
+        slot: this.playerContainer,
         videoSlot: this.player,
         videoSlotCanAutoplay: true
     };

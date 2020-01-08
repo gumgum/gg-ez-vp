@@ -104,7 +104,7 @@ export default class VPAIDWrapper {
 
     // Pass through for getAdDuration
     getAdDuration() {
-        return this._creative.getAdDuration();
+        return this._creative?.getAdDuration();
     }
 
     // Pass through for resizeAd

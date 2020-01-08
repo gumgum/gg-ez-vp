@@ -12,6 +12,7 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
     const { offsetWidth: width, offsetHeight: height } = this.playerContainer;
     const originalDimensions = { width, height };
+    this.VASTTracker = vastTracker;
     if (canSupportVPAID) {
         this.VPAIDiframe = iframe;
         this.VPAIDWrapper = new VPAIDWrapper({

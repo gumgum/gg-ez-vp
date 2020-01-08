@@ -16,7 +16,6 @@ export default function loadVPAID(url, container) {
         );
 
         const script = iframe.contentWindow.document.getElementById(SCRIPT_ID);
-        script.onerror = reject;
         let VPAIDCreative = getVPAIDCreative(iframe);
 
         // retrieve cached creative
@@ -29,12 +28,15 @@ export default function loadVPAID(url, container) {
             VPAIDCreative = getVPAIDCreative(iframe);
             resolve({ VPAIDCreative, iframe });
         };
+
+        // handle errors
+        script.onerror = reject;
     });
 }
 
 function getVPAIDCreative(iframe) {
     const creativeGetter = iframe.contentWindow.getVPAIDAd;
-    if (creativeGetter && typeof creativeGetter == 'function') {
+    if (creativeGetter && typeof creativeGetter === 'function') {
         const VPAIDCreative = creativeGetter();
         return VPAIDCreative;
     }

@@ -3,7 +3,7 @@ const SCRIPT_ID = 'adloaderscript';
 export default function loadVPAID(url, container) {
     return new Promise((resolve, reject) => {
         const iframe = document.createElement('iframe');
-        iframe.id = 'adloaderframe';
+        iframe.id = `adloaderframe_${Date.now()}`;
         iframe.setAttribute(
             'style',
             'border: 0px;margin: 0px;opacity: 1;padding:0px;height: 100%;position: absolute;width: 100%;top: 0;left: 0;'
@@ -16,17 +16,26 @@ export default function loadVPAID(url, container) {
         );
 
         const script = iframe.contentWindow.document.getElementById(SCRIPT_ID);
+        script.onerror = reject;
+        let VPAIDCreative = getVPAIDCreative(iframe);
 
-        script.onload = function() {
-            const fn = iframe.contentWindow.getVPAIDAd;
-            if (fn && typeof fn == 'function') {
-                const VPAIDCreative = fn();
-                resolve({ VPAIDCreative, iframe });
-            }
-        };
+        // retrieve cached creative
+        if (VPAIDCreative) {
+            return resolve({ VPAIDCreative, iframe });
+        }
 
-        script.onerror = function(e) {
-            reject(e);
+        // or load script
+        script.onload = () => {
+            VPAIDCreative = getVPAIDCreative(iframe);
+            resolve({ VPAIDCreative, iframe });
         };
     });
+}
+
+function getVPAIDCreative(iframe) {
+    const creativeGetter = iframe.contentWindow.getVPAIDAd;
+    if (creativeGetter && typeof creativeGetter == 'function') {
+        const VPAIDCreative = creativeGetter();
+        return VPAIDCreative;
+    }
 }

@@ -64,6 +64,7 @@ export default class GgEzVp {
         this.playerContainer = createNode('div', this.__getCSSClass('player-container'));
         // Create the video node
         this.player = createNode('video', this.__getCSSClass('viewer'));
+        this.player.muted = true;
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
@@ -457,23 +458,25 @@ export default class GgEzVp {
     volume = value => {
         const { isVPAID, VPAIDWrapper } = this;
         const volume = Math.min(Math.max(value, 0), 1);
+        this.player.muted = !volume;
         if (isVPAID) {
             return this.dataReady ? VPAIDWrapper?.setAdVolume(volume) : 0;
         }
         this.player.volume = volume;
-        this.player.muted = !volume;
     };
 
     // mute audio
     mute = () => {
         this.__prevVol = this.getVolume() || this.config.volume || 1;
         this.volume(0);
+        this.muted = true;
     };
 
     // unmute audio
     unmute = () => {
         const vol = this.__prevVol || this.config.volume || 1;
         this.volume(vol);
+        this.muted = false;
     };
 
     // toggle mute

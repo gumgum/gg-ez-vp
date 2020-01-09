@@ -6,7 +6,7 @@ export default function loadVPAID(url, container) {
         iframe.id = `adloaderframe_${Date.now()}`;
         iframe.setAttribute(
             'style',
-            'border: 0px;margin: 0px;opacity: 1;padding:0px;height: 100%;position: absolute;width: 100%;top: 0;left: 0;'
+            'border:0px;margin:0px;opacity:1;padding:0px;height:100%;position:absolute;width:100%;top:0;left:0;'
         );
         container.prepend(iframe);
         // url points to the ad js file

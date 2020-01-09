@@ -22,7 +22,8 @@ export default function renderVideoElement() {
         preload,
         loop,
         playsinline,
-        'webkit-playsinline': playsinline
+        'webkit-playsinline': playsinline,
+        disableRemotePlayback: true
     };
 
     applyConfigToVideoElement({

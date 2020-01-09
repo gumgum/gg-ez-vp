@@ -55,6 +55,12 @@
 
 .gg-ez-vp--viewer {
     width: 100%;
+    height: 100%;
+}
+
+.gg-ez-vp--player-container {
+    overflow: hidden;
+    position: relative;
 }
 
 .gg-ez-vp--controls {

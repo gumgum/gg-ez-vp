@@ -43,6 +43,7 @@ export default class VPAIDWrapper {
     __setCallbacksForCreative = setCallbacksForCreative;
 
     initAd = (width, height, viewMode, desiredBitrate, creativeData, environmentVars) => {
+        this.setAdVolume(0);
         this._creative?.initAd(
             width,
             height,
@@ -236,6 +237,7 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
+        //TODO CLICKTHROUGH NOT WORKING IN IOS
         this.emitter.emit('AdClickThru', { url, id, playerHandles });
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {

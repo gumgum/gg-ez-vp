@@ -2,7 +2,7 @@ import { VASTTracker } from 'vast-client';
 import loadVPAID from '../helpers/loadVPAID';
 import isVPAIDVersionSupported from '../helpers/isVPAIDVersionSupported';
 import VPAIDWrapper from '../lib/VPAIDWrapper';
-import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED, RESIZE } from '../constants';
+import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants';
 
 export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
@@ -13,7 +13,7 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const { VPAIDCreative, iframe } = await loadVPAID(VPAIDSource.fileURL, this.playerContainer);
     const VPAIDCreativeVersion = VPAIDCreative.handshakeVersion(SUPPORTED_VPAID_VERSION);
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
-    const { offsetWidth: width, offsetHeight: height } = this.playerContainer;
+    const { clientWidth: width, clientHeight: height } = this.playerContainer;
     const originalDimensions = { width, height };
     this.VASTTracker = vastTracker;
     if (canSupportVPAID) {
@@ -24,13 +24,6 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             dimensions: originalDimensions,
             creativeVersion: VPAIDCreativeVersion,
             VASTTracker: vastTracker
-        });
-        // Add a resize listener for the VPAID iframe (GH-48)
-        this.__nodeOn(this.VPAIDiframe.contentWindow, RESIZE, () => {
-            const { innerHeight: height, innerWidth: width } = this.VPAIDiframe.contentWindow;
-            if (!this.VPAIDFinished) {
-                this.VPAIDWrapper.resizeAd(width, height, 'normal');
-            }
         });
         this.__mountVideoElement();
         this.__renderControls();

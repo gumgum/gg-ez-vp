@@ -53,13 +53,15 @@
     justify-content: flex-end;
 }
 
-.gg-ez-vp--viewer {
+.gg-ez-vp--viewer,
+.gg-ez-vp--player-container {
     width: 100%;
     height: 100%;
 }
 
 .gg-ez-vp--player-container {
     overflow: hidden;
+    /* This puts the controls in front of the video in iOS */
     position: relative;
 }
 

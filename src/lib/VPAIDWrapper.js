@@ -1,7 +1,15 @@
 import checkVPAIDInterface from '../helpers/checkVPAIDInterface';
 import secondsToReadableTime from '../helpers/secondsToReadableTime';
 import setCallbacksForCreative from './setCallbacksForCreative';
-import { DATA_READY, ERROR, PLAYBACK_PROGRESS, VPAID_STARTED, SKIP, EXPAND } from '../constants';
+import {
+    DATA_READY,
+    ERROR,
+    PLAYBACK_PROGRESS,
+    PLAYER_CLICK,
+    VPAID_STARTED,
+    SKIP,
+    EXPAND
+} from '../constants';
 
 export default class VPAIDWrapper {
     constructor({
@@ -237,8 +245,9 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        //TODO CLICKTHROUGH NOT WORKING IN IOS
-        this.emitter.emit('AdClickThru', { url, id, playerHandles });
+        const event = { url, id, playerHandles };
+        this.emitter.emit('AdClickThru', event);
+        this.emitter.emit(PLAYER_CLICK, event);
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {
                 // use VPAID URL if available, fallback to VASTClickUrl

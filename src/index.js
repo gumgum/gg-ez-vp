@@ -4,7 +4,6 @@ import unbindAll from 'nanoevents/unbind-all';
 // instance methods
 import renderVideoElement from './lib/renderVideoElement';
 import runVPAID from './lib/runVPAID';
-import initVPAIDAd from './lib/initVPAIDAd';
 import enableVASTTracking from './lib/enableVASTTracking';
 import configureVPAID from './lib/configureVPAID';
 import renderControls from './lib/controls';
@@ -220,8 +219,6 @@ export default class GgEzVp {
     __enableVASTTracking = enableVASTTracking;
 
     __runVPAID = runVPAID;
-
-    __initVPAIDAd = initVPAIDAd;
 
     __configureVPAID = configureVPAID;
 

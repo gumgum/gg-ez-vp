@@ -169,7 +169,7 @@ export default class GgEzVp {
         }
 
         if (err) {
-            throw new Error(`GgEzVp Error: ${err}`);
+            throw new Error(err);
         }
     };
 
@@ -200,13 +200,6 @@ export default class GgEzVp {
         nextTick(this.__setReady);
     };
 
-    __addBlockerOverlay = () => {
-        if (this.isVPAID) {
-            const blocker = createNode('div', this.__getCSSClass('blocker'));
-            this.container.appendChild(blocker);
-        }
-    };
-
     __setReady = () => {
         this.ready = true;
         this.emitter.emit(READY);
@@ -228,44 +221,12 @@ export default class GgEzVp {
     // emits: DATA_READY || error
     __runVAST = async () => {
         try {
-            const {
-                config: { src },
-                container
-            } = this;
-            // Check if container is visible before loading VAST
-            const containerIsVisible = this.__isElementInViewport(container);
-            if (containerIsVisible) {
-                // Remove VAST listeners if available
-                if (this.__VASTVisibilityListeners?.length) {
-                    this.__VASTVisibilityListeners.forEach(fn => fn());
-                    this.__VASTVisibilityListeners = null;
-                }
-                // Parse VAST source
-                this.VASTData = await this.__parseVAST(src);
-                return;
-            }
-            // Set listeners to load VAST on resize or scroll if visible
-            this.__VASTVisibilityListeners = [RESIZE, 'scroll'].map(evtName =>
-                this.__nodeOn(window, evtName, this.__runVAST)
-            );
+            await this.__parseVAST(this.config.src);
         } catch (err) {
             if (this.VASTTracker) this.VASTTracker.errorWithCode(901);
             this.emitter.emit(ERROR, err);
             console.log(`GgEzVp [ERR]: ${err.toString()}`); //eslint-disable-line no-console
         }
-    };
-
-    __isElementInViewport = el => {
-        const rect = el.getBoundingClientRect();
-        // Check if container is within viewport and larger than 14px (its initial size)
-        return (
-            rect.width > 14 &&
-            rect.height > 14 &&
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
     };
 
     __isInternalEvent = eventName => internalEvents.includes(eventName);

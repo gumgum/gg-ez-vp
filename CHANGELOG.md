@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.0] - 2020-01-10
+
+-   Bugfix/vpaid rendering 3 (#72)
+
+    -   track VAST errors
+
+    -   prevent early calls to getAdDuration
+
+    -   remove unused import
+
+    -   use playerContainer container for VPAID creatives
+
+    -   add vasttracker as a ggezvp property
+
+    -   Use cached VPAID scripts
+
+    -   Remove VAST load timestamp macros
+
+    -   Guard against undefined VPAID wrapper method calls
+
+    -   Attach VPAID listeners before attempting script load
+
+    -   Reorder vpaid script listeners
+
+    -   Guard against undefined VPAIDWrapper calls
+
+    -   Don't call vpaid methods from instance before data-ready
+
+    -   render VPAID in mobile safari
+
+    -   Fix VPAID clickThrough in iOS, android chrome broken now
+
+    -   Use independent div for VPAID creative slot
+
 ## [1.6.0] - 2019-12-26
 
 -   Handle VPAID replay (#58) (#68)

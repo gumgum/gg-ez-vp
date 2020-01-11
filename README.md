@@ -210,6 +210,8 @@ The default styles that can be overridden by any custom styles you may need:
 }
 ```
 
+**It is encouraged to override the styles rather than completely writing your own.**
+
 Use these selectors to override the styles:
 
 | selector                         | component                                                                 |
@@ -238,6 +240,7 @@ Use these selectors to override the styles:
 | .gg-ez-vp--button-icon.replay    | shown after the video ends                                                |
 | .gg-ez-vp--button-icon.expand    | expand button icon                                                        |
 | .gg-ez-vp--blocker               | invisible div that can be used to prevent clicks on VPAID/VAST thumbnails |
+| .gg-ez-vp--slot                  | invisible div used as VPAID slot                                          |
 
 There are also a few modifier selectors applied to the container `.gg-ez-vp`:
 

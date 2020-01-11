@@ -1,4 +1,4 @@
-import { PLAYBACK_PROGRESS, TIMESTAMP, DATA_READY } from '../../constants';
+import { PLAYBACK_PROGRESS, TIMESTAMP } from '../../constants';
 import secondsToReadableTime from '../../helpers/secondsToReadableTime';
 import createNode from '../../helpers/createNode';
 

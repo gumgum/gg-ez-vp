@@ -2,9 +2,7 @@
 // https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/master/AdCOM%20v1.0%20FINAL.md#list_apiframeworks
 const MACROS_DICT = {
     '[APIFRAMEWORKS]': 2, //VPAID 2.0
-    '[SERVERSIDE]': 0, // false, requesting from client
-    '[TIMESTAMP]': Date.now, // current timestamp
-    '[timestamp]': Date.now // current timestamp
+    '[SERVERSIDE]': 0 // false, requesting from client
     //'[OMIDPARTNER]': 0 // TODO
 };
 

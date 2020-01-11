@@ -13,7 +13,8 @@ export default function applyConfigToVideoElement({
     setVolume
 }) {
     const initialVolume = muted || !volume ? 0 : volume;
-    setVolume(initialVolume);
+    player.volume = initialVolume;
+    player.muted = muted || volume === 0;
     appendVideoAttributes({ ...configAttributes, volume: initialVolume }, player);
     if (isVPAID) return;
     appendVideoSources(src, player, VASTSources);
@@ -52,5 +53,4 @@ function appendVideoSources(src, player, VASTSources) {
     });
 }
 
-const isBooleanAttr = k =>
-    ['autoplay', 'loop', 'muted', 'playsinline', 'webkit-playsinline'].includes(k);
+const isBooleanAttr = k => ['autoplay', 'loop', 'playsinline', 'webkit-playsinline'].includes(k);

@@ -1,7 +1,15 @@
 import checkVPAIDInterface from '../helpers/checkVPAIDInterface';
 import secondsToReadableTime from '../helpers/secondsToReadableTime';
 import setCallbacksForCreative from './setCallbacksForCreative';
-import { DATA_READY, ERROR, PLAYBACK_PROGRESS, VPAID_STARTED, SKIP, EXPAND } from '../constants';
+import {
+    DATA_READY,
+    ERROR,
+    PLAYBACK_PROGRESS,
+    PLAYER_CLICK,
+    VPAID_STARTED,
+    SKIP,
+    EXPAND
+} from '../constants';
 
 export default class VPAIDWrapper {
     constructor({
@@ -43,7 +51,8 @@ export default class VPAIDWrapper {
     __setCallbacksForCreative = setCallbacksForCreative;
 
     initAd = (width, height, viewMode, desiredBitrate, creativeData, environmentVars) => {
-        this._creative.initAd(
+        this.setAdVolume(0);
+        this._creative?.initAd(
             width,
             height,
             viewMode,
@@ -58,78 +67,78 @@ export default class VPAIDWrapper {
     // Pass through for startAd
     startAd() {
         this.emitter.emit(VPAID_STARTED);
-        this._creative.startAd();
+        this._creative?.startAd();
     }
 
     // Pass through for stopAd
     stopAd() {
-        this._creative.stopAd();
+        this._creative?.stopAd();
     }
 
     // Pass through for getAdLinear
     getAdLinear() {
-        return this._creative.getAdLinear();
+        return this._creative?.getAdLinear();
     }
 
     // Pass through for getAdRemainingTime
     getAdRemainingTime() {
-        return this._creative.getAdRemainingTime();
+        return this._creative?.getAdRemainingTime();
     }
 
     // Pass through for getAdExpanded
     getAdExpanded() {
-        return this._creative.getAdExpanded();
+        return this._creative?.getAdExpanded();
     }
 
     // Pass through for getAdSkippableState
     getAdSkippableState() {
-        return this._creative.getAdSkippableState();
+        return this._creative?.getAdSkippableState();
     }
 
     skipAd() {
         if (this.getAdSkippableState()) {
-            return this._creative.skipAd();
+            return this._creative?.skipAd();
         }
     }
 
     // Pass through for setAdVolume
     setAdVolume(val) {
-        this._creative.setAdVolume(val);
+        this._creative?.setAdVolume(val);
     }
 
     // Pass through for getAdVolume
     getAdVolume() {
-        return this._creative.getAdVolume();
+        return this._creative?.getAdVolume();
     }
 
     // Pass through for getAdDuration
     getAdDuration() {
-        return this._creative.getAdDuration();
+        return this._creative?.getAdDuration();
     }
 
     // Pass through for resizeAd
     resizeAd(width, height, viewMode) {
-        this._creative.resizeAd(width, height, viewMode);
+        this._creative?.resizeAd(width, height, viewMode);
     }
 
     // Pass through for pauseAd
     pauseAd() {
-        this._creative.pauseAd();
+        this._creative?.pauseAd();
     }
 
     // Pass through for pauseAd
     resumeAd() {
-        this._creative.resumeAd();
+        this._creative?.resumeAd();
     }
 
     // Pass through for expandAd
     expandAd() {
-        this._creative.expandAd();
+        this._creative?.expandAd();
     }
 
     // Pass through for collapseAd
     collapseAd() {
-        this._creative.collapseAd();
+        this._creative?.collapseAd();
     }
 
     /* VPAID listeners */
@@ -178,27 +187,27 @@ export default class VPAIDWrapper {
 
     // Callback for AdSkippableStateChange
     onAdSkippableStateChange() {
-        const adSkippableState = this._creative.getAdSkippableState();
+        const adSkippableState = this._creative?.getAdSkippableState();
         this.emitter.emit('AdSkippableStateChange', adSkippableState);
     }
 
     // Callback for AdExpandedChange
     onAdExpandedChange() {
-        const adExpanded = this._creative.getAdExpanded();
+        const adExpanded = this._creative?.getAdExpanded();
         this.emitter.emit('AdExpandedChange', adExpanded);
         this.VASTTracker.setFullscreen(adExpanded);
     }
 
     // Callback for AdSizeChange
     onAdSizeChange() {
-        const width = this._creative.getAdWidth();
-        const height = this._creative.getAdHeight();
+        const width = this._creative?.getAdWidth();
+        const height = this._creative?.getAdHeight();
         this.emitter.emit('AdSizeChange', { width, height });
     }
 
     // Callback for AdDurationChange
     onAdDurationChange() {
-        const duration = this._creative.getAdDuration();
+        const duration = this._creative?.getAdDuration();
         this.duration = duration;
         this.emitter.emit('AdDurationChange', duration);
         this.VASTTracker.setDuration(duration);
@@ -209,9 +218,9 @@ export default class VPAIDWrapper {
     // { remainingTime, readableTime, duration, currentTime }
     // the AdRemainingTimeChange event is NOT re-emitted, USE PLAYBACK_PROGRESS instead
     onAdRemainingTimeChange() {
-        const remainingTime = this._creative.getAdRemainingTime();
+        const remainingTime = this._creative?.getAdRemainingTime();
         if (remainingTime >= 0) {
-            const duration = this._creative.getAdDuration();
+            const duration = this._creative?.getAdDuration();
             const currentTime = duration - remainingTime;
             const fancyDuration = secondsToReadableTime(duration);
             const fancyCurrentTime = secondsToReadableTime(currentTime);
@@ -236,7 +245,9 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        this.emitter.emit('AdClickThru', { url, id, playerHandles });
+        const event = { url, id, playerHandles };
+        this.emitter.emit('AdClickThru', event);
+        this.emitter.emit(PLAYER_CLICK, event);
         if (playerHandles) {
             this.VASTTracker.on('clickthrough', VASTClickUrl => {
                 // use VPAID URL if available, fallback to VASTClickUrl
@@ -285,7 +296,7 @@ export default class VPAIDWrapper {
 
     // Callback for AdLinearChange
     onAdLinearChange() {
-        const adLinear = this._creative.getAdLinear();
+        const adLinear = this._creative?.getAdLinear();
         this.emitter.emit('AdLinearChange', adLinear);
     }
 
@@ -314,7 +325,7 @@ export default class VPAIDWrapper {
 
     // Callback for AdVolumeChange
     onAdVolumeChange() {
-        const volume = this._creative.getAdVolume();
+        const volume = this._creative?.getAdVolume();
         const isMuted = volume == 0;
         this.emitter.emit('AdVolumeChange', volume);
         this.VASTTracker.setMuted(isMuted);

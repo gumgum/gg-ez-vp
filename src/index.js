@@ -4,7 +4,6 @@ import unbindAll from 'nanoevents/unbind-all';
 // instance methods
 import renderVideoElement from './lib/renderVideoElement';
 import runVPAID from './lib/runVPAID';
-import initVPAIDAd from './lib/initVPAIDAd';
 import enableVASTTracking from './lib/enableVASTTracking';
 import configureVPAID from './lib/configureVPAID';
 import renderControls from './lib/controls';
@@ -64,6 +63,7 @@ export default class GgEzVp {
         this.playerContainer = createNode('div', this.__getCSSClass('player-container'));
         // Create the video node
         this.player = createNode('video', this.__getCSSClass('viewer'));
+        this.player.muted = true;
         // set vast data default
         this.VASTData = null;
         this.VPAIDWrapper = null;
@@ -140,7 +140,7 @@ export default class GgEzVp {
             this.on('click', this.__emitPlayerClick);
             this.__renderVideoElement();
         } catch (err) {
-            console.log(err); //eslint-disable-line no-console
+            console.log(`GgEzVp [ERR]: ${err.toString()}`); //eslint-disable-line no-console
         }
     };
 
@@ -148,8 +148,8 @@ export default class GgEzVp {
         // This will allow fullscreen in firefox when inside iframes
         // https://stackoverflow.com/a/9747340/1335287
         if (inIframe()) {
-            window.frameElement.setAttribute('allowfullscreen', '');
             window.frameElement.setAttribute('allow', 'fullscreen');
+            window.frameElement.setAttribute('allowfullscreen', '');
         }
     };
 
@@ -169,7 +169,7 @@ export default class GgEzVp {
         }
 
         if (err) {
-            throw new Error(`GgEzVp Error: ${err}`);
+            throw new Error(err);
         }
     };
 
@@ -200,13 +200,6 @@ export default class GgEzVp {
         nextTick(this.__setReady);
     };
 
-    __addBlockerOverlay = () => {
-        if (this.isVPAID) {
-            const blocker = createNode('div', this.__getCSSClass('blocker'));
-            this.container.appendChild(blocker);
-        }
-    };
-
     __setReady = () => {
         this.ready = true;
         this.emitter.emit(READY);
@@ -220,8 +213,6 @@ export default class GgEzVp {
 
     __runVPAID = runVPAID;
 
-    __initVPAIDAd = initVPAIDAd;
-
     __configureVPAID = configureVPAID;
 
     __VASTVisibilityListeners = null;
@@ -230,42 +221,12 @@ export default class GgEzVp {
     // emits: DATA_READY || error
     __runVAST = async () => {
         try {
-            const {
-                config: { src },
-                container
-            } = this;
-            // Check if container is visible before loading VAST
-            const containerIsVisible = this.__isElementInViewport(container);
-            if (containerIsVisible) {
-                // Remove VAST listeners if available
-                if (this.__VASTVisibilityListeners?.length) {
-                    this.__VASTVisibilityListeners.forEach(fn => fn());
-                    this.__VASTVisibilityListeners = null;
-                }
-                // Parse VAST source
-                this.VASTData = await this.__parseVAST(src);
-                return;
-            }
-            // Set listeners to load VAST on resize or scroll if visible
-            this.__VASTVisibilityListeners = [RESIZE, 'scroll'].map(evtName =>
-                this.__nodeOn(window, evtName, this.__runVAST)
-            );
+            await this.__parseVAST(this.config.src);
         } catch (err) {
+            if (this.VASTTracker) this.VASTTracker.errorWithCode(901);
             this.emitter.emit(ERROR, err);
+            console.log(`GgEzVp [ERR]: ${err.toString()}`); //eslint-disable-line no-console
         }
-    };
-
-    __isElementInViewport = el => {
-        const rect = el.getBoundingClientRect();
-        // Check if container is within viewport and larger than 14px (its initial size)
-        return (
-            rect.width > 14 &&
-            rect.height > 14 &&
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
     };
 
     __isInternalEvent = eventName => internalEvents.includes(eventName);
@@ -423,9 +384,9 @@ export default class GgEzVp {
         const { isVPAID, VPAIDStarted, VPAIDWrapper } = this;
         if (isVPAID) {
             if (VPAIDStarted) {
-                return VPAIDWrapper.resumeAd();
+                return VPAIDWrapper?.resumeAd();
             }
-            return VPAIDWrapper.startAd();
+            return VPAIDWrapper?.startAd();
         }
         this.player.play();
     };
@@ -434,7 +395,7 @@ export default class GgEzVp {
     pause = () => {
         const { isVPAID, VPAIDWrapper } = this;
         if (isVPAID) {
-            return VPAIDWrapper.pauseAd();
+            return VPAIDWrapper?.pauseAd();
         }
         this.player.pause();
     };
@@ -455,23 +416,25 @@ export default class GgEzVp {
     volume = value => {
         const { isVPAID, VPAIDWrapper } = this;
         const volume = Math.min(Math.max(value, 0), 1);
+        this.player.muted = !volume;
         if (isVPAID) {
-            return VPAIDWrapper.setAdVolume(volume);
+            return this.dataReady ? VPAIDWrapper?.setAdVolume(volume) : 0;
         }
         this.player.volume = volume;
-        this.player.muted = !volume;
     };
 
     // mute audio
     mute = () => {
         this.__prevVol = this.getVolume() || this.config.volume || 1;
         this.volume(0);
+        this.muted = true;
     };
 
     // unmute audio
     unmute = () => {
         const vol = this.__prevVol || this.config.volume || 1;
         this.volume(vol);
+        this.muted = false;
     };
 
     // toggle mute
@@ -486,7 +449,7 @@ export default class GgEzVp {
     // return the video volume
     getVolume = () => {
         if (this.isVPAID) {
-            return this.VPAIDWrapper.getAdVolume();
+            return this.dataReady ? this.VPAIDWrapper?.getAdVolume() : 0;
         }
         return this.player.muted ? 0 : this.player.volume;
     };
@@ -500,7 +463,7 @@ export default class GgEzVp {
                 duration = this.duration;
             } else {
                 // Retrieve duration from VPAID wrapper
-                duration = this.VPAIDWrapper.getAdDuration();
+                duration = this.dataReady && this.VPAIDWrapper?.getAdDuration();
             }
         } else {
             // Get video tag duration
@@ -514,7 +477,7 @@ export default class GgEzVp {
     // return the currentTime of the video
     getCurrentTime = () => {
         if (this.isVPAID) {
-            return this.VPAIDFinished ? this.duration : this.VPAIDWrapper.currentTime;
+            return this.VPAIDFinished ? this.duration : this.VPAIDWrapper?.currentTime;
         }
         const { currentTime } = this.player;
         return currentTime;

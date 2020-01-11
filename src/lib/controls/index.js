@@ -12,8 +12,6 @@ export default function renderControls() {
     const { container, config, __onTouchScreen, controlsRendered } = this;
     // Cancel if controls are already rendered
     if (controlsRendered) return;
-    // Include a blocker div between viewer and controls
-    this.__addBlockerOverlay();
     if (!config.controls) return;
     const isAd = config.adControls;
     const controls = document.createElement('div');

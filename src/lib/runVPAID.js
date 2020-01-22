@@ -1,9 +1,12 @@
+// See https://marcj.github.io/css-element-queries/ for ResizeSensor docs
+import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { VASTTracker } from 'vast-client';
 import loadVPAID from '../helpers/loadVPAID';
 import createNode from '../helpers/createNode';
 import isVPAIDVersionSupported from '../helpers/isVPAIDVersionSupported';
 import VPAIDWrapper from '../lib/VPAIDWrapper';
-import { DATA_READY, SUPPORTED_VPAID_VERSION, RESIZE, VPAID_STARTED } from '../constants';
+import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants';
+
 const viewMode = 'normal';
 let originalDimensions;
 
@@ -30,7 +33,6 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             VASTTracker: vastTracker
         });
         this.__mountVideoElement();
-        this.__renderControls();
         initVPAIDAd.call(this, { adParameters });
     }
 }
@@ -50,14 +52,8 @@ function addVPAIDOverlays() {
 function attachVPAIDListeners() {
     // Finish setup after VPAID is ready
     this.once(DATA_READY, () => {
-        const { offsetWidth, offsetHeight } = this.container;
-        if (
-            offsetWidth !== originalDimensions.width ||
-            offsetHeight !== originalDimensions.height
-        ) {
-            this.VPAIDWrapper.resizeAd(offsetWidth, offsetHeight, viewMode);
-        }
         this.dataReady = true;
+        this.__renderControls();
         this.__attachStoredListeners();
         this.__configureVPAID();
         this.__setReadyNextTick();
@@ -83,6 +79,16 @@ function attachVPAIDListeners() {
         this.player.style.width = '100%';
         this.player.style.height = '100%';
     });
+    // Resize the VPAID creative when its container is resized
+    new ResizeSensor(this.container, containerResizeListener.bind(this));
+}
+
+// Resizes the VPAID creative (aka clickable space) when the player container is resized
+function containerResizeListener() {
+    const { offsetWidth, offsetHeight } = this.container;
+    if (offsetWidth && offsetHeight) {
+        this.VPAIDWrapper?.resizeAd(offsetWidth, offsetHeight, viewMode);
+    }
 }
 
 function initVPAIDAd({ adParameters }) {

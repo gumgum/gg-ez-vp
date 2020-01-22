@@ -46,5 +46,8 @@
     "build:dev": "rollup -c -w",
     "devServer": "http-server "
   },
-  "author": "Eder Sanchez <eder@gumgum.com>"
+  "author": "Eder Sanchez <eder@gumgum.com>",
+  "dependencies": {
+    "css-element-queries": "^1.2.3"
+  }
 }

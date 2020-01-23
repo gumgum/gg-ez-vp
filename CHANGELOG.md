@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.2] - 2020-01-22
+
+-   fix VPAID clickthru when delegated to the player
+-   hide timestamps when either duration or currentTime are not provided
+
 ## [1.7.1] - 2020-01-22
 
 -   Listen for container resize and call VPAIDWrapper.resizeAd. Delegate listening for the container resize to https://marcj.github.io/css-element-queries/ (#76)

@@ -245,16 +245,20 @@ export default class VPAIDWrapper {
 
     // Callback for AdClickThru
     onAdClickThru(url, id, playerHandles) {
-        const event = { url, id, playerHandles };
-        this.emitter.emit('AdClickThru', event);
-        this.emitter.emit(PLAYER_CLICK, event);
-        if (playerHandles) {
-            this.VASTTracker.on('clickthrough', VASTClickUrl => {
-                // use VPAID URL if available, fallback to VASTClickUrl
-                window.top.open(url || VASTClickUrl);
-            });
-        }
-        this.VASTTracker.click();
+        this.VASTTracker.once('clickthrough', VASTClickURL => {
+            // click priority:
+            // 1- VPAID
+            // 2- VAST
+            // 3- fallback passed to VASTTracker.click(url)
+            const clickUrl = url || VASTClickURL;
+            const payload = { url: clickUrl, id, playerHandles };
+            this.emitter.emit(PLAYER_CLICK, payload);
+            if (playerHandles) {
+                window.open(clickUrl);
+            }
+        });
+        // url is used as a fallback if not provided by the VAST tag
+        this.VASTTracker.click(url);
     }
 
     // Callback for AdInteraction

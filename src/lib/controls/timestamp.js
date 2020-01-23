@@ -11,10 +11,14 @@ export default function timestamp(container) {
     const classNameRoot = this.__getCSSClass(TIMESTAMP);
     const timestampNode = createNode('div', classNameRoot);
 
+    const showContent = fancyCurrentTime && fancyDuration;
+    const separator = showContent ? '/' : '';
+    const durationText = showContent ? fancyDuration : '';
+
     const [timestampCurrent, , timestampDuration] = [
         ['current', fancyCurrentTime],
-        ['break', '/'],
-        ['total', fancyDuration]
+        ['break', separator],
+        ['total', durationText]
     ].map(([name, content]) => {
         const node = createNode('div', `${classNameRoot}-${name}`);
         node.innerText = content;
@@ -23,10 +27,8 @@ export default function timestamp(container) {
     });
 
     // Set duration once playback starts if it wasn't available
-    this.once(PLAYBACK_PROGRESS, ({ fancyDuration: updatedDuration }) => {
-        if (fancyDuration === '0:00') {
-            timestampDuration.innerText = updatedDuration;
-        }
+    this.once(PLAYBACK_PROGRESS, ({ fancyDuration }) => {
+        timestampDuration.innerText = fancyDuration;
     });
 
     //TODO: Throttle DOM updates when fancyCurrentTime is the same

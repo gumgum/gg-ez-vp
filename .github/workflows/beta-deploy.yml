@@ -35,3 +35,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE_DIR: 'dist'
         DEST_DIR: ${BETA_DIR}
+    - name: ECHO access_key
+      run: echo "${secrets.AWS_S3_BUCKET}"
+    - name: Invalidate CloudFront cache
+      run: aws cloudfront create-invalidation --distribution-id ${secrets_AWS_DISTRIBUTION_ID} --paths "${BETA_DIR}/*"

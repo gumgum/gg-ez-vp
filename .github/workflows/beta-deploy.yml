@@ -42,6 +42,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
     - name: Invalidate CloudFront cache
-      run: aws cloudfront create-invalidation --distribution-id ${AWS_DISTRIBUTION_ID} --paths "vp/beta/*"
+      run: aws cloudfront create-invalidation --distribution-id ${AWS_DISTRIBUTION_ID} --paths "/vp/beta/*"
       env:
           AWS_DISTRIBUTION_ID: ${{secrets.AWS_DISTRIBUTION_ID}}

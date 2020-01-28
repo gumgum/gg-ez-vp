@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.4] - 2020-01-27
+
+-   Emit playback-progress on VPAID milestones (#82)
+-   Update VPAID event docs (#75)
+-   Add timestamp separator if duration and currenTime exist
+
 ## [1.7.3] - 2020-01-24
 
 -   invalidate CDN cache on releases

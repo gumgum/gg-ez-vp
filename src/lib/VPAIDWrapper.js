@@ -210,32 +210,37 @@ export default class VPAIDWrapper {
         const duration = this._creative?.getAdDuration();
         this.duration = duration;
         this.emitter.emit('AdDurationChange', duration);
+        this.checkProgress();
         this.VASTTracker.setDuration(duration);
     }
 
     // Callback for AdRemainingTimeChange
-    // emits: PLAYBACK_PROGRESS
-    // { remainingTime, readableTime, duration, currentTime }
     // the AdRemainingTimeChange event is NOT re-emitted, USE PLAYBACK_PROGRESS instead
     onAdRemainingTimeChange() {
-        const remainingTime = this._creative?.getAdRemainingTime();
-        if (remainingTime >= 0) {
-            const duration = this._creative?.getAdDuration();
-            const currentTime = duration - remainingTime;
-            const fancyDuration = secondsToReadableTime(duration);
-            const fancyCurrentTime = secondsToReadableTime(currentTime);
-            const payload = {
-                remainingTime,
-                fancyCurrentTime,
-                fancyDuration,
-                duration,
-                currentTime
-            };
-            this.currentTime = currentTime;
-            this.emitter.emit(PLAYBACK_PROGRESS, payload);
-            this.VASTTracker.setProgress(currentTime);
-        }
+        this.checkProgress();
     }
+
+    // Checks the currentTime, sets it on the VASTTracker/VPAIDWrapper, then
+    // emits: PLAYBACK_PROGRESS
+    // { remainingTime, readableTime, duration, currentTime }
+    // Should be called on AdRemainingTimeChange, AdDurationChange, 25%, 50% and 75%
+    checkProgress = () => {
+        const remainingTime = this._creative?.getAdRemainingTime();
+        const duration = this._creative?.getAdDuration();
+        const currentTime = duration - remainingTime;
+        const fancyDuration = secondsToReadableTime(duration);
+        const fancyCurrentTime = secondsToReadableTime(currentTime);
+        const payload = {
+            remainingTime,
+            fancyCurrentTime,
+            fancyDuration,
+            duration,
+            currentTime
+        };
+        this.currentTime = currentTime;
+        this.emitter.emit(PLAYBACK_PROGRESS, payload);
+        this.VASTTracker.setProgress(currentTime);
+    };
 
     // Callback for AdImpression
     onAdImpression() {
@@ -277,24 +282,28 @@ export default class VPAIDWrapper {
     onAdVideoFirstQuartile() {
         // Video 25% completed
         this.emitter.emit('AdVideoFirstQuartile');
+        this.checkProgress();
     }
 
     // Callback for AdVideoMidpoint
     onAdVideoMidpoint() {
         // Video 50% completed
         this.emitter.emit('AdVideoMidpoint');
+        this.checkProgress();
     }
 
     // Callback for AdVideoThirdQuartile
     onAdVideoThirdQuartile() {
         // Video 75% completed
         this.emitter.emit('AdVideoThirdQuartile');
+        this.checkProgress();
     }
 
     // Callback for AdVideoComplete
     onAdVideoComplete() {
         // Video 100% completed
         this.emitter.emit('AdVideoComplete');
+        this.checkProgress();
         this.VASTTracker.complete();
     }
 

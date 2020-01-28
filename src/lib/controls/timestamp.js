@@ -2,6 +2,8 @@ import { PLAYBACK_PROGRESS, TIMESTAMP } from '../../constants';
 import secondsToReadableTime from '../../helpers/secondsToReadableTime';
 import createNode from '../../helpers/createNode';
 
+const defaultSeparator = '/';
+
 export default function timestamp(container) {
     const currentTime = this.getCurrentTime();
     const initialDuration = this.getDuration();
@@ -12,10 +14,10 @@ export default function timestamp(container) {
     const timestampNode = createNode('div', classNameRoot);
 
     const showContent = fancyCurrentTime && fancyDuration;
-    const separator = showContent ? '/' : '';
+    const separator = showContent ? defaultSeparator : '';
     const durationText = showContent ? fancyDuration : '';
 
-    const [timestampCurrent, , timestampDuration] = [
+    const [timestampCurrent, separatorNode, timestampDuration] = [
         ['current', fancyCurrentTime],
         ['break', separator],
         ['total', durationText]
@@ -35,6 +37,10 @@ export default function timestamp(container) {
     // Update currentTime
     this.on(PLAYBACK_PROGRESS, ({ fancyCurrentTime }) => {
         timestampCurrent.innerText = fancyCurrentTime;
+        const separatorText = separatorNode.innerText;
+        if (!separatorText && fancyDuration && fancyCurrentTime) {
+            separatorNode.innerText = defaultSeparator;
+        }
     });
 
     container.appendChild(timestampNode);

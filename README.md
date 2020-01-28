@@ -106,7 +106,7 @@ This minimal configuration will create a unique video player instance using the 
 
 | key         | defaultValue | required | description                                                                                                                                                                           |
 | ----------- | ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| container   | null         | true     | id of the DOM node where the player will be attached                                                                                                                                  |
+| container   | null         | true     | either a node's id or the DOM node itself where the player will be loaded to                                                                                                          |
 | src         | null         | true     | string or array of strings used to retrieve video and/or VAST                                                                                                                         |
 | width       | null         | false    | by default the player will take available space, unless width is specified                                                                                                            |
 | height      | null         | false    | by default the player will take available space, unless height is specified                                                                                                           |
@@ -340,6 +340,11 @@ All VPAID events are emmitted, additionally, some of them will also fire a custo
 | AdPaused              | pause             |
 | AdStopped             | ended             |
 | AdRemainingTimeChange | playback-progress |
+| AdDurationChange      | playback-progress |
+| AdVideoFirstQuartile  | playback-progress |
+| AdVideoMidpoint       | playback-progress |
+| AdVideoThirdQuartile  | playback-progress |
+| AdVideoComplete       | playback-progress |
 | AdError               | error             |
 
 It is encouraged to use these events mapped by the player, but if you require listening to other events, [all VPAID events](https://www.iab.com/wp-content/uploads/2015/06/VPAID_2_0_Final_04-10-2012.pdf) are emitted as well with exception of the `AdRemainingTimeChange` event (use `playback-progress` instead).

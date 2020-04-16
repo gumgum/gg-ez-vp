@@ -51,7 +51,6 @@ export default class VPAIDWrapper {
     __setCallbacksForCreative = setCallbacksForCreative;
 
     initAd = (width, height, viewMode, desiredBitrate, creativeData, environmentVars) => {
-        this.setAdVolume(0);
         this._creative?.initAd(
             width,
             height,
@@ -60,6 +59,7 @@ export default class VPAIDWrapper {
             creativeData,
             environmentVars
         );
+        this.setAdVolume(0);
     };
 
     /* Wrapper methods */

@@ -2,6 +2,7 @@ import { VASTClient } from 'vast-client';
 import { DEFAULT_VAST_OPTIONS } from '../constants';
 import mediaFilesReducer from '../helpers/mediaFilesReducer';
 import replaceVASTMacros from '../helpers/replaceVASTMacros';
+import addOverlays from '../helpers/addOverlays';
 
 // Wrapper for VAST-Client.get()
 export default async function parseVAST(src, options = DEFAULT_VAST_OPTIONS) {
@@ -20,6 +21,9 @@ export default async function parseVAST(src, options = DEFAULT_VAST_OPTIONS) {
     const sources = mediaFilesReducer(mediaFiles);
     this.VASTSources = sources;
     const VPAIDSource = sources.javascript.find(({ apiFramework }) => apiFramework === 'VPAID');
+
+    // Adds ovelrlays to block and handle clicks from mobile
+    addOverlays.call(this, !!VPAIDSource);
 
     // Load VPAID and run it
     if (VPAIDSource) {

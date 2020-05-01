@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.6] - 2020-04-30
+
+-   Add overlays for VAST (#86)
+
+## [1.7.5] - 2020-04-16
+
+-   Change VPAID volume after initAd call
+
 ## [1.7.4] - 2020-01-27
 
 -   Emit playback-progress on VPAID milestones (#82)

@@ -21,7 +21,6 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const canSupportVPAID = isVPAIDVersionSupported(VPAIDCreativeVersion);
     const { offsetWidth: width, offsetHeight: height } = this.container;
     originalDimensions = { width, height };
-    addVPAIDOverlays.call(this);
     this.VASTTracker = vastTracker;
     if (canSupportVPAID) {
         this.VPAIDiframe = iframe;
@@ -35,17 +34,6 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
         this.__mountVideoElement();
         initVPAIDAd.call(this, { adParameters });
     }
-}
-
-// Include a div for the VPAID slot (clicks go here)
-// And a div that can be used to prevent clicks on the VPAID through CSS pointer-events: none
-function addVPAIDOverlays() {
-    const slot = createNode('div', this.__getCSSClass('slot'));
-    this.playerContainer.appendChild(slot);
-    const blocker = createNode('div', this.__getCSSClass('blocker'));
-    this.container.appendChild(blocker);
-    this.__slot = slot;
-    this.__blocker = blocker;
 }
 
 // Attach listeners dependent on VPAID Wrapper

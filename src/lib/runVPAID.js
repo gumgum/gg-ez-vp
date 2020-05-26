@@ -1,18 +1,24 @@
+import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants';
+
 // See https://marcj.github.io/css-element-queries/ for ResizeSensor docs
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { VASTTracker } from 'vast-client';
-import loadVPAID from '../helpers/loadVPAID';
-import createNode from '../helpers/createNode';
-import isVPAIDVersionSupported from '../helpers/isVPAIDVersionSupported';
 import VPAIDWrapper from '../lib/VPAIDWrapper';
-import { DATA_READY, SUPPORTED_VPAID_VERSION, VPAID_STARTED } from '../constants';
+import isVPAIDVersionSupported from '../helpers/isVPAIDVersionSupported';
+import loadVPAID from '../helpers/loadVPAID';
 
 const viewMode = 'normal';
 let originalDimensions;
 
 export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
-    const { adParameters } = creative;
+    let adParameters;
+    if (creative.type === 'linear') {
+        adParameters = creative.adParameters
+    } else if (creative.type === 'nonlinear') {
+        adParameters = creative.variations[0].adParameters;
+    }
+
     // Listeners dependent on VPAIDWrapper must be defined BEFORE loading it,
     // in case the script is already in cache
     attachVPAIDListeners.call(this);
@@ -31,7 +37,9 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
             creativeVersion: VPAIDCreativeVersion,
             VASTTracker: vastTracker
         });
-        this.__mountVideoElement();
+        if (creative.type === 'linear') {
+            this.__mountVideoElement();
+        }
         initVPAIDAd.call(this, { adParameters });
     }
 }

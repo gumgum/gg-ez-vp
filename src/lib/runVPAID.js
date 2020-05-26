@@ -12,7 +12,13 @@ let originalDimensions;
 
 export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
-    const adParameters = creative.variations[0].adParameters;
+    let adParameters;
+    if (creative.type === 'linear') {
+        adParameters = creative.adParameters
+    } else if (creative.type === 'nonlinear') {
+        adParameters = creative.variations[0].adParameters;
+    }
+
     // Listeners dependent on VPAIDWrapper must be defined BEFORE loading it,
     // in case the script is already in cache
     attachVPAIDListeners.call(this);

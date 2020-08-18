@@ -18,17 +18,6 @@ export const PROGRESS = 'progress';
 export const TIMESTAMP = 'timestamp';
 export const PLAY = 'play';
 export const EXPAND = 'expand';
-// Default Controls Config
-const controls = {
-    [TIMESTAMP_AD]: false,
-    [SKIP]: false,
-    [VOLUME]: true,
-    [VOLUME_RANGE]: true,
-    [PROGRESS]: true,
-    [TIMESTAMP]: true,
-    [PLAY]: true,
-    [EXPAND]: true
-};
 // Config
 export const DEFAULT_OPTIONS = {
     container: null,
@@ -45,7 +34,16 @@ export const DEFAULT_OPTIONS = {
     isVAST: false,
     fullscreen: false,
     playsinline: true,
-    controls
+    controls: {
+        [TIMESTAMP_AD]: false,
+        [SKIP]: false,
+        [VOLUME]: true,
+        [VOLUME_RANGE]: true,
+        [PROGRESS]: true,
+        [TIMESTAMP]: true,
+        [PLAY]: true,
+        [EXPAND]: true
+    }
 };
 // VAST
 export const SUPPORTED_VPAID_VERSION = '2.0';

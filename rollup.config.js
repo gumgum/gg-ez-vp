@@ -1,19 +1,27 @@
-import path from 'path';
-import builtins from '@joseph184/rollup-plugin-node-builtins';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import replace from 'rollup-plugin-replace';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import babel from '@rollup/plugin-babel';
+import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 import license from 'rollup-plugin-license';
 import { terser } from 'rollup-plugin-terser';
-// TODO: optimize build, currently running postcss three times
 import postcss from 'rollup-plugin-postcss';
-
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 import pkg from './package.json';
+/* Configs used by rollup plugins */
+import {
+    babelEsConfig,
+    umdBabelConfig,
+    replaceConfig,
+    browserResolveConfig,
+    postcssConfig,
+    licenseConfig
+} from './rollup-plugin-configs';
 
 export default [
-    // browser-friendly UMD build
+    /*
+     * browser-friendly UMD build
+     */
     {
         input: 'src/index.js',
         output: {
@@ -22,30 +30,15 @@ export default [
             format: 'umd',
             sourcemap: true
         },
-        external: [],
         plugins: [
-            builtins(),
-            resolve({ preferBuiltins: false }),
-            babel({ runtimeHelpers: true }),
+            resolve(browserResolveConfig),
             commonjs(),
-            replace({
-                'process.env.NODE_ENV': JSON.stringify('production')
-            }),
-            postcss({
-                extract: path.join(__dirname, 'dist', 'gg-ez-vp.css'),
-                minimize: true
-            }),
+            nodePolyfills(),
+            babel(umdBabelConfig),
+            replace(replaceConfig),
+            postcss(postcssConfig),
             terser(),
-            license({
-                banner: {
-                    content: {
-                        file: path.join(__dirname, 'LICENSE')
-                    }
-                },
-                thirdParty: {
-                    output: path.join(__dirname, 'dist', 'dependencies.txt')
-                }
-            }),
+            license(licenseConfig),
             copy({
                 targets: [
                     { src: 'src/icons/*', dest: 'dist/icons' },
@@ -54,37 +47,44 @@ export default [
             })
         ]
     },
-    // Node and ES module version
+    /*
+     * Node and ES module version
+     */
     {
         input: 'src/index.js',
         output: [
-            { file: pkg.main, format: 'cjs', sourcemap: true },
-            { file: pkg.module, format: 'es', sourcemap: true }
+            { file: pkg.main, format: 'cjs', sourcemap: true, exports: 'default' },
+            { file: pkg.module, format: 'es', sourcemap: true, exports: 'default' }
         ],
-        external: ['events'],
+        external: [/@babel\/runtime/, 'events'],
         plugins: [
-            builtins(),
-            resolve({ preferBuiltins: true }),
-            babel({ runtimeHelpers: true }),
+            resolve(),
             commonjs(),
-            replace({
-                'process.env.NODE_ENV': JSON.stringify('production')
-            }),
-            postcss({
-                extract: path.join(__dirname, 'dist', 'gg-ez-vp.css'),
-                minimize: true
-            }),
+            babel(babelEsConfig),
+            replace(replaceConfig),
+            postcss(postcssConfig),
             terser(),
-            license({
-                banner: {
-                    content: {
-                        file: path.join(__dirname, 'LICENSE')
-                    }
-                },
-                thirdParty: {
-                    output: path.join(__dirname, 'dist', 'dependencies.txt')
-                }
-            })
+            license(licenseConfig)
+        ]
+    },
+    /*
+     * Demo page scripts
+     */
+    {
+        input: './demo.js',
+        output: {
+            name: 'demo',
+            file: 'dist/demo.js',
+            format: 'umd',
+            sourcemap: true
+        },
+        plugins: [
+            resolve(browserResolveConfig),
+            commonjs(),
+            babel(umdBabelConfig),
+            replace(replaceConfig),
+            terser()
         ]
     }
 ];
+

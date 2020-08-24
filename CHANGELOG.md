@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.9.0] - 2020-08-24
+
+-   Update build process and support IE 10/11 (#91)
+
 ## [1.8.0] - 2020-05-26
 
 -   Add nonlinear creative support (#87)

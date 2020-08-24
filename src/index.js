@@ -1,6 +1,5 @@
 // external modules
-import NanoEvents from 'nanoevents';
-import unbindAll from 'nanoevents/unbind-all';
+import { createNanoEvents } from 'nanoevents';
 // instance methods
 import renderVideoElement from './lib/renderVideoElement';
 import runVPAID from './lib/runVPAID';
@@ -52,7 +51,7 @@ const internalEvents = [
 export default class GgEzVp {
     constructor(options) {
         // set up the event emitter
-        this.emitter = new NanoEvents();
+        this.emitter = createNanoEvents();
         // flag than can be used from the outside to check if the instance is ready
         this.ready = false;
         // flag than can be used from the outside to check if the data needed to render is ready
@@ -215,8 +214,6 @@ export default class GgEzVp {
 
     __configureVPAID = configureVPAID;
 
-    __VASTVisibilityListeners = null;
-
     // helps retrieve and parse the VAST data
     // emits: DATA_READY || error
     __runVAST = async () => {
@@ -294,7 +291,7 @@ export default class GgEzVp {
     // teardown methods
     __removeListeners = () => {
         // remove internal listeners
-        unbindAll(this.emitter);
+        this.emitter.events = {};
 
         // remove player listeners
         this.__nodeListeners.forEach(([node, ...args]) => {

@@ -14,7 +14,7 @@ export default async function runVPAID(creative, VPAIDSource, vastClient, ad) {
     const vastTracker = new VASTTracker(vastClient, ad, creative);
     let adParameters;
     if (creative.type === 'linear') {
-        adParameters = creative.adParameters
+        adParameters = creative.adParameters;
     } else if (creative.type === 'nonlinear') {
         adParameters = creative.variations[0].adParameters;
     }

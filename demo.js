@@ -24,9 +24,9 @@ const events = [
     'VPAID-started'
 ];
 
-window.onload = function onload() {
+window.addEventListener('load', function onload() {
     configs.forEach(createPlayerInstance);
-};
+});
 
 function createPlayerInstance(config) {
     const instance = new GgEzVp(config);

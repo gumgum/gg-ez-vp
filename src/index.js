@@ -139,7 +139,7 @@ export default class GgEzVp {
             this.on('click', this.__emitPlayerClick);
             this.__renderVideoElement();
         } catch (err) {
-            console.log(`GgEzVp [ERR]: ${err.toString()}`); //eslint-disable-line no-console
+            console.log('GgEzVp [ERR]:', err); //eslint-disable-line no-console
         }
     };
 
@@ -148,7 +148,6 @@ export default class GgEzVp {
         // https://stackoverflow.com/a/9747340/1335287
         if (inIframe()) {
             window.frameElement.setAttribute('allow', 'fullscreen');
-            window.frameElement.setAttribute('allowfullscreen', '');
         }
     };
 
@@ -222,7 +221,7 @@ export default class GgEzVp {
         } catch (err) {
             if (this.VASTTracker) this.VASTTracker.errorWithCode(901);
             this.emitter.emit(ERROR, err);
-            console.log(`GgEzVp [ERR]: ${err.toString()}`); //eslint-disable-line no-console
+            console.log('GgEzVp [ERR]:', err); //eslint-disable-line no-console
         }
     };
 

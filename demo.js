@@ -25,10 +25,10 @@ const events = [
 ];
 
 window.addEventListener('load', function onload() {
-    configs.forEach(createPlayerInstance);
+    window.playerInstances = configs.map(createPlayerInstance);
 });
 
-function createPlayerInstance(config) {
+function createPlayerInstance(config, index) {
     const instance = new GgEzVp(config);
     const logger = (eventName, cb) => {
         return evt => {
@@ -43,13 +43,13 @@ function createPlayerInstance(config) {
         instance.on(eventName, logger(eventName, cb));
     });
     // Set instance demo controls
-    setDemoControls(instance, config);
+    setDemoControls(instance, config, index);
     return instance;
 }
 
 const nextTick = requestAnimationFrame || setTimeout;
 
-function setDemoControls(playerInstance, config) {
+function setDemoControls(playerInstance, config, index) {
     const sectionContainer = playerInstance.container.parentNode;
     const playBtn = sectionContainer.querySelector('.play-btn');
     const muteBtn = sectionContainer.querySelector('.mute-btn');
@@ -69,6 +69,7 @@ function setDemoControls(playerInstance, config) {
             const src = input.value || config.src;
             const isVAST = !!checkbox.checked;
             playerInstance = createPlayerInstance({ ...config, src, isVAST });
+            window.playerInstances[index] = playerInstance;
         });
     });
 }

@@ -319,7 +319,7 @@ Custom events are provided by [Nano Events](https://github.com/ai/nanoevents)
 
 ## VAST
 
-VAST 3.0 is supported, thanks to [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js) for the playback of a **single Linear Creative**.
+VAST 4.2 is supported, thanks to [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js).
 If a VPAID is detected, it will be loaded and executed, otherwise, the player will track and emit all the events in the VAST tag.
 
 ## VPAID

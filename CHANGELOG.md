@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.10.0] - 2020-12-17
+
+-   Update VAST-client to 3.1.1 (#92)
+-   Updates github actions because of a [vulnerability](https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/).
+
 ## [1.9.0] - 2020-08-24
 
 -   Update build process and support IE 10/11 (#91)

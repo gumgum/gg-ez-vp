@@ -4116,10 +4116,10 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vast-client@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/vast-client/-/vast-client-3.0.0.tgz#153022beb4a4bae8a210ac7119bb31f6d57d00c2"
-  integrity sha512-ud1Xjfqr2kNeQct5eELHj16FQdLK1iH2mXq0PjV5M+N+GcJWrYttblZUDZDN6jRkc1VomG6gbuxqlU0Id3UWDA==
+vast-client@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/vast-client/-/vast-client-3.1.1.tgz#75f044ff1554e0f193302dfa1c20c7f7006fd1f8"
+  integrity sha512-ED32RnLthWgAjQiEPsbqqC4LkN8+EhFyevHVh2SsmlPr6auugjswdbv+VgaQ/d7KUH/vpZ675HzVkIqkB2ibiQ==
   dependencies:
     xmldom "^0.3.0"
 

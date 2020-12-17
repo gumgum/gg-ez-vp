@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set env
-      run: |
-        echo "LATEST_DIR=vp/latest" >> $GITHUB_ENV
-        echo "VERSIONED_DIR=vp/{GITHUB_REF:10}" >> $GITHUB_ENV
+    - name: Set latest dir
+      run: echo "LATEST_DIR=vp/latest" >> $GITHUB_ENV
+    - name: Set version dir
+      run: echo "VERSIONED_DIR=vp/{GITHUB_REF:10}" >> $GITHUB_ENV
     - name: Use Node.js 12
       uses: actions/setup-node@v1
       with:

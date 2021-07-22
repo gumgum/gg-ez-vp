@@ -322,6 +322,40 @@ Custom events are provided by [Nano Events](https://github.com/ai/nanoevents)
 VAST 4.2 is supported, thanks to [dailymotion/vast-client-js](https://github.com/dailymotion/vast-client-js).
 If a VPAID is detected, it will be loaded and executed, otherwise, the player will track and emit all the events in the VAST tag.
 
+#### Inline VAST example
+The player also accepts Inline VAST XML being returned from many SSPs. Therefore a Blob URL object needs to be created.
+
+```
+const src = `<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
+    <Ad>
+        <InLine>
+            <Creatives>
+                <Creative sequence="1">
+                    <Linear>
+                        <Duration>00:01:00</Duration>
+                        <VideoClicks>
+                            <ClickThrough id="GDFP"><![CDATA[https://iabtechlab.com]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile id="GDFP" delivery="progressive" type="video/mp4"><![CDATA[https://aba.gumgum.com/13861/8/big_buck_bunny_640x360.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>`;
+
+const blob = new Blob([src], { type: 'text/xml' });
+const config = {
+    container: 'myVideo',
+    src: URL.createObjectURL(blob),
+    isVAST: true
+};
+const ggEzVpInstance = new GgEzVp(config);
+```
+
 ## VPAID
 
 The player is capable of playing VPAID 2.0 if the `src` is a VAST tag and `isVAST` is set to `true` in the configuration.

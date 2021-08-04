@@ -38,7 +38,7 @@ function getConfigXMLURL(xmlContent) {
 
 window.addEventListener('load', async function onload() {
     try {
-        const xmlContent = await fetch('/demo_vast.xml').then(response => response.text());
+        const xmlContent = await fetch('/gg-ez-vp/demo_vast.xml').then(response => response.text());
         const xmlURL = getConfigXMLURL(xmlContent);
         const xmlConfig = configs[configs.length - 1];
         xmlConfig.src = xmlURL;

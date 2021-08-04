@@ -8,8 +8,14 @@ const configs = [
     // VAST
     {
         container: 'videoContainer2',
-        src:
-            'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=[timestamp]',
+        src: 'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=[timestamp]',
+        isVAST: true
+    },
+    // XML VAST
+    {
+        container: 'videoContainer3',
+        src: null,
+        xmlContent: null,
         isVAST: true
     }
 ];
@@ -24,8 +30,24 @@ const events = [
     'VPAID-started'
 ];
 
-window.addEventListener('load', function onload() {
-    window.playerInstances = configs.map(createPlayerInstance);
+function getConfigXMLURL(xmlContent) {
+    const xmlBlob = new Blob([xmlContent], { type: 'text/xml' });
+    const xmlURL = URL.createObjectURL(xmlBlob);
+    return xmlURL;
+}
+
+window.addEventListener('load', async function onload() {
+    try {
+        const xmlContent = await fetch('/demo_vast.xml').then(response => response.text());
+        const xmlURL = getConfigXMLURL(xmlContent);
+        const xmlConfig = configs[configs.length - 1];
+        xmlConfig.src = xmlURL;
+        xmlConfig.xmlContent = xmlContent;
+        window.playerInstances = configs.map(createPlayerInstance);
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+    }
 });
 
 function createPlayerInstance(config, index) {
@@ -57,7 +79,24 @@ function setDemoControls(playerInstance, config, index) {
     const f5Btn = sectionContainer.querySelector('.reload-btn');
     const checkbox = sectionContainer.querySelector('.gds-form-group__toggleswitch-input');
 
-    if (!input.value) input.value = config.src;
+    const isTextarea = input.tagName === 'TEXTAREA';
+
+    if (isTextarea) {
+        if (!input.value || !input.value.trim()) {
+            input.value = config.xmlContent;
+        }
+
+        if (input.value !== config.xmlContent) {
+            config.xmlContent = input.value;
+            const xmlURL = getConfigXMLURL(config.xmlContent);
+            config.src = xmlURL;
+        }
+    } else {
+        if (!input.value) {
+            input.value = config.src;
+        }
+    }
+
     if (config.isVAST) checkbox.checked = true;
 
     playerInstance.__nodeOn(playBtn, 'click', () => playerInstance.playPause());
@@ -66,9 +105,11 @@ function setDemoControls(playerInstance, config, index) {
         playerInstance.destroy();
         playerInstance = null;
         nextTick(() => {
-            const src = input.value || config.src;
-            const isVAST = !!checkbox.checked;
-            playerInstance = createPlayerInstance({ ...config, src, isVAST });
+            let src = input.value || config.src;
+            if (input.value && config.xmlContent !== input.value) {
+                src = getConfigXMLURL(input.value);
+            }
+            playerInstance = createPlayerInstance({ ...config, src, isVAST: !!checkbox.checked });
             window.playerInstances[index] = playerInstance;
         });
     });

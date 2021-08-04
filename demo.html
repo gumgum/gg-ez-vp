@@ -19,9 +19,7 @@
         <link rel="stylesheet" href="styles.css" type="text/css" media="all" />
     </head>
     <body>
-        <h1 class="gds-text--header-md -text-center -m-v-2">
-            GG EZ Video Player Demo Page
-        </h1>
+        <h1 class="gds-text--header-md -text-center -m-v-2">GG EZ Video Player Demo Page</h1>
         <div class="gds-layout__container">
             <div class="gds-layout__row">
                 <div class="gds-layout__column--sm-12 gds-layout__column--md-12">
@@ -92,6 +90,64 @@
                                     type="checkbox"
                                     value=""
                                     data-gds-input=""
+                                />
+                                <span class="gds-form-group__toggleswitch-indicator"></span>VAST
+                            </label>
+                        </div>
+                        <div class="gds-button-group gds-button-group--responsive">
+                            <button
+                                type="button"
+                                class="play-btn gds-button-group__button gds-button--primary"
+                            >
+                                Toggle playback
+                            </button>
+                            <button
+                                type="button"
+                                class="mute-btn gds-button-group__button gds-button--warning"
+                            >
+                                Toggle mute
+                            </button>
+                            <button
+                                type="button"
+                                class="reload-btn gds-button-group__button gds-button--default"
+                            >
+                                Recreate instance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gds-layout__row">
+                <div class="gds-layout__column--sm-12 gds-layout__column--md-12">
+                    <div class="gds-card -p-a-2">
+                        <div id="videoContainer3" class="video-containers -text-center"></div>
+                        <div class="gds-form-group -m-b-1" data-gds-form-group="">
+                            <a href="/gg-ez-vp/#vast" target="_blank">
+                                <label
+                                    class="gds-form-group__label"
+                                    for="input-2"
+                                    data-tooltip="See documentation for XML usage!"
+                                    >Source XML</label
+                                >
+                            </a>
+                            <textarea
+                                class="gds-form-group__text-input"
+                                id="input-2"
+                                placeholder="Enter XML content"
+                                data-gds-input=""
+                                style="min-height: 150px"
+                            >
+                            </textarea>
+                        </div>
+                        <div class="gds-form-group__toggleswitch -m-v-1 -disabled">
+                            <label class="gds-form-group__toggleswitch-label">
+                                <input
+                                    class="gds-form-group__toggleswitch-input"
+                                    type="checkbox"
+                                    value="true"
+                                    data-gds-input=""
+                                    checked
+                                    disabled
                                 />
                                 <span class="gds-form-group__toggleswitch-indicator"></span>VAST
                             </label>

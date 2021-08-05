@@ -1,6 +1,8 @@
 /*global GgEzVp*/
 const VAST_SAMPLE =
     'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=[timestamp]';
+const XML_SAMPLE =
+    'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=';
 const configs = [
     //MP4
     {
@@ -40,7 +42,7 @@ function getConfigXMLURL(xmlContent) {
 
 window.addEventListener('load', async function onload() {
     try {
-        const xmlContent = await fetch(VAST_SAMPLE).then(response => response.text());
+        const xmlContent = await fetch(XML_SAMPLE).then(response => response.text());
         const xmlURL = getConfigXMLURL(xmlContent);
         const xmlConfig = configs[configs.length - 1];
         xmlConfig.src = xmlURL;

@@ -146,7 +146,7 @@ export default class GgEzVp {
     __allowIframeFullscreen = () => {
         // This will allow fullscreen in firefox when inside iframes
         // https://stackoverflow.com/a/9747340/1335287
-        if (inIframe()) {
+        if (window.frameElement && inIframe()) {
             window.frameElement.setAttribute('allow', 'fullscreen');
         }
     };

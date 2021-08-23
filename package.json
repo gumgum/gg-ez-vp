@@ -5,9 +5,6 @@
   "main": "dist/gg-ez-vp.cjs.js",
   "module": "dist/gg-ez-vp.esm.js",
   "browser": "dist/gg-ez-vp.js",
-  "files": [
-    "dist"
-  ],
   "repository": "git@github.com:gumgum/gg-ez-vp.git",
   "bugs": "https://github.com/gumgum/gg-ez-vp/issues",
   "license": "MIT",
@@ -44,6 +41,7 @@
     "start": "run-p build:dev devServer",
     "prebuild": "yarn run clean",
     "build": "rollup -c",
+    "prepare": "rollup -c",
     "build:dev": "rollup -c -w",
     "devServer": "http-server "
   },

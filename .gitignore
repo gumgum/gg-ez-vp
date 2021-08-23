@@ -37,6 +37,7 @@ dist
 package-lock.json
 dist/
 dist
+.idea
 
 # Vim specific
 .vim

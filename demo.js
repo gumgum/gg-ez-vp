@@ -110,7 +110,8 @@ function setDemoControls(playerInstance, config, index) {
         playerInstance = null;
         nextTick(() => {
             let src = input.value || config.src;
-            if (input.value && config.xmlContent !== input.value) {
+            // Transform XML content into blob url
+            if (index === 2 && input.value && config.xmlContent !== input.value) {
                 src = getConfigXMLURL(input.value);
             }
             playerInstance = createPlayerInstance({ ...config, src, isVAST: !!checkbox.checked });

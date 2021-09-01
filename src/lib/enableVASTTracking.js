@@ -27,7 +27,7 @@ function setVASTTracking(vastTracker, on) {
 const VASTEventListeners = {
     click: tracker => () => tracker.click(),
     ended: tracker => () => tracker.complete(),
-    error: tracker => () => tracker.errorWithCode(405),
+    error: tracker => () => tracker.error({ ERRORCODE: 405 }),
     pause: tracker => () => tracker.setPaused(true),
     skip: tracker => () => tracker.skip(),
     play: tracker => () => tracker.setPaused(false),

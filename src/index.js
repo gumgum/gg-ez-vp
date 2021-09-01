@@ -217,9 +217,10 @@ export default class GgEzVp {
     // emits: DATA_READY || error
     __runVAST = async () => {
         try {
+            throw 'oh snap';
             await this.__parseVAST(this.config.src);
         } catch (err) {
-            if (this.VASTTracker) this.VASTTracker.errorWithCode(901);
+            if (this.VASTTracker) this.VASTTracker.error({ ERRORCODE: 901 });
             this.emitter.emit(ERROR, err);
             console.log('GgEzVp [ERR]:', err); //eslint-disable-line no-console
         }
@@ -303,9 +304,11 @@ export default class GgEzVp {
         once: []
     };
 
-    __storeListener = type => (...args) => {
-        this.__listenerStore?.[type].push(args);
-    };
+    __storeListener =
+        type =>
+        (...args) => {
+            this.__listenerStore?.[type].push(args);
+        };
 
     // attach pending listeners
     // emits: 'attaching-EVENT_NAME', where EVENT_NAME is the original event name

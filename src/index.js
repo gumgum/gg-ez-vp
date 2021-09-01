@@ -217,7 +217,6 @@ export default class GgEzVp {
     // emits: DATA_READY || error
     __runVAST = async () => {
         try {
-            throw 'oh snap';
             await this.__parseVAST(this.config.src);
         } catch (err) {
             if (this.VASTTracker) this.VASTTracker.error({ ERRORCODE: 901 });

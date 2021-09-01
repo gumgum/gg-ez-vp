@@ -25,7 +25,7 @@ export default class VPAIDWrapper {
         if (!isValidVPAID) {
             /* eslint-disable-next-line no-console */
             console.log("GgEzVp [WARN]: The VPAIDCreative doesn't conform to the VPAID spec");
-            VASTTracker.errorWithCode(901);
+            VASTTracker.error({ ERRORCODE: 901 });
             return;
         }
         this.VASTTracker = VASTTracker;
@@ -161,7 +161,7 @@ export default class VPAIDWrapper {
     onAdError(message) {
         this.emitter.emit('AdError', message);
         this.emitter.emit(ERROR, message);
-        this.VASTTracker.errorWithCode(901);
+        this.VASTTracker.error({ ERRORCODE: 901 });
     }
 
     // Callback for AdLog

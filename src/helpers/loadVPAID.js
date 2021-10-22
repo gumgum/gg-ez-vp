@@ -9,12 +9,16 @@ export default function loadVPAID(url, container) {
             'border:0px;margin:0px;opacity:1;padding:0px;height:100%;position:absolute;width:100%;top:0;left:0;'
         );
         container.appendChild(iframe);
+        
+        const idoc = iframe.contentDocument || iframe.contentWindow.document
+        idoc.open();
         // url points to the ad js file
-        iframe.contentWindow.document.write(
+        idoc.write(
             // split the end script tag to prevent closing js prematurely
             `<head><style>body{margin:0}</style></head><body><script id="${SCRIPT_ID}" src="${url}" async></scr` +
                 'ipt></body>'
         );
+        idoc.close();
 
         const script = iframe.contentWindow.document.getElementById(SCRIPT_ID);
         let VPAIDCreative = getVPAIDCreative(iframe);

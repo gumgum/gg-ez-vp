@@ -268,6 +268,7 @@ See src/styles.css for all styles.
 | pause            | none                    | stop video playback                                                                                                                                        |
 | playPause        | none                    | toggle pause state on/off                                                                                                                                  |
 | play             | none                    | start video playback                                                                                                                                       |
+| triggerVastClick| none                    | if  the ad is a VAST, it triggers the click through |
 | volume           | float number            | sets the video volume, [see volume configuration](#customization)                                                                                          |
 | getVolume        | float number            | gets the video volume                                                                                                                                      |
 | getDuration      | number                  | gets the video duration                                                                                                                                    |

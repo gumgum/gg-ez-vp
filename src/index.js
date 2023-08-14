@@ -481,6 +481,7 @@ export default class GgEzVp {
         return currentTime;
     };
 
+    // gets the click through url from the Vast loaded 
     getVastClick = () => {
         if (this.config.isVAST) {
             return (this.VASTTracker.clickThroughURLTemplate.url);

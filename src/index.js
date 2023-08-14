@@ -481,11 +481,12 @@ export default class GgEzVp {
         return currentTime;
     };
 
-    triggerVastClick = () => {
+    getVastClick = () => {
         if (this.config.isVAST) {
-            this.VASTTracker.click();
+            return (this.VASTTracker.clickThroughURLTemplate.url);
         } else {
             console.log('ad is not a VAST');
+            return '';
         }
     };
 

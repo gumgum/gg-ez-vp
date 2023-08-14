@@ -270,6 +270,7 @@ See src/styles.css for all styles.
 | play             | none                    | start video playback                                                                                                                                       |
 | volume           | float number            | sets the video volume, [see volume configuration](#customization)                                                                                          |
 | getVolume        | float number            | gets the video volume                                                                                                                                      |
+| getVastClick     | none                    | gets the click through url from the loaded vast                                                                                                                                        |
 | getDuration      | number                  | gets the video duration                                                                                                                                    |
 
 ## Accessible properties

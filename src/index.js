@@ -481,6 +481,15 @@ export default class GgEzVp {
         return currentTime;
     };
 
+    getVastClick = () => {
+        if (this.config.isVAST) {
+            return (this.VASTTracker.clickThroughURLTemplate.url);
+        } else {
+            console.log('ad is not a VAST');
+            return '';
+        }
+    };
+
     // turn fullscreen on/off
     fullscreenToggle = fullscreenToggle;
 

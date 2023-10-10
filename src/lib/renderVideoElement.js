@@ -25,13 +25,14 @@ export default function renderVideoElement() {
         'webkit-playsinline': playsinline,
         disableRemotePlayback: true
     };
-
     applyConfigToVideoElement({
         src,
         configAttributes,
         player,
         isVPAID,
         VASTSources,
-        setVolume: this.volume
+        setVolume: this.volume,
+        mediaFileMaxWidth: this.config.mediaFileMaxWidth,
+        mediaFileMaxHeight: this.config.mediaFileMaxHeight
     });
 }

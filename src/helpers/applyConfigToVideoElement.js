@@ -10,14 +10,16 @@ export default function applyConfigToVideoElement({
     player,
     isVPAID,
     VASTSources,
-    setVolume
+    setVolume,
+    mediaFileMaxWidth,
+    mediaFileMaxHeight
 }) {
     const initialVolume = muted || !volume ? 0 : volume;
     player.volume = initialVolume;
     player.muted = muted || volume === 0;
     appendVideoAttributes({ ...configAttributes, volume: initialVolume }, player);
     if (isVPAID) return;
-    appendVideoSources(src, player, VASTSources);
+    appendVideoSources(src, player, VASTSources, mediaFileMaxWidth, mediaFileMaxHeight);
 }
 
 function appendVideoAttributes(configAttributes, player) {
@@ -36,12 +38,13 @@ function appendVideoAttributes(configAttributes, player) {
     });
 }
 
-function appendVideoSources(src, player, VASTSources) {
+function appendVideoSources(src, player, VASTSources, mediaFileMaxWidth, mediaFileMaxHeight) {
     const origin = VASTSources?.media || src;
     const sources = Array.isArray(origin) ? origin : [origin];
+    // save the smallest source in case all the videos are skipped by maxWidth and/or masHeight parameters
+    let smallest_source = null;
 
-    // Add all sources to the video node
-    sources.forEach(s => {
+    const appendSource = s => {
         const isVASTMediaFile = !!s.fileURL;
         const src = isVASTMediaFile ? s.fileURL : s;
         const source = document.createElement('source');
@@ -50,7 +53,30 @@ function appendVideoSources(src, player, VASTSources) {
             source.type = s.mimeType;
         }
         player.appendChild(source);
+    };
+
+    // Add all sources to the video node
+    sources.forEach(s => {
+        if (
+            (mediaFileMaxWidth && mediaFileMaxWidth < s.width) ||
+            (mediaFileMaxHeight && mediaFileMaxHeight < s.height)
+        ) {
+            if (
+                s.mimeType === 'video/mp4' && (
+                    smallest_source === null ||
+                    smallest_source.width * smallest_source.height > s.width * s.height
+                )
+            ) {
+                smallest_source = s;
+            }
+            return;
+        }
+        appendSource(s);
     });
+
+    if (player.children.length === 0) {
+        appendSource(smallest_source);
+    }
 }
 
 const isBooleanAttr = k => ['autoplay', 'loop', 'playsinline', 'webkit-playsinline'].includes(k);

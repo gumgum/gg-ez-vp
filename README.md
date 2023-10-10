@@ -120,6 +120,8 @@ This minimal configuration will create a unique video player instance using the 
 | loop        | false        | false    | whether to loop video or not                                                                                                                                                          |
 | isVAST      | false        | false    | enables support for a single VAST / VPAID TAG to be parsed and used as source, will force displaying the ad controls                                                                  |
 | adControls  | false        | false    | forces displaying the ad controls instead of the regular contols                                                                                                                      |
+| mediaFileMaxWidth  | null  | false    | when na Vast files has multiple videos, this will filter out videos that have larger width                                                                                            |
+| mediaFileMaxHeight  | null  | false    | when na Vast files has multiple videos, this will filter out videos that have larger height                                                                                            |
 
 ### Controls
 
